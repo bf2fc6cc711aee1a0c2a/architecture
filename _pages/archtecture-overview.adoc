@@ -5,6 +5,6 @@ permalink: /overview/
 layout: default
 ---
 
-# Architecture Overview
+== Architecture Overview
 
 _This page will contain the architecture overview._
