@@ -5,7 +5,7 @@ layout: default
 <article class="post">
 
   <header class="post-header">
-    <h1 class="post-title">ADR-{{ page.num | escape }}: {{page.title | escape }}</h1>
+    <h1 class="post-title">PADR-{{ page.num | escape }}: {{page.title | escape }}</h1>
   </header>
 
   <div>
@@ -29,13 +29,15 @@ layout: default
       {% endfor %}
     </div>
     {% endif %}
-    {% if page.applies_padrs.size > 0 %}
-    <div>Applies PADRs: 
-    {% for padr in page.applies_padrs %}
-    <a href="/padr/{{padr}}">PADR-{{padr}}</a>{% if forloop.last==false %}, {% endif %}
+    <div>Applications:
+    {% for adr in site.adr %}
+    {% for padr in adr.applies_padrs %}
+    {% if padr == page.num %}
+    <a href="/adr/{{adr.num}}">ADR-{{adr.num}}</a>
+    {% endif %}
+    {% endfor %}
     {% endfor %}
     </div>
-    {% endif %}
   </div>
 
   <div class="post-content">
