@@ -17,11 +17,11 @@ If you don't know what an ADR is, look [here](/about/#architecture-decision-reco
 {% for adr in adrs %}
 
   <tr>
-    <td>
+    <td><span class="status-{{ adr.status | downcase }}">
       <a href="{{ adr.num | escape }}/">ADR-{{ adr.num }}: {{ adr.title }}</a>
       {% for tag in adr.tags %}
-      <span class="tag">{{tag}}</span>
-      {% endfor %}
+      <span class="tag tag-{{tag}}">{{tag}}</span>
+      {% endfor %}</span>
     </td>
     <td>
       {{ adr.status }}
