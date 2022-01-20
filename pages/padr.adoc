@@ -1,15 +1,16 @@
 ---
-title: ADRs
+title: PADRs
 permalink: /padr/
 layout: default
 ---
+:page-liquid:
+== Platform Architecture Decision Records
 
-<link rel="stylesheet" href="/css/adr.css">
+If you don't know what an ADR is, look link:/about/#architecture-decision-records-adr[here].
 
-# Platform Architecture Decision Records
+== Accepted PADRs
 
-# Accepted Platform ADRs
-
+++++
 <table>
 {% assign padrs = site.padr | sort: "num" %}
 {% for adr in padrs %}
@@ -28,4 +29,5 @@ layout: default
 
 {% endfor %}
 </table>
+++++
 

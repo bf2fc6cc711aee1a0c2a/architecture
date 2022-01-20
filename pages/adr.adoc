@@ -1,9 +1,16 @@
+---
+title: ADRs
+permalink: /adr/
+layout: default
+---
+:page-liquid:
 == Architecture Decision Records
 
 If you don't know what an ADR is, look link:/about/#architecture-decision-records-adr[here].
 
 == Accepted ADRs
 
+++++
 <table>
 {% assign adrs = site.adr | sort: "num" %}
 {% for adr in adrs %}
@@ -22,6 +29,7 @@ If you don't know what an ADR is, look link:/about/#architecture-decision-record
 
 {% endfor %}
 </table>
+++++
 
 == Github Process
 
