@@ -1,0 +1,10 @@
+---
+num: 6
+title: "Service Registry Deployment"
+status: "Superseded"
+superseded_by: 30
+authors:
+  - "Eric Wittmann"
+tags: sr
+---
+https://docs.google.com/document/d/1gFqYOb7poZ5q-4nTBqcUjU0jzyoSRTKP6ciJwh_C9kc/edit#[Original doc]

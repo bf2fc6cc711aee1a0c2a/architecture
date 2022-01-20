@@ -1,0 +1,8 @@
+---
+num: 51
+title: "Approach for building and automating RHOAS Services SDKs"
+status: "Accepted"
+authors:
+  - "Enda Phelan"
+---
+https://docs.google.com/document/d/18PDld9737N3WBao1rTdUnKguiKE9AiLVxJQj_BTg-3I/edit?usp=sharing[Original doc]

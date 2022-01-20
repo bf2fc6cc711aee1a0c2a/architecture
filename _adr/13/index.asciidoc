@@ -1,0 +1,10 @@
+---
+num: 13
+title: "Connector runtime options"
+status: "Accepted"
+authors:
+  - "Luca Burgazzoli"
+  - "Gunnar Morling"
+tags: connectors
+---
+https://docs.google.com/document/d/1xMm7oV8snke4vm7NVIXtIQ-1G8eSSUijwdWqHwMfOD8/edit#[Original doc]

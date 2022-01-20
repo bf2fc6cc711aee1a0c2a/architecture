@@ -1,0 +1,9 @@
+---
+num: 42
+title: "Architecture for data plane components upgrade management"
+status: "Superseded"
+superseded_by: Interim Upgrade Management Solution For Strimzi and Kafka
+authors:
+  - "Wei Li"
+---
+https://docs.google.com/document/d/1VSTE84bIAlFl5FHSdx7-2bh-EE0TP5Eupjpfec0ntiM/edit#[Original doc]

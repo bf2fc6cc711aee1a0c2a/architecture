@@ -1,0 +1,10 @@
+---
+num: 22
+title: "Using the OpenShift Developer Console to bind OSD-based Applications to RHOSAK"
+status: "Accepted"
+authors:
+  - "Gunnar Morling"
+  - "Pete Muir"
+  - "Christian Vogt"
+---
+https://docs.google.com/document/d/1fcc8Xz4ccLx6CKK_kpZ7D0cM2nQWGtDGms8FUonZSRo/edit[Original doc]

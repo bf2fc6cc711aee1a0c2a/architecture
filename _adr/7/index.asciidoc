@@ -1,0 +1,10 @@
+---
+num: 7
+title: "Service Registry Storage"
+status: "Superseded"
+superseded_by: 30
+authors:
+  - "Eric Wittmann"
+tags: sr
+---
+https://docs.google.com/document/d/16wG0q4T4Tlo5hGyXanYh1HvCKFfVwZsHlQXvdCfpfps/edit[Original doc]

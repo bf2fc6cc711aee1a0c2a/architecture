@@ -1,0 +1,8 @@
+---
+num: 36
+title: "Token requests for agent operators to authenticate with control plane"
+status: "Accepted"
+authors:
+  - "Wei Li"
+---
+https://docs.google.com/document/d/1rTV4oI2p_rZKZ6waQGFXD1JsMnBKlFOxJxOQEN2wFRg/edit[Original doc]

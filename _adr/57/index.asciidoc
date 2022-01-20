@@ -1,0 +1,8 @@
+---
+num: 57
+title: "Fleetshard tells fleet manager what DNS records to create for an instance"
+status: "Accepted"
+authors:
+  - "Gerard Ryan"
+---
+https://docs.google.com/document/d/1fsaC07lVEYSMoBMHdG6dti8H_zY1M3OwXMW2Fpk71BM/edit#[Original doc]

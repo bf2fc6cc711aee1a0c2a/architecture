@@ -1,0 +1,8 @@
+---
+num: 56
+title: "IngressController per clould Availability Zone"
+status: "Accepted"
+authors:
+  - "Gerard Ryan"
+---
+https://docs.google.com/document/d/1IvgyZi7ZcsOFjsaFb5IfFzivwlo3OaKqIG7ywWWgwjQ/edit?ts=60d5d6ef#[Original doc]

@@ -1,0 +1,8 @@
+---
+num: 46
+title: "URL path for our management APIs"
+status: "Accepted"
+authors:
+  - "Emmanuel Bernard"
+---
+https://docs.google.com/document/d/1mf3a7qvtwAbaLYJJMvTxLHl-C7qU-3HGTovp1sCwSeE/edit#[Original doc]

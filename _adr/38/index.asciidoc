@@ -1,0 +1,9 @@
+---
+num: 38
+title: "MK Fleet Shard Synchronizer"
+status: "Accepted"
+authors:
+  - "Steve Hawkins"
+  - "Ramesh Reddy"
+---
+https://docs.google.com/document/d/1SMrFyA9tBd0_m0JSQbh0SGgSMaHwDWxypY5RX1tH9vI/edit#[Original doc]
