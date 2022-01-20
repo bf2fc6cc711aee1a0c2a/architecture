@@ -13,7 +13,14 @@ layout: default
     {% if page.superseded_by %}
     <div>Superseded by: <a href="../{{page.superseded_by}}">ADR-{{ page.superseded_by | escape }}</a></div>
     {% endif %}
-    <div>Authors: {{ page.authors | join: ", " | escape }}</div>
+    <div>Authors:
+      {% for author_name in page.authors %}
+      {% assign author_id = author_name | downcase | replace: " ", "_" %}
+      {% assign author_github = site.data.people[author_id].github %}
+      {% if author_github %}{% avatar user=author_github %}{% endif %}
+      {{ author_name }}{% if forloop.last==false %}, {% endif %}
+      {% endfor %}
+    </div>
     {% if page.tags.size > 0 %}
     <div>Tags: 
       {% for tag in page.tags %}
