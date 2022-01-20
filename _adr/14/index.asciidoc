@@ -5,5 +5,6 @@ status: "Superseded"
 superseded_by: 31
 authors:
   - "Eric Wittmann"
+tags: service-registry
 ---
 https://docs.google.com/document/d/1koYJ5s-dnlNibDYIZ3kKPEmwiOTOHWHt1D0JY3EwsZE/edit#[Original doc]

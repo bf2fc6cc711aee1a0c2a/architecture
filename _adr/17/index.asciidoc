@@ -4,5 +4,7 @@ title: "Binding OSD-based Applications to Managed Kafkas"
 status: "Accepted"
 authors:
   - "Pete Muir"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1peCOwXZV4F3qxO9gUkq9iAxkHJWjhgds5m0p2vN5yWk/edit[Original doc]

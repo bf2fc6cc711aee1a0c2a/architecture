@@ -4,5 +4,7 @@ title: "Strimzi Operator Installation and Upgrade"
 status: "Accepted"
 authors:
   - "Thomas Cooper"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1-RVU7clIIvdEUVuP-CQiT-fqQpNUO6sFl7N2BHp_nno/edit#[Original doc]

@@ -6,5 +6,7 @@ authors:
   - "David Ffrench"
   - "Paolo Patierno"
   - "Paul Bergene"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/17ukdP2skTbqWYcYocr_HMnUXHFgz4oZRG3fPdFzf4KY/edit#[Original doc]

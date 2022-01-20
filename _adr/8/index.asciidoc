@@ -5,5 +5,6 @@ status: "Superseded"
 superseded_by: 38
 authors:
   - "Abhishek Koserwal"
+tags: kafka
 ---
 https://docs.google.com/document/d/1W5JrM453Nw8dLHny7Q-s98ZFKysKiAhnTjQi7MSvwXo/edit#[Original doc]

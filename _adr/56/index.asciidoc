@@ -1,6 +1,6 @@
 ---
 num: 56
-title: "IngressController per clould Availability Zone"
+title: "IngressController per cloud Availability Zone"
 status: "Accepted"
 authors:
   - "Gerard Ryan"

@@ -5,5 +5,7 @@ status: "Superseded"
 superseded_by: 
 authors:
   - "Luca Burgazzoli"
+tags: 
+  - connectors
 ---
 https://docs.google.com/document/d/1sspp8bEDfA18Bq0eoj_pLkarSud09514h6cx_AFJvaE/edit[Original doc]
