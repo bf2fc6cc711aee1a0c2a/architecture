@@ -2,7 +2,7 @@
 layout: page
 title: Contexts
 permalink: /context/
-layout: default
+layout: page
 ---
 
 == Context Overviews
