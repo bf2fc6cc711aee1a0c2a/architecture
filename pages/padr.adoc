@@ -6,7 +6,7 @@ layout: page
 :page-liquid:
 == Platform Architecture Decision Records
 
-If you don't know what an ADR is, look link:/about/#architecture-decision-records-adr[here].
+A Platform ADR, or PADR, is an link:/about/#architecture-decision-records-adr[ADR] which applies to the whole platform. 
 
 == Accepted PADRs
 

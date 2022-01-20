@@ -73,21 +73,10 @@ reuse these cookbooks.
 
 ==== Process
 
-It is expected that ADRs will be matured within an Epic Brief: while
-working on the technical aspect of an Epic Brief, the ADRs will be
-identified and moved to an appendix while maturing the solution. ADRs
-can then be extracted as a separate document. An ADR :
-
-* Is recorded in the link:/ADRs[ADR index]
-* follows the
-link:/adrs/000/Defining_a_template_for_architecture_Decision_Records.html[ADR
-template]
-* lives under the `_adrs` directory of this site.
-* Is announced to mas-architecture@redhat.com
-** When identified
-** When proposed to move to accepted
-* Is announced to mas-all@redhat.com
-** When accepted
+It is expected that ADRs will be matured within an Epic Brief: 
+while working on the technical aspect of an Epic Brief, the ADRs will be identified and moved to an appendix while maturing the solution. 
+ADRs can then be extracted as a separate document. 
+The link:adr-process[ADR process] describes in more detail how ADRs we written and approved.
 
 === Epic Brief
 

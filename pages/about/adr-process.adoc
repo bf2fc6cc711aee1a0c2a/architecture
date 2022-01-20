@@ -1,0 +1,57 @@
+---
+layout: page
+title: About
+permalink: /about/adr-process
+layout: default
+---
+
+== Github Process
+
+=== Proposed ADRs
+
+If you identify the need for an ADR please {{site.github.repository_url}}/issues/new[open an issue] describing the decision that needs to be taken.
+
+The discussion of the issue should decide whether a new ADR really is needed.
+If so, it should also seek to identify.
+
+* Whether any {{site.url}}/padr/[platform ADRs] apply. 
+* What tags the ADR should have. 
+* What the _summary_ of the new ADR should be. 
+
+=== Drafting an ADR
+
+If, following discussion on the issue, an ADR really is called-for then open a PR to allocate an ADR id. 
+
+This PR will add a `\_adr/__nnnn__/index.adoc` file (where _nnnn_ is the ADR id) to the {{site.github.repository_name}} repo, giving your draft ADR an id. 
+
+* If the issue identified any applicable PADRs the `applied_adrs` property should be added to the front matter. 
+  It's an array of all the applicable PADRs.
+* If the issue identified and tags, the `tags` property should be added to the front matter. 
+  It's an array of tags.
+* The only content of the ADR at this point will be the _summary_ that the ADR proposal issue produced. 
+
+This PR should be merged immediately, and the original issue closed. 
+
+=== Writing an ADR
+
+Fill in the content for your ADR, https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request[opening a draft PR] if you want to work with collaborators.
+
+If your ADR supersedes an existing ADR add the `superseded_by` property to the front matter of the ADR that's being superseded.
+
+=== Approving an ADR
+
+When your ADR is ready for review, open a PR (or convert your draft PR to a full PR).
+
+The review process may be iterative, but ultimately the PR will either be rejected or approved.
+
+If the ADR is approved:
+
+. The `status` in the ADR front matter is changed to `Accepted`.
+. The PR is merged.
+. An announcement is made to mas-all@redhat.com.
+
+If the ADR is rejected:
+
+. The `status` in the ADR front matter is changed to `Rejected``.
+. The PR is merged.
+
