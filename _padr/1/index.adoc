@@ -1,0 +1,9 @@
+---
+num: 1
+title: "Template Platform ADR"
+status: "Accepted"
+authors:
+  - "David Ffrench"
+  - "Emmanuel Bernard"
+---
+Blah blah

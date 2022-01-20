@@ -48,6 +48,9 @@ collections:
   adr:
     output: true
     sort_by: num
+  padr:
+    output: true
+    sort_by: num
 
 include:
  - CNAME
@@ -78,3 +81,7 @@ defaults:
       path: "_adr"
     values:
       layout: "adr"
+  - scope:
+      path: "_padr"
+    values:
+      layout: "padr"
