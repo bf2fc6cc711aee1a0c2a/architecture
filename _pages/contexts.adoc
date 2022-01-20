@@ -1,0 +1,14 @@
+---
+layout: page
+title: Contexts
+permalink: /context/
+layout: default
+---
+
+== Context Overviews
+
+This page will contain the context overviews.
+
+* link:control-plane[Control Plane]
+* link:data-plane[Data Plane]
+* link:customer-osd[Customer Owned OSD]

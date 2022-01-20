@@ -1,0 +1,102 @@
+---
+layout: page
+title: About
+permalink: /about/
+layout: default
+---
+
+== Document types
+
+This pages describes the different kinds of content on this site.
+
+=== Architecture Overview
+
+==== Audience
+
+* External stakeholders
+* People new to the project
+* Anyone looking for a refresher on the general architecture
+
+==== Description
+
+A living document that serves as an introduction and jumping off point
+for the managed service architecture. High level overview of the key
+contexts and components. Should link off to more detailed context
+overviews and also any key overarching ADRs. Should be kept high level
+to minimize the maintenance cost.
+
+==== Process
+
+Updating the Architectural overview is a step part of an ADR or an Epic
+Brief elaboration.
+
+=== Context Overview
+
+==== Audience
+
+* External Stakeholders
+* New people joining the team particularly if working in a particular
+context
+* Team members working in other contexts that want a better and deeper
+understanding of a particular context
+* Anyone looking for a refresher on a particular context
+
+==== Description
+
+Living document that is a focused and detailed architectural overview of
+a particular context. Example contexts would include the Control Plane
+and Data Plane. Should outline each of the components in that context
+(including important if not all sub components. Key interactions should
+also be outlined with a reasonable amount of detail while avoiding
+implementation details where possible. Should be kept high level to
+minimize the maintenance cost.
+
+==== Process
+
+Updating the Context overview is a step part of an ADR or an Epic Brief
+elaboration.
+
+=== Architecture Decision Records (ADR)
+
+==== Audience
+
+* Architects / Team Leads / Engineering from all services
+
+==== Description
+
+Captures single important architectural decisions including the why and
+what but should avoid implementation details where possible that may
+soon become out of date or not apply to other services that want to
+follow the decision made in the ADR. ADRs should be addressing how to
+solve a problem, their title reflecting it. Other service teams would
+reuse these cookbooks.
+
+==== Process
+
+It is expected that ADRs will be matured within an Epic Brief: while
+working on the technical aspect of an Epic Brief, the ADRs will be
+identified and moved to an appendix while maturing the solution. ADRs
+can then be extracted as a separate document. An ADR :
+
+* Is recorded in the link:/ADRs[ADR index]
+* follows the
+link:/adrs/000/Defining_a_template_for_architecture_Decision_Records.html[ADR
+template]
+* lives under the `_adrs` directory of this site.
+* Is announced to mas-architecture@redhat.com
+** When identified
+** When proposed to move to accepted
+* Is announced to mas-all@redhat.com
+** When accepted
+
+=== Epic Brief
+
+==== Audience
+
+* Architects / Team Leads / Engineering
+* BU and PM
+
+==== Description
+
+Focused design doc that dives into the details of how to execute on a
+given solution to the outlined problem. The problem will have often been
