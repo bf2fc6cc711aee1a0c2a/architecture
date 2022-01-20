@@ -1,0 +1,9 @@
+---
+layout: home
+---
+
+This is the home of the MAS architecture group.
+
+It contains various link:/about[kinds of document].
+
+If you're new here it might make sense to understand the kinds of document, and then start with the link:/overview[architecture overview]

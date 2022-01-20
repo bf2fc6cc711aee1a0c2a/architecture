@@ -49,8 +49,10 @@ collections:
     sort_by: num
 
 include:
- - _pages
  - CNAME
+
+exclude:
+ - README.md
 
 # Exclude from processing.
 # The following items will not be processed, by default.
