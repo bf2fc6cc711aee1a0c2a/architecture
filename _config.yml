@@ -43,6 +43,7 @@ plugins:
   - jekyll-titles-from-headings
   - jekyll-relative-links
   - jekyll-avatar
+  - jekyll-github-metadata
 
 collections:
   adr:
