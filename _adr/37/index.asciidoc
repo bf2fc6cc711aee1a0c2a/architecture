@@ -5,5 +5,7 @@ status: "Accepted"
 authors:
   - "Keith Wall"
   - "Paolo Patierno"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1ROaAwzTvYflntSXq4Kxc-OS32aFbKDy0UTr3vr-7imE/edit[Original doc]

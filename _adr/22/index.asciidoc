@@ -6,5 +6,7 @@ authors:
   - "Gunnar Morling"
   - "Pete Muir"
   - "Christian Vogt"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1fcc8Xz4ccLx6CKK_kpZ7D0cM2nQWGtDGms8FUonZSRo/edit[Original doc]

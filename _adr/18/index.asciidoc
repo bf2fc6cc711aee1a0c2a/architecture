@@ -5,5 +5,7 @@ status: "Superseded"
 superseded_by: 
 authors:
   - "Craig Brookes"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1Mth0SSMqJ5snBlZfemVVs8SwoL_Jclm3c-nvCMhQDIw/edit#[Original doc]

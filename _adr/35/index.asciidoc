@@ -5,5 +5,7 @@ status: "Accepted"
 authors:
   - "Hiram Chirino"
   - "Luca Burgazzoli"
+tags: 
+  - connectors
 ---
 https://docs.google.com/document/d/1UiRhf51ZkAd86RDbWIyNI69nCX6wXb_1LTfcCZUjvEM/edit[Original doc]

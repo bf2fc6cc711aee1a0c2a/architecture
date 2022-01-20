@@ -5,5 +5,7 @@ status: "Superseded"
 superseded_by: 62 
 authors:
   - "Alexandre Kieling"
+tags: 
+  - connectors
 ---
 https://docs.google.com/document/u/0/d/1ElPAGOPim7G8Vu8F9nt3q6h3qXCzTi2Axtw76Ewpjpw/edit[Original doc]

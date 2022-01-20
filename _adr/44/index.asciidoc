@@ -5,5 +5,7 @@ status: "Superseded"
 superseded_by: 
 authors:
   - "Ramesh Reddy"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1LuzgreSKW7_2HffqMaPJL7_SeZa51CHMw-SecPkjv4Y/edit#heading=h.ogyc3wrotny3[Original doc]

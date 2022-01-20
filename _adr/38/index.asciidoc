@@ -5,5 +5,7 @@ status: "Accepted"
 authors:
   - "Steve Hawkins"
   - "Ramesh Reddy"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1SMrFyA9tBd0_m0JSQbh0SGgSMaHwDWxypY5RX1tH9vI/edit#[Original doc]

@@ -5,5 +5,7 @@ status: "Superseded"
 superseded_by: Interim Upgrade Management Solution For Strimzi and Kafka
 authors:
   - "Wei Li"
+tags: 
+  - kafka
 ---
 https://docs.google.com/document/d/1VSTE84bIAlFl5FHSdx7-2bh-EE0TP5Eupjpfec0ntiM/edit#[Original doc]

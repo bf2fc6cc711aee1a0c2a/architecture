@@ -4,5 +4,7 @@ title: "Add-on Flow for Managed Connectors"
 status: "Accepted"
 authors:
   - "Hiram Chirino"
+tags: 
+  - connectors
 ---
 https://docs.google.com/document/d/1gS7dL0hNnuFzB0QbtDm9zUvdT6_v5ngEdx-1J89weHo/edit[Original doc]
