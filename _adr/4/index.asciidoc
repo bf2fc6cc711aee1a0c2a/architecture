@@ -1,0 +1,10 @@
+---
+num: 4
+title: "Developer CLI Initial Architecture"
+status: "Accepted"
+authors:
+  - "Gunnar Morling"
+  - "Pete Muir"
+  - "Wojciech Trocki"
+---
+https://docs.google.com/document/d/13fpo2buIFBmAcHLL5MmjC_Rfekzp2gE4zk_0NBBdJRg/edit#[Original doc]

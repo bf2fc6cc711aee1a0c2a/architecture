@@ -1,0 +1,9 @@
+---
+num: 23
+title: "Connectors Control and Data Planes Architecture"
+status: "Superseded"
+superseded_by: 
+authors:
+  - "Luca Burgazzoli"
+---
+https://docs.google.com/document/d/1sspp8bEDfA18Bq0eoj_pLkarSud09514h6cx_AFJvaE/edit[Original doc]

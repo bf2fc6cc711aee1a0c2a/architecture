@@ -1,0 +1,9 @@
+---
+num: 58
+title: "Use of Kubeconfig to interact with standalone clusters in the dataplane"
+status: "Accepted"
+authors:
+  - "Dimitri Saridakis"
+  - "Manyanda Chitimbo"
+---
+https://docs.google.com/document/d/1Ore48JcWeKnOngU-z-2Q4EozDJJCR0-OAUi07rx6Dc4/edit[Original doc]

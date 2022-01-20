@@ -1,0 +1,9 @@
+---
+num: 50
+title: "Integrate Control Plane with Notification Service"
+status: "Accepted"
+authors:
+  - "Abhishek Koserwal"
+  - "David Ffrench"
+---
+https://docs.google.com/document/d/1V8lwOpcheJTD9fVfHfRHQSnVY_V3LcSnUYBBUdkmCT8/edit[Original doc]

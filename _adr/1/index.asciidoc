@@ -1,0 +1,9 @@
+---
+num: 1
+title: "Document architecture decision using the Architecture Decision Records approach and define their template"
+status: "Accepted"
+authors:
+  - "David Ffrench"
+  - "Emmanuel Bernard"
+---
+https://docs.google.com/document/d/1yVi_1ZTN2EYbsbBigCBC_NYG3eyJGyqzKMVk8ZbLPiA/edit#[Original doc]

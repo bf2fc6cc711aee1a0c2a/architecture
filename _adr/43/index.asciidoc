@@ -1,0 +1,10 @@
+---
+num: 43
+title: "Kas-fleet-manager integration with AMS"
+status: "Superseded"
+superseded_by: 66
+authors:
+  - "Abhishek Koserwal"
+  - "David Ffrench"
+---
+https://docs.google.com/document/d/1N3HVG5RGaiYhiIgO9I6axLD9O92JBejyYdZdS2etqaA/edit[Original doc]

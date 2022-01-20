@@ -1,0 +1,8 @@
+---
+num: 24
+title: "Should Managed Services artifact builds use upstream or Red Hat built dependencies"
+status: "Accepted"
+authors:
+  - "Thomas Cooper"
+---
+https://docs.google.com/document/d/1ti2_u9xXF0lmArEWXN-lzB8mydL6jrCIeDOaxY-rZgA/edit#[Original doc]

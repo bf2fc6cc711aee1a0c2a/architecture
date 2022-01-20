@@ -1,0 +1,11 @@
+---
+num: 33
+title: "Installation methods for components on agent OSD clusters"
+status: "Superseded"
+superseded_by: 41
+authors:
+  - "Wei Li"
+  - "Keith Wall"
+  - "Tom Cooper"
+---
+https://docs.google.com/document/d/1A8hpfjDoWQcBnCXlpdLFO3Dt55_5m6pbY2H87JNtz2s/edit#[Original doc]

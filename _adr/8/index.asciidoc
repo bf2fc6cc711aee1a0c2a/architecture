@@ -1,0 +1,9 @@
+---
+num: 8
+title: "Agent Operator for managing the Kafka Cluster Lifecycle"
+status: "Superseded"
+superseded_by: 38
+authors:
+  - "Abhishek Koserwal"
+---
+https://docs.google.com/document/d/1W5JrM453Nw8dLHny7Q-s98ZFKysKiAhnTjQi7MSvwXo/edit#[Original doc]

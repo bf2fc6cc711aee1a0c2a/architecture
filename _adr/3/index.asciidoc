@@ -1,0 +1,8 @@
+---
+num: 3
+title: "Aggregating UI components and tenancy model"
+status: "Accepted"
+authors:
+  - "Pete Muir"
+---
+https://docs.google.com/document/d/1kgWiXMMh4UKdfyvL8K-6WRn6kqsZyTaShgXeX7gSud0/edit#[Original doc]

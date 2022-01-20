@@ -1,0 +1,10 @@
+---
+num: 5
+title: "Kafka Cluster Certificate Generation"
+status: "Accepted"
+authors:
+  - "David Ffrench"
+  - "Paolo Patierno"
+  - "Paul Bergene"
+---
+https://docs.google.com/document/d/17ukdP2skTbqWYcYocr_HMnUXHFgz4oZRG3fPdFzf4KY/edit#[Original doc]

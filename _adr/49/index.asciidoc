@@ -1,0 +1,8 @@
+---
+num: 49
+title: "Persisting performance tests results"
+status: "Accepted"
+authors:
+  - "Pawel Paszki"
+---
+https://docs.google.com/document/d/1nEAOnRHEf1d1EYd0TYX1IbFOxqWKimkrZUdLy7QOXTI/edit#heading=h.ds8q4xtkmu64[Original doc]

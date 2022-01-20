@@ -1,0 +1,8 @@
+---
+num: 10
+title: "Installation & Configuration of Observability Components from Within an OSD Cluster"
+status: "Accepted"
+authors:
+  - "Jeremy Ary"
+---
+https://docs.google.com/document/d/1ctRxQAlXulCth5SwowQGbRKVhN3wZa1EiqsDHWMRu7w/edit#[Original doc]

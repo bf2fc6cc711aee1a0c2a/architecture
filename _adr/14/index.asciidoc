@@ -1,0 +1,9 @@
+---
+num: 14
+title: "Service Registry Security"
+status: "Superseded"
+superseded_by: 31
+authors:
+  - "Eric Wittmann"
+---
+https://docs.google.com/document/d/1koYJ5s-dnlNibDYIZ3kKPEmwiOTOHWHt1D0JY3EwsZE/edit#[Original doc]

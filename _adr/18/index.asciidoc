@@ -1,0 +1,9 @@
+---
+num: 18
+title: "Managed Kafka Upgrades"
+status: "Superseded"
+superseded_by: 
+authors:
+  - "Craig Brookes"
+---
+https://docs.google.com/document/d/1Mth0SSMqJ5snBlZfemVVs8SwoL_Jclm3c-nvCMhQDIw/edit#[Original doc]

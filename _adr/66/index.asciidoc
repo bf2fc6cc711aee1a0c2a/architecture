@@ -1,0 +1,9 @@
+---
+num: 66
+title: "Fleet Manager - Terms and Quota management with AMS"
+status: "Accepted"
+authors:
+  - "David Ffrench"
+  - "Abhishek Koserwal"
+---
+https://docs.google.com/document/d/1k27L1D8t7FNdrQ91rxbXPTUoxkazK3-HLakGGYJd-ro/edit[Original doc]
