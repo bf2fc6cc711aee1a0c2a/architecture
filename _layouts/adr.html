@@ -9,10 +9,11 @@ layout: default
   </header>
 
   <div>
-    <div>Status: {{ page.status | escape }}</div>
+    <div>Status: <span class="status-{{page.status | downcase }}">{{ page.status | escape }}</span>
     {% if page.superseded_by %}
-    <div>Superseded by: <a href="../{{page.superseded_by}}">ADR-{{ page.superseded_by | escape }}</a></div>
+    <strong>(superseded by: <a href="../{{page.superseded_by}}">ADR-{{ page.superseded_by | escape }}</a>)</strong>
     {% endif %}
+    </div>
     <div>Authors:
       {% for author_name in page.authors %}
       {% assign author_id = author_name | downcase | replace: " ", "_" %}
@@ -24,7 +25,7 @@ layout: default
     {% if page.tags.size > 0 %}
     <div>Tags: 
       {% for tag in page.tags %}
-      <span class="tag">{{tag}}</span>
+      <span class="tag tag-{{tag}}">{{tag}}</span>
       {% endfor %}
     </div>
     {% endif %}

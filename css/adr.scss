@@ -17,3 +17,22 @@
 .avatar {
   border-radius: 50% !important;
 }
+
+.tag-kafka {
+  background-color: #884400;
+  color: white;
+}
+
+.tag-service-registry {
+  background-color: #008844;
+  color: white;
+}
+
+.tag-connectors {
+  background-color: #440088;
+  color: white;
+}
+
+.status-superseded {
+  text-decoration: line-through;
+}
