@@ -54,6 +54,9 @@ collections:
 
 include:
  - CNAME
+ 
+ github:
+  repository_url: https://github.com/redhat-developer/app-services-architecture
 
 
 # Exclude from processing.
