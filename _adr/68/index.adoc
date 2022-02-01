@@ -1,0 +1,15 @@
+---
+num: 68
+title: "Colocating managed services on the same data plane OSD fleet"
+status: "Draft"
+authors:
+  - "Keith Wall"
+  - "Tom Bentley"
+  - "David Ffrench"
+---
+
+## Context and Problem Statement
+
+As Red Hat starts to offer additional managed services, a portion of services will follow the bin-packed data plane deployment model which is used in RHOSAK. Each new data plane OSD cluster added to the fleet requires 3 master nodes and 3 infra nodes for a multi-az cluster. If each new bin-packed managed service deploys their own data plane OSD fleet, Red Hat's underlying infrastructure cost will be higher.
+
+If Red Hat does not address this problem, the implication is the cost to customers of new managed services will be higher due to the additional master and infra nodes causing an increase in data plane infrastructure cost.

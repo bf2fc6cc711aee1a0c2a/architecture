@@ -40,3 +40,15 @@
 .edit {
   float: right;
 }
+
+.post-toc {
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+}
+
+div.post-toc h2 {
+  font-size: 28px;
+  margin-bottom: 0px;
+}

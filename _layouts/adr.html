@@ -37,6 +37,11 @@ layout: page
   </div>
 
   <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      {{ page.document | tocify_asciidoc }}
+    </div>
+    
     {{ content }}  
   </div>
 
