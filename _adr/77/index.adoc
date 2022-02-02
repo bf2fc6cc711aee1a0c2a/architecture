@@ -17,3 +17,58 @@ We have the choice:
 Homogeneous OSD model:: Each OSD cluster houses only Kafka instances with the same number of brokers
 Heterogeneous OSD model:: We place Kafka instances of different sizes in the same OSD cluster
 
+## Goals
+
+* Identify the preferred arrangement
+
+## Non-goals
+
+* Decisions about other considerations of running Kafka clusters with more than 3 brokers (e.g. cluster balancing, operational consequences etc).
+
+## Stakeholders
+* Eng
+* BU
+* SRE
+
+## Current Architecture
+
+In the current architecture we only support Kafka clusters of 3 brokers, so this is not a question that has needed to be addressed before.
+
+## Proposed Architecture
+
+We propose to adopt the heterogeneous model.
+
+The homogenous model would have a number of drawbacks:
+
+* It means scaling an existing Kafka instance up or down would become a problem of _Kafka cluster migration_.
+This is known to be a hard problem, which would therefore delay the provision of such a feature for an unkown period of time. In contrast, by using the heterogeneous model we can scale the Kafka clusters in place. 
+* It forces us to run additional OSD clusters immediately in each region, with the fixed costs that go with that. By following the heterogenous model we avoid the additional cost.
+
+### Threat Model
+
+* <Provide a link to the relevant threat model. You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+
+* Take a copy of the threat model when the ADR is proposed, and merge those changes in once the ADR is accepted
+
+## Alternatives Considered / Rejected
+
+The scaling problem generally could also be solved via _vertical scaling_ -- using the same number of resources (machines, primarily) but of a larger capacity (more CPU, more memory, more network capacity). This would work at smaller scales, such as doubling existing service limits, but the cost of provisioning clusters of larger capacity (in terms of partitions and throughput) scales faster than linearly. 
+By making use of Kafka's existing ability to scale horizontally we can be confident of supporting much larger service capacity without the cost of providing the service scaling unsustainably.
+
+Once horizontal scaling is assumed the only alternative is the homogeneous OSD model.
+The reasons for rejecting this are covered above.
+
+## Challenges
+
+The heterogenous model has some drawbacks of its own:
+
+* By allowing each Kafka instance within the OSD to scale there is the possibility that, eventually, enough customers want larger Kafka instances that we hit OSD limits.
+This is never a certainty: It is possible that the OSD limits are never reached because enough Kafka instances never need to be scaled enough to hit a limit. [ADR-78](../78) will discuss this further.
+
+## Dependencies
+
+* None
+
+## Consequences if Not Completed
+
+A decision on the model is a prerequisite to supporting larger Kafka instances.
