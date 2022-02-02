@@ -58,7 +58,7 @@ include:
  
  # Workaround: See https://github.com/redhat-developer/app-services-architecture/pull/11
 github:
-  repository_url: https://github.com/redhat-developer/app-services-architecture
+  repository_url: https://github.com/bf2fc6cc711aee1a0c2a/architecture
 
 
 # Exclude from processing.
