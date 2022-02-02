@@ -1,0 +1,19 @@
+---
+num: 77
+title: "Heterogeneous Kafka data plane"
+status: "Draft"
+authors:
+  - "Tom Bentley"
+---
+
+## Context and Problem Statement
+
+In order to offer a _scalable_ managed Kafka service we need to support Kafka clusters composed of more than 3 brokers.
+This is often known as _horizontal scaling_, and Kafka already supports clusters with large numbers of brokers. 
+
+An immediate consequence of this will be that we will have clusters of different sizes.
+We have the choice:
+
+Homogeneous OSD model:: Each OSD cluster houses only Kafka instances with the same number of brokers
+Heterogeneous OSD model:: We place Kafka instances of different sizes in the same OSD cluster
+
