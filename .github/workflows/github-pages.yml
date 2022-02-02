@@ -8,8 +8,6 @@ on:
 jobs:
   github-pages:
     runs-on: ubuntu-latest
-    env:
-      PAGES_REPO_NWO: bf2fc6cc711aee1a0c2a/architecture
     steps:
       - uses: actions/checkout@v2
       - uses: helaili/jekyll-action@v2
