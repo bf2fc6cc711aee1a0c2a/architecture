@@ -41,7 +41,7 @@ We propose to adopt the heterogeneous model.
 The homogenous model would have a number of drawbacks:
 
 * It means scaling an existing Kafka instance up or down would become a problem of _Kafka cluster migration_.
-This is known to be a hard problem, which would therefore delay the provision of such a feature for an unkown period of time. In contrast, by using the heterogeneous model we can scale the Kafka clusters in place. 
+This is known to be a hard problem, which would therefore delay the provision of such a feature for an unknown period of time. In contrast, by using the heterogeneous model we can scale the Kafka clusters in place. 
 * It forces us to run additional OSD clusters immediately in each region, with the fixed costs that go with that. By following the heterogenous model we avoid the additional cost.
 
 ### Threat Model
