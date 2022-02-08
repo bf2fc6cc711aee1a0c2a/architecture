@@ -1,0 +1,23 @@
+---
+num: 7
+category: "Fleet manager, fleet shard and instance operators"
+title: "Update / upgrade responsibility principle"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+We want clear responsibility on what decides vs do a give update / upgrade.
+
+The update service decides who should upgrade to what based on rules.
+These rules include what to do for new instances.
+The upgrade service is in control of the upgrade speed.
+
+[NOTE]
+====
+Note that the update service does not exist yet today and is done by the fleet manager.
+====
+
+Fleet manager is responsible for converting the upgrade service intent into ManagedCR changes.
+
+Fleet shard is responsible for executing the upgrade requested.
