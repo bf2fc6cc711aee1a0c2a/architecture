@@ -1,0 +1,17 @@
+---
+num: 80
+title: "CEE diagnostic gathering mechanism"
+status: "Draft"
+authors:
+  - "Keith Wall""
+---
+
+## Context and Problem Statement
+
+In order to proviide support to customers of a Managed Service, CEE require a mechansim that allows them to capture the
+state of the instance of the service for diagnostic purposes.  CEE will use this information in conjunction with the
+problem statement provided by the customer in order to efficiently investigate the problem and determine a solution.
+
+The data gathering mechanism must consider the issue of Personal Information (PI) or other sensitive information and ensure
+that is its handled appropiately.
+
