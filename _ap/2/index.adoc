@@ -1,0 +1,15 @@
+---
+num: 2
+category: "Other"
+title: "Blast radius reduction principle"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+Every architecture decision should look at the blast radius impact.
+This is particularly true of upgrades, single points of failures and other wide changing of the system.
+
+The question to use to look into the problem is simple: when something goes down, what % of service instances are affected?
+
+How can changes be gradually propagated?
