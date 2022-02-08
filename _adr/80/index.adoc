@@ -13,7 +13,7 @@ state of the instance of the service for diagnostic purposes.  CEE will use this
 problem statement provided by the customer in order to efficiently investigate the problem and determine a solution.
 
 The data gathering mechanism must consider the issue of Personal Information (PI) or other sensitive information and ensure
-that is its handled appropiately.
+that it is handled appropriately.
 
 Authorization controls must be in place to ensure that the diagnostic gathering mechanism can only be used by suitably
 permissioned groups.
