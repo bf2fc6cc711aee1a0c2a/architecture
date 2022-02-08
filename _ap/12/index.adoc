@@ -1,0 +1,10 @@
+---
+num: 12
+category: "Other"
+title: "How to push rules from git to production"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+TODO ADR related to “GitHub as the storage layer for production rules”
