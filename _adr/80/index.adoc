@@ -8,7 +8,7 @@ authors:
 
 ## Context and Problem Statement
 
-In order to proviide support to customers of a Managed Service, CEE require a mechansim that allows them to capture the
+In order to provide support to customers of a Managed Service, CEE require a mechanism that allows them to capture the
 state of the instance of the service for diagnostic purposes.  CEE will use this information in conjunction with the
 problem statement provided by the customer in order to efficiently investigate the problem and determine a solution.
 
