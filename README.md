@@ -11,5 +11,6 @@ https://architecture.appservices.tech
 ## Running Locally
 
 ```
+bundle install
 bundle exec jekyll serve
 ```
