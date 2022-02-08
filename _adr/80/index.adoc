@@ -15,3 +15,8 @@ problem statement provided by the customer in order to efficiently investigate t
 The data gathering mechanism must consider the issue of Personal Information (PI) or other sensitive information and ensure
 that is its handled appropiately.
 
+Authorizsation controls must be in place to ensure that the diagnostic gathering mechanism can only be used by suitably
+permissioned groups.
+
+
+
