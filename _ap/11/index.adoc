@@ -1,0 +1,10 @@
+---
+num: 11
+category: "Production"
+title: "Diagnosing a problem in production at the pod level"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+See https://docs.google.com/document/d/1ZWn3j22gGmkfWyqNWrsQAKjsLoVAXfgxQ9zMysOVhTk/edit[How to diagnose a Java/Quarkus process in production (for support)]
