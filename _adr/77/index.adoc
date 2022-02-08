@@ -60,7 +60,7 @@ The reasons for rejecting this are covered above.
 
 ## Challenges
 
-The heterogenous model has some drawbacks of its own:
+The heterogeneous model has some drawbacks of its own:
 
 * By allowing each Kafka instance within the OSD to scale there is the possibility that, eventually, enough customers want larger Kafka instances that we hit OSD limits.
 This is never a certainty: It is possible that the OSD limits are never reached because enough Kafka instances never need to be scaled enough to hit a limit. [ADR-78](../78) will discuss this further.
