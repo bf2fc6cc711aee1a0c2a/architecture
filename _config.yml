@@ -51,6 +51,9 @@ collections:
   padr:
     output: true
     sort_by: num
+  ap:
+    output: true
+    sort_by: num
 
 include:
  - CNAME
@@ -90,3 +93,7 @@ defaults:
       path: "_padr"
     values:
       layout: "padr"
+  - scope:
+      path: "_ap"
+    values:
+      layout: "ap"

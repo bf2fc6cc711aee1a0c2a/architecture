@@ -1,0 +1,34 @@
+---
+title: Architectural Patterns
+permalink: /ap/
+layout: page
+---
+:page-liquid:
+== Architectural Patterns
+
+If you don’t know what an Architectural Pattern, or AP, is, look link:/about/#architectural-pattern-ap[here].
+
+++++
+
+{% assign aps = site.ap | sort: "num" | group_by: "category" | sort: "name" %}
+{% for category in aps %}
+<h4>{{ category.name }}</h4>
+<table>
+  {% for ap in category.items %}
+  <tr>
+    <td><span class="status-{{ ap.status | downcase }}">
+      <a href="{{ ap.num | escape }}/">AP-{{ ap.num }}: {{ ap.title }}</a>
+      {% for tag in ap.tags %}
+      <span class="tag tag-{{tag}}">{{tag}}</span>
+      {% endfor %}</span>
+    </td>
+    <td>
+      {{ ap.status }}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endfor %}
+
+++++
+
