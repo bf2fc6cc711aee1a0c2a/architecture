@@ -12,8 +12,8 @@ In order to provide support to customers of a Managed Service, CEE require a mec
 state of the instance of the service for diagnostic purposes.  CEE will use this information in conjunction with the
 problem statement provided by the customer in order to efficiently investigate the problem and determine a solution.
 
-The data gathering mechanism must consider the issue of Personal Information (PI) or other sensitive information and ensure
-that it is handled appropriately.
+The data gathering mechanism must consider the issue of Personally Identifiable Information (PII) or other sensitive
+information and ensure that it is handled appropriately.
 
 Authorization controls must be in place to ensure that the diagnostic gathering mechanism can only be used by suitably
 permissioned groups.
