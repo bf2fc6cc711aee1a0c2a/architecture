@@ -20,3 +20,73 @@ permissioned groups.
 
 
 
+## Goals
+
+* Identify the preferred solution for the diagnostic gathering mechanism.
+* Provide guidelines for content that should be included.
+
+## Non-goals
+
+None
+
+## Stakeholders
+* Eng
+* BU
+* SRE
+
+## Current Architecture
+
+None
+
+## Proposed Architecture
+
+https://datatracker.ietf.org/doc/html/rfc2119[RFC-2119] keywords are used in this proposal.
+
+It is RECOMMENDED that managed services use https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_scripts[Back Plane]
+https://github.com/openshift/managed-scripts/[managed scripts] as the foundation of the  data gathering mechanism. Backplane has an 
+established authorization model that ensures that CEE have the permissions to run the scripts (KW: how does this work)?
+
+Each Managed Service that implements this ADR MUST provide one or more backplane scripts that the interrogate the state of a service instance.
+The exact way way the script will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
+RECOMMENEDED that the scropt invoke the `oc adm inspect` command to gather than Kubernetes state in addition to any other service specific
+state gathering commands.
+
+It is RECOMMENDED that the output from the backplane script be a UNIX tar stream.  This will allow the artifact to provide the diagnostic
+information in a structured form that can easily be processed using common command-line tools.
+
+The scripts MUST NOT gather PII or other sensitive information.  This may be done either by redacting artifacts known to contain secrets, or
+not gathering certain information in the first place.  For example, in a Java based system where PII may be present in the Java heap, the safe
+option is not to collect heap dumps.
+
+The scripts MUST be non-mutating in nature.
+
+### Threat Model
+
+* <Provide a link to the relevant threat model. You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+
+* Take a copy of the threat model when the ADR is proposed, and merge those changes in once the ADR is accepted
+
+## Alternatives Considered / Rejected
+
+The option of providing an OpenShift MustGather Image was considered, however, as the approved access mechanism to the data-plane is backplane,
+utilising the backplane managed-scripts feature to perform the data gathering step minimised dependencies.
+
+## Challenges
+
+None.
+
+## Dependencies
+
+* None
+
+## Consequences if Not Completed
+
+Poor customer experience when raising support-cases.
+
+## References
+
+https://source.redhat.com/departments/it/digitalsolutionsdelivery/enterprise-architecture/mojo_content/red_hat_data_classifications
+https://access.redhat.com/solutions/6559791
+
+
+
