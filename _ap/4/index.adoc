@@ -1,0 +1,56 @@
+---
+num: 4
+category: "Fleet manager, fleet shard and instance operators"
+title: "Fleet manager - fleet shard local autonomy"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+See managed CR.
+The fleet shard is responsible for implementing a managed custom resource.
+It has a much autonomy as possible vs the fleet manager:
+
+* it can reject a request
+* It has access to local observability
+
+The goal is the maximum local autonomy principle.
+
+The fleet manager fleet shard refashion ship allows for different topology deployments:
+
+* on customer OSD
+* On red hat owned OSD
+* As a bin packed model
+* As a SaaS
+
+The same architecture works for all the models.
+
+To express remaining capacity, the fleet shard returns the number of ManagedCR types it can hosts.
+The fleet manager is not aware of remaining RAM or CPU capacity, it is aware of remaining Kafka of t-shirt size S.
+The fleet shard is responsible for t-shirt size to physical resource conversion.
+The same fleet shard can answer capacity for different t-shirt sizes.
+Each remaining value is not to be understood as reserved but as computed with the existing free resource.
+So a deployment of a new instance will update remaining capacity for all t-shirt sizes.
+
+[NOTE]
+====
+This model has one limit, the fleet manager is responsible for increasing the infrastructure cluster capacity and needs some knowledge.
+Should the fleet shard factors / keep extension capacity? Eg a Kafka cluster going from 3 to 6 brokers?
+====
+
+Several fleet shard types can be deployed in the same infrastructure cluster.
+Likewise, the remaining managed CR capacity is dynamically computed.
+
+[NOTE]
+====
+How to deal with reserved capacity for growth and the contract between fleet shard?
+Maybe worker pool segregation between fleet shards?
+====
+
+== What are the reasons for this model to be favored today
+
+Why have the fleetshard do these sort of operations. It's back to the general general principle of local autonomy.
+Since it receives the Managed CR and returns whether it can honor the request, it feels like a natural place to also land the remaining capacity concerns.
+The fleetshard has local knowledge of operator Instance CR status, resource usage, remaining "space", local observability, etc which feel useful to compute remaining capacity.
+The team handling the bin packing modeling problem (as in how many Kafkas can fit on the head of a pin aka node), tests and choices for given nodes is the instance team where the fleetshard is.
+Then there is the explored option of several fleet managers sharing the same data plane OSD clusters. Depending on the (non)isolation model we go with, the resource capacity model is better computable from the local data plane. (Unless there is a grand calculator service that knows of all the binpack characteristics of all services being shared on dataplanes - it's a doable model but one that we did not wanted to go with for team autonomy and bin packing maturity concerns).
