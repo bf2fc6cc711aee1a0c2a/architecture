@@ -1,0 +1,12 @@
+---
+num: 9
+category: "Multi services usages"
+title: "Orchestration of services and resources dependencies"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+Done via fleet manager calls
+
+TODO ADR from Daniele
