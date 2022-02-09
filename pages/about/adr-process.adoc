@@ -22,13 +22,20 @@ If so, it should also seek to identify.
 
 If, following discussion on the issue, an ADR really is called-for then open a PR to allocate an ADR id. 
 
-This PR will add a `\_adr/__nnnn__/index.adoc` file (where _nnnn_ is the ADR id) to the {{site.github.repository_name}} repo, giving your draft ADR an id. 
+This PR will add a `_adr/__nnnn__/index.adoc` file (where __nnnn__ is the ADR id) to the {{site.github.repository_name}} repo, giving your draft ADR an id. 
+You can use the template in link:/adr/0/[`_adr/0/index.adoc`], so the steps to opening the PR are:
 
-* If the issue identified any applicable PADRs the `applies_padrs` property should be added to the front matter. 
+. Fork {{site.github.repository_url}}[this repo] on github
+. Check out your fork (`git clone _YORKFORK_ && cd architecture`)
+. Create a branch (`git checkout -b adr-__nnnn__`)
+. Create your ADR file from the template (`cp -r _adr/0 _adr/__nnnn__`)
+. Update your ADR file:
+  * If the issue identified any applicable PADRs the `applies_padrs` property should be added to the front matter. 
   It's an array of all the applicable PADRs.
-* If the issue identified and tags, the `tags` property should be added to the front matter. 
+  * If the issue identified and tags, the `tags` property should be added to the front matter. 
   It's an array of tags.
-* The only content of the ADR at this point will be the _summary_ that the ADR proposal issue produced. 
+  * The only content of the ADR at this point will be the _summary_ that the ADR proposal issue produced. 
+. Push your branch (`git push origin adr-_nnnn_`) and {{site.github.repository_url}}/compare[open the PR] on github. 
 
 This PR should be merged immediately, and the original issue closed. 
 
