@@ -4,6 +4,8 @@ title: "Heterogeneous Kafka data plane"
 status: "Draft"
 authors:
   - "Tom Bentley"
+tags:
+  - kafka
 ---
 
 ## Context and Problem Statement
