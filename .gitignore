@@ -3,3 +3,5 @@ Gemfile.lock
 vendor
 .bundle/
 .idea
+.vscode
+
