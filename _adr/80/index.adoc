@@ -3,7 +3,7 @@ num: 80
 title: "CEE diagnostic gathering mechanism"
 status: "Draft"
 authors:
-  - "Keith Wall""
+  - "Keith Wall"
 ---
 
 ## Context and Problem Statement
