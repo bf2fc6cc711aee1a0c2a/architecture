@@ -24,7 +24,7 @@ If, following discussion on the issue, an ADR really is called-for then open a P
 
 This PR will add a `\_adr/__nnnn__/index.adoc` file (where _nnnn_ is the ADR id) to the {{site.github.repository_name}} repo, giving your draft ADR an id. 
 
-* If the issue identified any applicable PADRs the `applied_adrs` property should be added to the front matter. 
+* If the issue identified any applicable PADRs the `applies_padrs` property should be added to the front matter. 
   It's an array of all the applicable PADRs.
 * If the issue identified and tags, the `tags` property should be added to the front matter. 
   It's an array of tags.
@@ -55,3 +55,33 @@ If the ADR is rejected:
 . The `status` in the ADR front matter is changed to `Rejected``.
 . The PR is merged.
 
+== Front matter directory
+
+ADRs use Jekyll https://jekyllrb.com/docs/front-matter/[front matter] properties to record certain metadata about the ADR.
+
+Here's an example
+```
+---
+num: 77
+title: "Heterogeneous Kafka data plane"
+status: "Draft"
+authors:
+  - "Tom Bentley"
+tags:
+  - kafka
+---
+Blah blah blah...
+```
+
+`num`:: The ADR number. 
+This is allocated when the ADR is first drafted and never changes thereafter.
+The next available id should be the largest id in the link:/adr/[ADR index] plus one.
+`title`:: The ADR's title. The `<h1>` title of the ADR is defined in the ADR template to be `{{num}}: {{title}}`
+`status`:: The status of the ADR, one of `Draft`, `Accepted`, `Rejected`.
+`authors`:: An array of strings, the names or github usernames of the primary author(s) of the ADR.
+ To use your github username you'll need to add yourself to `_data/people.yml`.
+`tags`:: A list of tags, for classifying the ADR.
+`applies_padrs`:: List of numbers, the ids of the PADRs which this ADR applies.
+These may be added retrospectively (after the ADR is accepted).
+`superseded_by`:: The id of a later ADR which supersedes this one. 
+This may be added retrospectively (after the ADR is accepted).
