@@ -12,13 +12,12 @@ In order to provide support to customers of a Managed Service, CEE require a mec
 state of the instance of the service for diagnostic purposes.  CEE will use this information in conjunction with the
 problem statement provided by the customer in order to efficiently investigate the problem and determine a solution.
 
-The data gathering mechanism must consider the issue of Personally Identifiable Information (PII) or other sensitive
-information and ensure that it is handled appropriately.
+The data gathering mechanism must consider the issue of
+https://source.redhat.com/departments/it/digitalsolutionsdelivery/enterprise-architecture/mojo_content/red_hat_data_classifications
+[Personally Identifiable Information (PII)] or other sensitive information and ensure that it is handled appropriately.
 
 Authorization controls must be in place to ensure that the diagnostic gathering mechanism can only be used by suitably
 permissioned groups.
-
-
 
 ## Goals
 
@@ -43,8 +42,9 @@ None
 https://datatracker.ietf.org/doc/html/rfc2119[RFC-2119] keywords are used in this proposal.
 
 It is RECOMMENDED that managed services use https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_scripts[Back Plane]
-https://github.com/openshift/managed-scripts/[managed scripts] as the foundation of the  data gathering mechanism. Backplane has an 
-established authorization model that ensures that CEE have the permissions to run the scripts (KW: how does this work)?
+https://github.com/openshift/managed-scripts/[managed scripts] as the foundation of the data gathering mechanism. Backplane has an
+established https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_cluster_permissions[authorization model] that ensures that CEE
+have the permissions to run the scripts.
 
 Each Managed Service that implements this ADR MUST provide one or more backplane scripts that interrogate the state of a service instance.
 The exact way way the script will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
@@ -85,8 +85,7 @@ Poor customer experience when raising support-cases.
 
 ## References
 
-https://source.redhat.com/departments/it/digitalsolutionsdelivery/enterprise-architecture/mojo_content/red_hat_data_classifications
-https://access.redhat.com/solutions/6559791
+This https://access.redhat.com/solutions/6559791[support article] walks the reader through the backplane set-up required for members of CEE.
 
 
 
