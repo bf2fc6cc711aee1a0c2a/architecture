@@ -46,7 +46,7 @@ It is RECOMMENDED that managed services use https://source.redhat.com/groups/pub
 https://github.com/openshift/managed-scripts/[managed scripts] as the foundation of the  data gathering mechanism. Backplane has an 
 established authorization model that ensures that CEE have the permissions to run the scripts (KW: how does this work)?
 
-Each Managed Service that implements this ADR MUST provide one or more backplane scripts that the interrogate the state of a service instance.
+Each Managed Service that implements this ADR MUST provide one or more backplane scripts that interrogate the state of a service instance.
 The exact way way the script will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
 RECOMMENEDED that the scropt invoke the `oc adm inspect` command to gather than Kubernetes state in addition to any other service specific
 state gathering commands.
