@@ -71,12 +71,31 @@ follow the decision made in the ADR. ADRs should be addressing how to
 solve a problem, their title reflecting it. Other service teams would
 reuse these cookbooks.
 
+=== Architectural Pattern
+
+==== Audience
+
+* Architects / Team Leads / Engineering from all services
+
+==== Description
+
+One of the goals of the MAS architecture group is to share patterns and solutions between services, to create consistency. Consistency enables efficiency (particularly for  supportability and operability) and a better user experience.
+
+An Architectural Pattern captures a single important architectural pattern. Allows for reuse of patterns by other ADRs and Platform ADRs. They focus on what (but should avoid implementation details where possible that may soon become out of date or not apply to other services that want to follow the decision made in the ADR). They should also describe when they can be applied.
+
+Many libraries of architectural patterns exist outside of this repository. An Architectural Pattern is encouraged to make use of them, and can depend and build on them by including a link to them.
+
 ==== Process
 
-It is expected that ADRs will be matured within an Epic Brief: 
-while working on the technical aspect of an Epic Brief, the ADRs will be identified and moved to an appendix while maturing the solution. 
-ADRs can then be extracted as a separate document. 
-The link:adr-process[ADR process] describes in more detail how ADRs we written and approved.
+Architectural Patterns are created when patterns are identified. There are well known issues with attempting to create consistency too early as it can reduce innovation (by requiring people to stick to a standard) and create bad solutions (that worked for the first piece of software for which the standard was created). We attempt to balance this through not creating platform ADRs “too early”.
+
+At this point the pattern exists and service ADRs can refer to it, and note if they are not following it.
+
+A platform ADR is created when an architectural pattern has been successfully applied to (at least) three services. A platform ADR follows the same structure as a service ADR. Once a platform ADR is created, the architectural pattern must be used to solve that problem until the platform ADR is superseded.
+
+If an architectural pattern exists but is not required by a platform ADR, and a new service ADR wishes to implement a competing pattern there will be an enforced period during which neither can become required by a platform ADR to ensure we are not prematurely standardising. From the point at which the competing pattern is introduced at least 3 new services much choose a pattern for a platform ADR to be allowed.
+
+When service ADRs are reviewed by the MAS architecture group every reviewer should think whether they have seen this pattern before in a previous service ADR (or other work that wasn’t previously part of an ADR). If a pattern is identified, and the service ADR does not already refer to a platform ADR then: (a) the reviewer and the author of the ADR should collaborate to send an email to the mas-architecture@redhat.com list linking the relevant ADRs and highlight the pattern identified; and (b) this should be scheduled for discussion in the next MAS Architecture meeting.
 
 === Epic Brief
 
