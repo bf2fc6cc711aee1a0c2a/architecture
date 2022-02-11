@@ -48,7 +48,7 @@ This is known to be a hard problem, which would therefore delay the provision of
 
 ### Threat Model
 
-* <Provide a link to the relevant threat model. You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+* No change to existing threat model
 
 * Take a copy of the threat model when the ADR is proposed, and merge those changes in once the ADR is accepted
 
