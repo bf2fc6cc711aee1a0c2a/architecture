@@ -1,0 +1,18 @@
+---
+num: 6
+category: "Fleet manager, fleet shard and instance operators"
+title: "Fleet shard operator - instance operator versioning"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+The fleet shard operator has a single version deployed on a given infrastructure cluster.
+This is an accepted risk from a blast radius point of view.
+
+Several versions of the instance operator exist on a given infrastructure cluster.
+See <<Instance operator responsibility hand over>>.
+
+The Managed CR contains explicitly the targeted version of instance operator. This version is piloted by the fleet manager as part of its blast radius management responsibility.
+
+TODO discuss default version for new instances deployed?
