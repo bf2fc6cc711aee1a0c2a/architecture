@@ -1,0 +1,10 @@
+---
+num: 10
+category: "Multi services usages"
+title: "Service interactions and dependencies during development"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+See https://docs.google.com/document/d/1Yn9ftse9hbSqRz_WopUofAaId0xKVHGeaaHglZ0R8Dg/edit[Service Interaction and dependencies - Expectations Framework]
