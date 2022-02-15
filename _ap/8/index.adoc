@@ -1,0 +1,10 @@
+---
+num: 8
+category: "DNS, network, bandwidth"
+title: "Bandwidth sensitive workload and Availability Zones"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+TODO Discuss Kafka choice of ELB Ingress with affinity to AZ
