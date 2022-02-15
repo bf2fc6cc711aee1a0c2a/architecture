@@ -1,0 +1,20 @@
+---
+num: 1
+category: "Fleet manager, fleet shard and instance operators"
+title: "ManagedCR"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+The managed CR e.g. ManagedKafkaCR represents the managed service concept.
+It is the custom’s resource contract exchanged between the fleet manager and operated by the fleet shard.
+The managed CR spec is only to be modified by the fleet manager.
+The managed CR status is only to be updated by the fleet shard as per the single responsibility principle.
+
+The Managed CR is not the user contract (API), it is the implementation of it.
+A custom resource based API would have less concepts exposed.
+One of the reasons is that a given service tier or might evolve and a user could be moved to a new tier.
+Another reason is concrete limits like BW can evolve by tier but are sent to the fleet shard as concrete limit today to execute on.
+
+This model uses the reconciliation loop well popularized by Kubernetes.
