@@ -37,6 +37,7 @@ This means that when a user creates a Kafka instance they get to specify "how bi
 
 * Consistency of scaling across different infrastructures (both on the same cloud, and between different clouds).
 * Define how the fleet manager manages shard capacity.
+* Storage scaling, which already supported in the fleet manager and shard, and is orthogonal to the scaling of clusters under consideration here.
 
 ## Current situation
 // Where are we now?
@@ -49,11 +50,11 @@ The service does not offer any scaling options, except for storage, which is ort
 ### Conceptual model
 Conceptually we define a _series_, which is an ordered list of _sizes_ of instance. The ordering of the list MUST be defined by the ordering of the functional attributes that define the service. For example, for the example series "ex1", we might have the sizes:
 
-`ex1.small`:: Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, 1MB max message size.
-`ex1.medium`:: Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, 1MB max message size.
-`ex1.large`:: Ingress 90MB/s, egress 90MB/s, 3000 partitions, 1500 connections per instance, 1MB max message size.
+`ex1.small`:: Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, max 100 connections per second, 1MB max message size.
+`ex1.medium`:: Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, max 100 connections per second, 1MB max message size.
+`ex1.large`:: Ingress 90MB/s, egress 90MB/s, 3000 partitions, 1500 connections per instance, max 100 connections per second, 1MB max message size.
 
-In this example most of the functional attributes scales linearly, with the exception of max message size. In general, linearity SHALL NOT be a requirement, even for those attributes which do scale up.
+In this example most of the functional attributes scales linearly, with the exception of connection rate and max message size. In general, linearity SHALL NOT be a requirement, even for those attributes which do scale up.
 For example, it would have been acceptable to define the `ex1.large` ingress as 100M/s, even though this is not 3× the `ex1.small` ingress, even when the other `ex1.large` functional parameters are 3× their `ex1.small` values.
 
 ### UI/Fleet manager interface
@@ -80,6 +81,7 @@ Reusing the example series defined above:
         "egress": "30MB/s",
         "partitions": "1000",
         "connections": "500",
+        "connectionRate": "100",
         "maxMessageSize": "1MB"
       }
     },
@@ -90,6 +92,7 @@ Reusing the example series defined above:
         "egress": "60MB/s",
         "partitions": "2000",
         "connections": "1000",
+        "connectionRate": "100",
         "maxMessageSize": "1MB"
       }
     },
@@ -100,6 +103,7 @@ Reusing the example series defined above:
         "egress": "90MB/s",
         "partitions": "3000",
         "connections": "1500",
+        "connectionRate": "100",
         "maxMessageSize": "1MB"
       }
     }
