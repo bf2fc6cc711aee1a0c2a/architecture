@@ -36,6 +36,7 @@ This means that when a user creates a Kafka instance they get to specify "how bi
 // Bulleted list of outcomes that this ADR is not trying to achieve.
 
 * Consistency of scaling across different infrastructures (both on the same cloud, and between different clouds).
+* Define how the fleet manager manages shard capacity.
 
 ## Current situation
 // Where are we now?
@@ -111,13 +112,16 @@ NOTE: It may be necessary, eventually, to distinguish the supported actions that
 For example, we might want to prevent the creation of new instances of the "ex1" series while supporting existing instances. 
 So we might eventually want additional properties alongside "name" and "parameters" in the instance size schema.
 
+Requests for instance creation will require a series and size.
+
 ### Fleet manager/fleet shard interface
 
 Principles:
 
 * A fleet shard is able to provide a subset of series, possibly only one. 
 * The availability of a series might be limited to a particular cloud, region or combination of both.
-* It is a private concern of the shard exactly how each size in the series is provisioned. 
+* It is a private concern of the shard exactly how each size in the series is provisioned.
+    * In principle it could use vertical, horizontal scaling and density > 1, in addition to applying quotas to limit capacity to the advertised limits.
 * When the manager provides an ConfigMap of the functional parameters the shard is expected to provide.
 * Within the shard image it has a model for how to provision each set of functional parameters.
 * The shard validates this model against the ConfigMap on startup. It is an error if the `ConfigMap` defines a set of functional parameters which the shard does not support. It is not an error is the shard's model supports sets of functional parameters which the `ConfigMap` does not define.
