@@ -1,0 +1,28 @@
+---
+num: 81
+title: Kafka instance scaling
+status: "Draft"
+authors:
+  - "Tom Bentley"
+tags:
+  - "kafka"
+#applies_padrs: # What PADRs does this ADR apply?
+#applies_patterns: # What APs does this ADR apply?
+---
+
+NOTE: https://datatracker.ietf.org/doc/html/rfc2119[RFC-2119] keywords are used in this proposal.
+
+// Top style tips:
+// * Use one sentence per line
+// * No unexpanded acronyms
+// * No undefined jargon
+
+// No need for a title heading, it's added by the template
+
+## Context and Problem Statement
+// What is the background against which this decision is being taken?
+
+Excluding storage sizing, the Kafka service currently supports a single size of Kafka cluster composed of 3 broker pods with fixed CPU, memory and density. 
+In order for the service to be more broadly applicable to production Kafka use cases we need to be able to provide it at a variety of scales.
+This means that when a user creates a Kafka instance they get to specify "how big" the instance they're creating should be. 
+
