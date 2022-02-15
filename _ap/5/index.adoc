@@ -1,0 +1,10 @@
+---
+num: 5
+category: "Fleet manager, fleet shard and instance operators"
+title: "Instance operator responsibility hand over"
+status: "Draft"
+authors:
+  - "Emmanuel Bernard"
+---
+
+TODO describe the hand over instance responsibility between two instance operator versions
