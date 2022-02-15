@@ -26,3 +26,144 @@ Excluding storage sizing, the Kafka service currently supports a single size of 
 In order for the service to be more broadly applicable to production Kafka use cases we need to be able to provide it at a variety of scales.
 This means that when a user creates a Kafka instance they get to specify "how big" the instance they're creating should be. 
 
+## Goals
+// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+
+* Define how instance scaling is defined conceptually and in the interfaces between the UI, fleet manager and fleet shard.
+* Avoid tying our hands to any particular unit of scaling.
+
+## Non-goals
+// Bulleted list of outcomes that this ADR is not trying to achieve.
+
+* Consistency of scaling across different infrastructures (both on the same cloud, and between different clouds).
+
+## Current situation
+// Where are we now?
+
+The service does not offer any scaling options, except for storage, which is orthogonal to this problem.
+
+## Proposal
+// What is the decision being proposed
+
+### Conceptual model
+Conceptually we define a _series_, which is an ordered list of _sizes_ of instance. The ordering of the list MUST be defined by the ordering of the functional attributes that define the service. For example, for the example series "ex1", we might have the sizes:
+
+`ex1.small`:: Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, 1MB max message size.
+`ex1.medium`:: Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, 1MB max message size.
+`ex1.large`:: Ingress 90MB/s, egress 90MB/s, 3000 partitions, 1500 connections per instance, 1MB max message size.
+
+In this example most of the functional attributes scales linearly, with the exception of max message size. In general, linearity SHALL NOT be a requirement, even for those attributes which do scale up.
+For example, it would have been acceptable to define the `ex1.large` ingress as 100M/s, even though this is not 3× the `ex1.small` ingress, even when the other `ex1.large` functional parameters are 3× their `ex1.small` values.
+
+### UI/Fleet manager interface
+
+This ADR doesn't mandate any particular presentation for how the scale options are presented in the UI.
+In particular, while there is only one series defined, there is no requirement to display series in the UI at all.
+
+The fleet manager SHALL be the source of truth for the series and sizes available, and how those depend on cloud and region. 
+The fleet manager SHALL provide an endpoint which the UI uses to determine the available options.
+The UI MUST NOT make assumptions about linearity of scaling, instead it uses only the series and sizes provided by the endpoint.
+This endpoint will return a map of lists.
+The map keys will be the series, and the elements of the list will be the available sizes within that series, in increasing order. 
+Nothing is implied by the order of the keys in the series map, e.g. an "ex2" may occur before or after an "ex1" and the order doesn't imply anything about those series.
+
+Reusing the example series defined above:
+[source,json]
+----
+"sizes": {
+  "ex1": [
+    { 
+      "name": "small",
+      "parameters": {
+        "ingress": "30MB/s", // should this really be a map, or a list of parameters, thus allowing more detailed descriptions in addition to a bare name+value?
+        "egress": "30MB/s",
+        "partitions": "1000",
+        "connections": "500",
+        "maxMessageSize": "1MB"
+      }
+    },
+    { 
+      "name": "medium",
+      "parameters": {
+        "ingress": "60MB/s",
+        "egress": "60MB/s",
+        "partitions": "2000",
+        "connections": "1000",
+        "maxMessageSize": "1MB"
+      }
+    },
+    { 
+      "name": "large",
+      "parameters": {
+        "ingress": "90MB/s",
+        "egress": "90MB/s",
+        "partitions": "3000",
+        "connections": "1500",
+        "maxMessageSize": "1MB"
+      }
+    }
+  ],
+  // other series as necessary
+}
+----
+
+NOTE: It may be necessary, eventually, to distinguish the supported actions that are supported for a given series and size.
+For example, we might want to prevent the creation of new instances of the "ex1" series while supporting existing instances. 
+So we might eventually want additional properties alongside "name" and "parameters" in the instance size schema.
+
+### Fleet manager/fleet shard interface
+
+Principles:
+
+* A fleet shard is able to provide a subset of series, possibly only one. 
+* The availability of a series might be limited to a particular cloud, region or combination of both.
+* It is a private concern of the shard exactly how each size in the series is provisioned. 
+* When the manager provides an ConfigMap of the functional parameters the shard is expected to provide.
+* Within the shard image it has a model for how to provision each set of functional parameters.
+* The shard validates this model against the ConfigMap on startup. It is an error if the `ConfigMap` defines a set of functional parameters which the shard does not support. It is not an error is the shard's model supports sets of functional parameters which the `ConfigMap` does not define.
+* When the manager requests instance creation it passes the functional parameters which correspond to the requested instance series and size.
+* The shard then uses its internal model to determine the deployment configuration (in terms of `Kafka` CRs, ingress replicas and so on).
+
+
+
+### Threat model
+// Provide a link to the relevant threat model. 
+// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+
+No changes to existing threat models identified.
+
+## Alternatives Considered / Rejected
+
+A single series (S,M,L)::
+This would work fine initially, but:
+
+* We couldn't easily offer a size smaller than small.
+
+* It would be problematic if later on wanted to be able to provision the service on different hardware. 
+
+* It requires that we can provide the same sizes on other clouds, which could be problematic if performance parity between clouds could not be achieved.
++
+An integer unit (1 unit, 2 unit etc)::
+Similar problems to a single series of T-shirt sizes
++
+Provisioning only in multiples of integer units::
+This solves being able to insert new sizes between existing sizes in the future, but because it's a single scale it doesn't provide infrastructure independence.
+
+
+## Challenges
+// What are the costs/drawbacks of the proposed decision?
+
+Defining the _series_ concept up-front (before we actually need it) imposes a small extra cost in terms of the initial implementation complexity of providing a scalable service. 
+However, adopting this conceptual model early means
+
+* we can recognize and develop a collective understand of the fact that however we initially define how we scale the service is arbitrary and may be subject to change over time, between clouds, or as a result of our future desire to provide the service in a different way.
+
+* the inter-component contracts consider this need up-front.
+
+## Dependencies
+// What are the knock-on effects if this decision is accepted?
+
+## Consequences if not completed
+// What are the knock-on effects if this decision is not accepted?
+
+Some decisions about the scaling model, and it's representation between the interfaces is required in order to provide a scalable service.
