@@ -57,9 +57,9 @@ state gathering commands.
 It is RECOMMENDED that the output from the backplane script be a UNIX tar stream.  This will allow the artifact to provide the diagnostic
 information in a structured form that can easily be processed using common command-line tools.
 
-The scripts MUST NOT gather PII or other sensitive information.  This may be done either by redacting artifacts known to contain secrets, or
-not gathering certain information in the first place.  For example, in a Java based system where PII may be present in the Java heap, the safe
-option is not to collect heap dumps.
+It is RECOMMENDED that the script takes reasonable steps to avoid the collection of PII or other sensitive information. This may be done
+either by redacting artifacts known to contain secrets/keys etc, or not gathering certain information in the first place.  For
+example, in a Java based system where PII may be present in the Java heap, the safe option is not to collect heap dumps.
 
 The scripts MUST be non-mutating in nature.
 
