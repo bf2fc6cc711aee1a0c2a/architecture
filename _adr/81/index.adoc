@@ -104,36 +104,36 @@ An example response JSON is shown below.
       "sizes": [ <5>
         { 
           "name": "small", <6>
-          "parameters": { <7>
-            "ingress": "30MB/s", 
-            "egress": "30MB/s",
-            "partitions": "1000",
-            "connections": "500",
-            "connectionRate": "100",
-            "maxMessageSize": "1MB"
-          }
+          "parameters": [ <7>
+            { "name": "ingress", "value": "30", "unit": "MB/s" }
+            { "name": "egress", "value": "30", "unit": "MB/s" }
+            { "name": "partitions", "value": "1000" }
+            { "name": "connections", "value": "500" }
+            { "name": "connectionRate", "value": "100", "unit": "/s" }
+            { "name": "maxMessageSize", "value": "1", "unit": "MB" }
+          ]
         },
         { 
           "name": "medium",
-          "parameters": {
-            "ingress": "60MB/s",
-            "egress": "60MB/s",
-            "partitions": "2000",
-            "connections": "1000",
-            "connectionRate"s "100",
-            "maxMessageSize": "1MB"
-          }
+          "parameters": [
+            { "name": "ingress", "value": "60", "unit": "MB/s" }
+            { "name": "egress", "value": "60", "unit": "MB/s" }
+            { "name": "partitions", "value": "2000" }
+            { "name": "connections", "value": "1000" }
+            { "name": "connectionRate", "value": "100", "unit": "/s" }
+            { "name": "maxMessageSize", "value": "1", "unit": "MB" }
+          ]
         },
         { 
           "name": "large",
-          "parameters": {
-            "ingress": "90MB/s",
-            "egress": "90MB/s",
-            "partitions": "3000",
-            "connections": "1500",
-            "connectionRate": "100",
-            "maxMessageSize": "1MB"
-          }
+          "parameters": [
+            { "name": "ingress", "value": "90", "unit": "MB/s" }
+            { "name": "egress", "value": "90", "unit": "MB/s" }
+            { "name": "partitions", "value": "3000" }
+            { "name": "connections", "value": "1500" }
+            { "name": "connectionRate", "value": "100", "unit": "/s" }
+            { "name": "maxMessageSize", "value": "1", "unit": "MB" }
+          ]
         }
       ],
     },
