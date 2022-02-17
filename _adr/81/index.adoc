@@ -19,128 +19,212 @@ NOTE: https://datatracker.ietf.org/doc/html/rfc2119[RFC-2119] keywords are used 
 
 // No need for a title heading, it's added by the template
 
-## Context and Problem Statement
+== Context and Problem Statement
 // What is the background against which this decision is being taken?
 
 Excluding storage sizing, the Kafka service currently supports a single size of Kafka cluster composed of 3 broker pods with fixed CPU, memory and density. 
 In order for the service to be more broadly applicable to production Kafka use cases we need to be able to provide it at a variety of scales.
 This means that when a user creates a Kafka instance they get to specify "how big" the instance they're creating should be. 
 
-## Goals
+== Goals
 // Bulleted list of outcomes that this ADR, if accepted, should help achieve
 
-* Define how instance scaling is defined conceptually and in the interfaces between the UI, fleet manager and fleet shard.
+* Define how instance scaling is modelled conceptually and in the interfaces between the UI, fleet manager and fleet shard.
 * Avoid tying our hands to any particular unit of scaling.
+* Enable other profiles of the service in the future, without having to change the contracts between components.
 
-## Non-goals
+== Non-goals
 // Bulleted list of outcomes that this ADR is not trying to achieve.
 
 * Consistency of scaling across different infrastructures (both on the same cloud, and between different clouds).
 * Define how the fleet manager manages shard capacity.
 * Storage scaling, which already supported in the fleet manager and shard, and is orthogonal to the scaling of clusters under consideration here.
 
-## Current situation
+== Current situation
 // Where are we now?
 
 The service does not offer any scaling options, except for storage, which is orthogonal to this problem.
 
-## Proposal
+== Proposal
 // What is the decision being proposed
 
-### Conceptual model
-Conceptually we define a _series_, which is an ordered list of _sizes_ of instance. The ordering of the list MUST be defined by the ordering of the functional attributes that define the service. For example, for the example series "ex1", we might have the sizes:
+=== Conceptual model
+Conceptually we define a _series_, which is an ordered list of _sizes_ of instance. 
 
-`ex1.small`:: Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, max 100 connections per second, 1MB max message size.
-`ex1.medium`:: Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, max 100 connections per second, 1MB max message size.
-`ex1.large`:: Ingress 90MB/s, egress 90MB/s, 3000 partitions, 1500 connections per instance, max 100 connections per second, 1MB max message size.
+A _series_ has a name, and a description. The description might include what is common across the sizes it supports (e.g. "3 AZ").
 
-In this example most of the functional attributes scales linearly, with the exception of connection rate and max message size. In general, linearity SHALL NOT be a requirement, even for those attributes which do scale up.
-For example, it would have been acceptable to define the `ex1.large` ingress as 100M/s, even though this is not 3× the `ex1.small` ingress, even when the other `ex1.large` functional parameters are 3× their `ex1.small` values.
+A _size_ has a name and a set of <parameter, value> pairs. Each of the sizes in a series MUST have the same set of function parameters (e.g. ingress bandwidth), but the values MAY differ.
 
-### UI/Fleet manager interface
+The ordering of the list MUST be defined by the ordering of the functional attributes that define the service. 
+
+For example, for the "Example" series, we might have the sizes:
+
+`small`:: Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, max 100 connections per second, 1MB max message size.
+`medium`:: Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, max 100 connections per second, 1MB max message size.
+`large`:: Ingress 90MB/s, egress 90MB/s, 3000 partitions, 1500 connections per instance, max 100 connections per second, 1MB max message size.
+
+In this example the functional attributes scales linearly, with the exception of connection rate and max message size.
+In general, linearity SHALL NOT be a requirement, even for those attributes which do scale up.
+For example, it would have been acceptable to define the `large` ingress as 100M/s, even though this is not 3× the `small` ingress, even when the other `large` functional parameters are 3× their `small` values.
+
+=== General principles
+
+* A fleet shard is required to provide only a subset of all series supported by the service globally. Indeed, a fleet share might possibly support only a single series one. For example a shard on AWS might support a different set of series to a shard on Azure, or the same series might have different sizes on those clouds.
+
+* The availability of a series might be limited to a particular cloud, region or combination of both.
+
+* It is a private concern of the shard exactly how each size in the series is provisioned. In principle it could use vertical, horizontal scaling and/or density > 1, in addition to applying quotas to limit capacity to the advertised limits. The fleet manager doesn't know.
+
+=== UI/Fleet manager interface
 
 This ADR doesn't mandate any particular presentation for how the scale options are presented in the UI.
-In particular, while there is only one series defined, there is no requirement to display series in the UI at all.
+In particular while there is only one series defined, there is no requirement to display series in the UI at all.
 
 The fleet manager SHALL be the source of truth for the series and sizes available, and how those depend on cloud and region. 
-The fleet manager SHALL provide an endpoint which the UI uses to determine the available options.
+The fleet manager SHALL provide an endpoint which the MUST UI use to determine the available series and sizes.
 The UI MUST NOT make assumptions about linearity of scaling, instead it uses only the series and sizes provided by the endpoint.
-This endpoint will return a map of lists.
-The map keys will be the series, and the elements of the list will be the available sizes within that series, in increasing order. 
-Nothing is implied by the order of the keys in the series map, e.g. an "ex2" may occur before or after an "ex1" and the order doesn't imply anything about those series.
 
-Reusing the example series defined above:
+==== Series discovery
+
+Reusing the "Example" series defined above, let's illustrate how the Fleet Manager could communicate the available kinds of cluster to a UI.
+
+.Sequence diagram of UI/Fleet manager interaction
+image::ui-fleet_manager.png[UI/Fleet manager interaction]
+
+After the UI has discovered the available cloud providers and regions it would make another GET request `/api/kafkas_mgmt/v1/series/{cloudId}/{cloudRegion}` to discover the series available in this cloud and region.
+An example response JSON is shown below.
+
 [source,json]
+.Example series available to a UI from the Fleet Manager's `GET /api/kafkas_mgmt/v1/series/{cloudId}/{cloudRegion}` endpoint
 ----
-"sizes": {
-  "ex1": [
-    { 
-      "name": "small",
-      "parameters": {
-        "ingress": "30MB/s", // should this really be a map, or a list of parameters, thus allowing more detailed descriptions in addition to a bare name+value?
-        "egress": "30MB/s",
-        "partitions": "1000",
-        "connections": "500",
-        "connectionRate": "100",
-        "maxMessageSize": "1MB"
-      }
+"series": [ <1>
+    { "name": "Example", <2>
+      "id": 1, <3>
+      "description": "Multi-broker, multi-AZ", <4>
+      "sizes": [ <5>
+        { 
+          "name": "small", <6>
+          "parameters": { <7>
+            "ingress": "30MB/s", 
+            "egress": "30MB/s",
+            "partitions": "1000",
+            "connections": "500",
+            "connectionRate": "100",
+            "maxMessageSize": "1MB"
+          }
+        },
+        { 
+          "name": "medium",
+          "parameters": {
+            "ingress": "60MB/s",
+            "egress": "60MB/s",
+            "partitions": "2000",
+            "connections": "1000",
+            "connectionRate"s "100",
+            "maxMessageSize": "1MB"
+          }
+        },
+        { 
+          "name": "large",
+          "parameters": {
+            "ingress": "90MB/s",
+            "egress": "90MB/s",
+            "partitions": "3000",
+            "connections": "1500",
+            "connectionRate": "100",
+            "maxMessageSize": "1MB"
+          }
+        }
+      ],
     },
-    { 
-      "name": "medium",
-      "parameters": {
-        "ingress": "60MB/s",
-        "egress": "60MB/s",
-        "partitions": "2000",
-        "connections": "1000",
-        "connectionRate": "100",
-        "maxMessageSize": "1MB"
-      }
-    },
-    { 
-      "name": "large",
-      "parameters": {
-        "ingress": "90MB/s",
-        "egress": "90MB/s",
-        "partitions": "3000",
-        "connections": "1500",
-        "connectionRate": "100",
-        "maxMessageSize": "1MB"
-      }
-    }
-  ],
-  // other series as necessary
-}
+    // other series as necessary
+]
 ----
+<1> This list is not considered ordered
+<2> Names MUST be unique within the `series` list 
+<3> The `id` uniquely identifies a series, allowing the name to be changed
+<4> Can be used in a UI/CLI to help guide users to appropriate profile/flavour of the service
+<5> The list MUST be ordered such that later items represent clusters with more capacity
+<6> The name MUST be unique within the `sizes` list
+<7> The parameters MUST be consistent within a series, but different series MAY have different parameters.
+
+NOTE: The above is not intended as a detailed API specification, merely an illustration of how the series and size are communicate from the Fleet Manager to a UI.
 
 NOTE: It may be necessary, eventually, to distinguish the supported actions that are supported for a given series and size.
 For example, we might want to prevent the creation of new instances of the "ex1" series while supporting existing instances. 
 So we might eventually want additional properties alongside "name" and "parameters" in the instance size schema.
 
-Requests for instance creation will require a series and size.
+==== Instance creation
 
-### Fleet manager/fleet shard interface
+The `POST /api/kafkas_mgmt/v1/kafkas` endpoint would change to take the series id and size name in addition to the existing parameters.
 
-Principles:
+[source,json]
+.Example `POST /api/kafkas_mgmt/v1/kafkas` made by a UI to the Fleet Manager to create an instance
+----
+{
+    "region": "us-east-1",
+    "cloud_provider": "aws",
+    "seriesId": 1, <1>
+    "sizeName": "small", <2>
+    "name": "serviceapitest"
 
-* A fleet shard is able to provide a subset of series, possibly only one. 
-* The availability of a series might be limited to a particular cloud, region or combination of both.
-* It is a private concern of the shard exactly how each size in the series is provisioned.
-    * In principle it could use vertical, horizontal scaling and density > 1, in addition to applying quotas to limit capacity to the advertised limits.
-* When the manager provides an ConfigMap of the functional parameters the shard is expected to provide.
-* Within the shard image it has a model for how to provision each set of functional parameters.
-* The shard validates this model against the ConfigMap on startup. It is an error if the `ConfigMap` defines a set of functional parameters which the shard does not support. It is not an error is the shard's model supports sets of functional parameters which the `ConfigMap` does not define.
-* When the manager requests instance creation it passes the functional parameters which correspond to the requested instance series and size.
-* The shard then uses its internal model to determine the deployment configuration (in terms of `Kafka` CRs, ingress replicas and so on).
+}
+----
+<1> New property, the id refers to the id of the series previously served from the series discovery endpoint
+<2> New property, the name refers to the name of the size in the given series.
 
+To allow the API to evolve compatibly, the manager is allowed to use a default series and size in the case that the `POST` request omits these properties.
 
+If the requested series and/or size is not available in that cloud provider and region a HTTP 400 error response is returned.
 
-### Threat model
+==== Getting instance state
+
+Similarly, the `GET /api/kafkas_mgmt/v1/kafkas/{id}` endpoint would change to include the series and size.
+
+=== Fleet manager responsibilities
+
+The supported series are passed to the fleet manager via app interface.
+
+When terraforming a shard, the manager needs to keep track of which series are/will be supported on that shard.
+
+Currently it is acceptable for the manager to embed knowledge of the machine types needed by the shard.
+The manager does not know how the nodes running on those machines will be used.
+It is expected that a future ADR will describe a mechanism for the shard and manager to dynamically adjust the number of nodes.
+
+=== Fleet manager/fleet shard interface
+
+.Sequence diagram of Fleet shard operator/Fleet manager interaction
+image::adr-81-fso-manager.png[Fleet shard operator/Fleet manager interaction]
+
+When the manager includes an instance in the response to its `GET /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas` it does not include the series or size.
+It instead passes the functional parameters corresponding to the size selected by the user via the Managed Custom Resource.
+This is basically the same as the existing contract.
+
+[source,json]
+.Example fragment of JSON for an instance included in the `GET /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas`` response from the Fleet Manager
+----
+"capacity": {
+  "ingressThroughputPerSec": "4Mi", <1>
+  "egressThroughputPerSec": "4Mi",
+  "totalMaxConnections": "500",
+  "maxDataRetentionSize": "100Gi",
+  "maxPartitions": "100",
+  "maxDataRetentionPeriod": "P14D",
+  "maxConnectionAttemptsPerSec": "100"
+}
+----
+<1> Currently the API uses a combined `ingressEgressThroughputPerSec` property
+
+The shard then uses its internal model to determine the deployment configuration (in terms of `Kafka` CRs, ingress replicas and so on).
+Initially this could be as simple as dividing the `ingressThroughputPerSec` by some constant in order to determine a number of brokers to be deployed, and using the remaining parameters to configure quotas.
+
+=== Threat model
 // Provide a link to the relevant threat model. 
 // You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
 
 No changes to existing threat models identified.
 
-## Alternatives Considered / Rejected
+== Alternatives Considered / Rejected
 
 A single series (S,M,L)::
 This would work fine initially, but:
@@ -158,7 +242,7 @@ Provisioning only in multiples of integer units::
 This solves being able to insert new sizes between existing sizes in the future, but because it's a single scale it doesn't provide infrastructure independence.
 
 
-## Challenges
+== Challenges
 // What are the costs/drawbacks of the proposed decision?
 
 Defining the _series_ concept up-front (before we actually need it) imposes a small extra cost in terms of the initial implementation complexity of providing a scalable service. 
@@ -168,10 +252,10 @@ However, adopting this conceptual model early means
 
 * the inter-component contracts consider this need up-front.
 
-## Dependencies
+== Dependencies
 // What are the knock-on effects if this decision is accepted?
 
-## Consequences if not completed
+== Consequences if not completed
 // What are the knock-on effects if this decision is not accepted?
 
 Some decisions about the scaling model, and it's representation between the interfaces is required in order to provide a scalable service.
