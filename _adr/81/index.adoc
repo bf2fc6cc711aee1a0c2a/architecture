@@ -51,15 +51,15 @@ The service does not offer any scaling options, except for storage, which is ort
 === Conceptual model
 Conceptually we define a _profile_, which is an ordered list of _sizes_ of instance. 
 
-In addition to being a composite of sizes, a _profile_ has an id, a name, and a description.
-The description might include what is common across the sizes it supports, or what differentiates it from other profiles (e.g. "3 AZ").
+In addition to being a composite of sizes, a _profile_ has an id and a set of parameters that is common across all the sizes in the profile.
 
-A _size_ has an id, a name, a description and a set of <parameter, value> pairs.
+A _size_ has an id and a set of parameter values.
+Each parameter value associates value with one of the parameters defined in the parent profile.
 Each of the sizes in a profile MUST have the same set of function parameters (e.g. ingress bandwidth), but the values MAY differ.
 
 The ordering of the list MUST be defined by the ordering of the functional attributes that define the service. 
 
-For example, for the "Example" profile, we might have the sizes:
+For example, for the "Standard" profile, we might have the sizes:
 
 `small`:: Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, max 100 connections per second, 1MB max message size.
 `medium`:: Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, max 100 connections per second, 1MB max message size.
@@ -93,10 +93,10 @@ The UI MUST NOT make assumptions about linearity of scaling, instead it uses onl
 
 ==== Profile discovery
 
-Reusing the "Example" profile defined above, let's illustrate how the Fleet Manager could communicate the available kinds of cluster to a UI.
+Reusing the "Standard" profile defined above, let's illustrate how the Fleet Manager could communicate the available kinds of cluster to a UI.
 
 .Sequence diagram of UI/Fleet manager interaction
-image::ui-fleet_manager.png[UI/Fleet manager interaction]
+image::adr-81-ui-fleet_manager.png[UI/Fleet manager interaction]
 
 After the UI has discovered the available cloud providers and regions it would make another GET request `/api/kafkas_mgmt/v1/profile/{cloudId}/{cloudRegion}` to discover the profiles available in this cloud and region.
 An example response JSON is shown below.
@@ -105,71 +105,74 @@ An example response JSON is shown below.
 .Example profile available to a UI from the Fleet Manager's `GET /api/kafkas_mgmt/v1/profiles/{cloudId}/{cloudRegion}` endpoint
 ----
 "profiles": [ <1>
-    { "id": 1, <2>
-      "name": "Example", <3>
-      "description": "Multi-broker, multi-AZ", <4>
-      "parameters": { <5>
-        "ingress" : { "name": "Ingress", "unit": "MiB/s" },
-        "egress": { "name": "Egress", "unit": "MiB/s" },
-        "partitions": { "name": "Partitions" },
-        "connections": { "name": "Connections" },
-        "connectionRate": { "name": "Connection Rate", "unit": "/s" },
+    { "id": "standard", <2>
+      "parameters": { <3>
+        "ingressThroughputPerSec" : { "name": "Ingress", "unit": "MiB/s" },
+        "egressThroughputPerSec": { "name": "Egress", "unit": "MiB/s" },
+        "maxPartitions": { "name": "Partitions" },
+        "totalMaxConnections": { "name": "Connections" },
+        "maxConnectionAttemptsPerSec": { "name": "Connection Rate", "unit": "/s" },
         "maxMessageSize": { "name": "Maximum message size", "unit": "MiB" },
+        "cost": { "name": "Number of entitlements required to create an instance" }
       },
-      "sizes": [ <6>
-        { "id": "s", <7>
-          "name": "Small", <8>
-          "description": "",
-          "parameterValues": { <9>
-            "ingress": "30", "egress": "30", "partitions": "1000", "connections": "500",
-            "connectionRate": "100", "maxMessageSize": "1"
+      "sizes": [ <4>
+        { "id": "s", <5>
+          "parameterValues": { <7>
+            "ingressThroughputPerSec": "30", "egressThroughputPerSec": "30", 
+            "maxPartitions": "1000", "totalMaxConnections": "500",
+            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
+            "cost": 1,
           }
         },
         { "id": "m",
-          "name": "Medium",
           "parameterValues": {
-            "ingress": "60", "egress": "60", "partitions": "2000", "connections": "1000",
-            "connectionRate": "100", "maxMessageSize": "1" 
+            "ingressThroughputPerSec": "60", "egressThroughputPerSec": "60", 
+            "maxPartitions": "2000", "totalMaxConnections": "1000",
+            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
+            "cost": 2,
           }
         },
         { "id": "l",
-          "name": "Large",
           "parameterValues": {
-            "ingress": "90", "egress": "90", "partitions": "3000", "connections": "1500",
-            "connectionRate": "100", "maxMessageSize": "1"
+            "ingressThroughputPerSec": "90", "egressThroughputPerSec": "90", 
+            "maxPartitions": "3000", "totalMaxConnections": "1500",
+            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1".
+            "cost": 3,
           }
         }
       ],
     },
+    { "id": "eval", 
+      // ...
+    }
     // other profiles as necessary
 ]
 ----
 <1> The order of this list MAY be reflect the way that profiles are shown in the UI. 
 E.g. "Developer", "Standard" and "Enterprise" profiles might be shown in that order.
-<2> The profiles `id` uniquely identifies the profile. 
+<2> Each profile's `id` uniquely identifies the profile. 
 It MUST NOT change.
-<3> Profile names MUST be unique within the `profiles` list. 
-It MAY be changed. 
-It MAY be localized.
-<4> The profile description can be used in a UI/CLI to help guide users to appropriate flavour of the service. 
-It MAY be localized.
-<5> Each profile defines a set of parameters, together with their units and descriptions. 
+It should be treated as an internal id and MUST NOT be exposed directly to a user.
+<3> Each profile defines a set of parameters, together with their units and descriptions. 
 Each size in the profile must give values for all the parameters that the profile defines. 
 Different profiles MAY define different parameters. 
 The units and descriptions MAY be localized.
-<6> The size list MUST be ordered such that later items represent clusters with more capacity.
-<7> The size `id` uniquely identifies the size within the profile. 
+<4> The size list MUST be ordered such that later items represent clusters with more capacity.
+<5> The size `id` uniquely identifies the size within the profile. 
 It MUST NOT change.
-It MUST NOT be localized.
-<8> The size `name` MUST be unique within the `sizes` list. 
-It MAY be changed.
-It MAY be localized.
-<9> The `parameterValues` of a size MUST define the same properties as the profile's `parameters` object.
+It should be treated as an internal id and MUST NOT be exposed directly to a user.
+The unit or meaning of cost is not defined in this ADR. 
+<7> The `parameterValues` of a size MUST define the same properties as the profile's `parameters` object.
 
 NOTE: The above is not intended as a detailed API specification, merely an illustration of how the profiles and their sizes are communicated from the Fleet Manager to a UI.
 
-NOTE: It may be necessary, eventually, to distinguish the supported actions that are supported for a given profile and size.
-For example, we might want to prevent the creation of new instances of the "ex1" profile while supporting existing instances. 
+Because the profile and size ids never change a UI MAY use them as keys for localized user-facing names and descriptions.
+
+Where it is necessary for a single string to be used to unambiguously refer to a given size within a profile the format `<profileId>.<sizeId>` SHOULD be used. 
+To avoid ambiguity profile and size ids MUST be a valid DNS subdomain.
+
+It may be necessary, eventually, to distinguish the supported actions that are supported for a given profile and size.
+For example, we might want to prevent the creation of new instances of the "eval" profile while supporting existing instances. 
 So we might eventually want additional properties in the instance size schema.
 
 ==== Instance creation
@@ -182,7 +185,7 @@ The `POST /api/kafkas_mgmt/v1/kafkas` endpoint would change to take the profile 
 {
     "region": "us-east-1",
     "cloud_provider": "aws",
-    "profileId": 1, <1>
+    "profileId": "standard", <1>
     "sizeId": "s", <2>
     "name": "serviceapitest"
 
