@@ -116,15 +116,19 @@ An example response JSON is shown below.
         "totalMaxConnections": { "name": "Connections" },
         "maxConnectionAttemptsPerSec": { "name": "Connection Rate", "unit": "/s" },
         "maxMessageSize": { "name": "Maximum message size", "unit": "MiB" },
-        "cost": { "name": "Number of entitlements required to create an instance" }
+        "quotaType": { "name": "The kind of quota an instance of this plan consumes" }, <4>
+        "quotaConsumed": { "name": "The amount of quota instance of this plan consumes" }, <5>
+        "capacityConsumed": { "name": "An amount of shard capacity consumed by an instance of this plan" } <6>
       },
-      "sizes": [ <4>
-        { "id": "s", <5>
-          "parameterValues": { <7>
+      "sizes": [ <7>
+        { "id": "s", <8>
+          "parameterValues": { <9>
             "ingressThroughputPerSec": "30", "egressThroughputPerSec": "30", 
             "maxPartitions": "1000", "totalMaxConnections": "500",
             "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
-            "cost": 1,
+            "quotaType": "foo", 
+            "quotaConsumed": 1, 
+            "capacityConsumed": 1
           }
         },
         { "id": "m",
@@ -132,15 +136,19 @@ An example response JSON is shown below.
             "ingressThroughputPerSec": "60", "egressThroughputPerSec": "60", 
             "maxPartitions": "2000", "totalMaxConnections": "1000",
             "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
-            "cost": 2,
+            "quotaType": "foo", 
+            "quotaConsumed": 2,
+            "capacityConsumed": 2
           }
         },
         { "id": "l",
           "parameterValues": {
-            "ingressThroughputPerSec": "90", "egressThroughputPerSec": "90", 
+            "ingressTh <10>roughputPerSec": "90", "egressThroughputPerSec": "90", 
             "maxPartitions": "3000", "totalMaxConnections": "1500",
-            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1".
-            "cost": 3,
+            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
+            "quotaType": "foo", 
+            "quotaConsumed": 3,
+            "capacityConsumed": 3
           }
         }
       ],
@@ -160,12 +168,21 @@ It should be treated as an internal id and MUST NOT be exposed directly to a use
 Each size in the instance type must give values for all the parameters that the instance type defines. 
 Different instance types MAY define different parameters. 
 The units and descriptions MAY be localized.
-<4> The size list MUST be ordered such that later items represent clusters with more capacity.
-<5> The size `id` uniquely identifies the size within the instance type. 
+<4> A reference to a kind of quota.
+This is an abstraction for how the service is billed.
+Note that all plans support this parameter.
+<5> A reference to an amount of quota consumed.
+This is an abstraction for how the service is billed. 
+Note that all plans support this parameter.
+<6> This is currently needed so that the UI can report whether an instance can be created.
+This parameter will be removed once a shard is able to report its capacity to the fleet manager, and the fleet manager exposes a dedicated endpoint for plan validation.
+Note that all plans support this parameter.
+<7> The size list MUST be ordered such that later items represent clusters with more capacity.
+<8> The size `id` uniquely identifies the size within the instance type. 
 It MUST NOT change.
 It should be treated as an internal id and MUST NOT be exposed directly to a user.
 The unit or meaning of cost is not defined in this ADR. 
-<7> The `parameterValues` of a size MUST define the same properties as the instance type's `parameters` object.
+<9> The `parameterValues` of a size MUST define the same properties as the instance type's `parameters` object.
 
 NOTE: The above is not intended as a detailed API specification, merely an illustration of how the instance types and their sizes are communicated from the Fleet Manager to a UI.
 
