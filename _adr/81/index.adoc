@@ -49,17 +49,20 @@ The service does not offer any scaling options, except for storage, which is ort
 // What is the decision being proposed
 
 === Conceptual model
-Conceptually we define a _profile_, which is an ordered list of _sizes_ of instance. 
+Conceptually we define an _instance type_ (also known as a _profile_), which is an ordered list of _sizes_ of instance. 
 
-In addition to being a composite of sizes, a _profile_ has an id and a set of parameters that is common across all the sizes in the profile.
+In addition to being a composite of sizes, an _instance type_ has an id and a set of parameters that is common across all the sizes in the instance type.
 
-A _size_ has an id and a set of parameter values.
-Each parameter value associates value with one of the parameters defined in the parent profile.
-Each of the sizes in a profile MUST have the same set of function parameters (e.g. ingress bandwidth), but the values MAY differ.
+A _size_ has an id (which is unique among the other sizes in the same instance type), and a set of parameter values.
+Each parameter value associates a value with one of the parameters defined in the parent instance type.
+Each of the sizes in an instance type MUST have the same set of function parameters (e.g. ingress bandwidth), but the values MAY differ.
+
+Finally, we use the term _plan_ to refer to an (instance type, size)-pair.
+Thus a plan is, unambiguously, a particular size of a particular instance type. 
 
 The ordering of the list MUST be defined by the ordering of the functional attributes that define the service. 
 
-For example, for the "Standard" profile, we might have the sizes:
+For example, for the "Standard" instance type, we might have the sizes:
 
 `small`:: Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, max 100 connections per second, 1MB max message size.
 `medium`:: Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, max 100 connections per second, 1MB max message size.
@@ -71,40 +74,40 @@ For example, it would have been acceptable to define the `large` ingress as 100M
 
 === General principles
 
-* An individual fleet shard is required to provide only a subset of all profiles supported by the service globally. 
-Indeed, a fleet shard might possibly support only a single profile.
-For example a shard on AWS might support a different set of profiles to a shard on Azure, or the same profiles might have different sizes on those clouds.
-One of the purposes of introducing the profile/size concept is to provide flexibility in the kinds of service offered in the future.
+* An individual fleet shard is required to provide only a subset of all instance types supported by the service globally. 
+Indeed, a fleet shard might possibly support only a single instance type.
+For example a shard on AWS might support a different set of instance types to a shard on Azure, or the same instance types might have different sizes on those clouds.
+One of the purposes of introducing the instance type and size concepts is to provide flexibility in the kinds of service offered in the future.
 
-* The availability of a profile might be limited to a particular cloud, region or combination of both.
+* The availability of an instance type might be limited to a particular cloud, region or combination of both.
 
-* It is a private concern of the shard exactly how each size in a profile is provisioned.
+* It is a private concern of the shard exactly how each size in an instance type is provisioned.
 In principle it could use vertical and/or horizontal scaling and/or density > 1, in addition to applying quotas to limit capacity to the advertised limits.
 The fleet manager doesn't know.
 
 === UI/Fleet manager interface
 
 This ADR does not mandate any particular presentation for how the scale options are presented in the UI.
-In particular while there is only one profile defined, there is no requirement to display profiles in the UI at all.
+In particular while there is only one instance type defined, there is no requirement to display instance types in the UI at all.
 
-The fleet manager SHALL be the source of truth for the profiles and sizes available, and how those depend on cloud and region. 
-The fleet manager SHALL provide an endpoint which the UI MUST use to determine the available profiles and sizes.
-The UI MUST NOT make assumptions about linearity of scaling, instead it uses only the profiles and sizes provided by the endpoint.
+The fleet manager SHALL be the source of truth for the instance types and sizes available, and how those depend on cloud and region. 
+The fleet manager SHALL provide an endpoint which the UI MUST use to determine the available instance types and sizes.
+The UI MUST NOT make assumptions about linearity of scaling, instead it uses only the instance types and sizes provided by the endpoint.
 
-==== Profile discovery
+==== Instance type discovery
 
-Reusing the "Standard" profile defined above, let's illustrate how the Fleet Manager could communicate the available kinds of cluster to a UI.
+Reusing the "Standard" instance type defined above, let's illustrate how the Fleet Manager could communicate the available kinds of cluster to a UI.
 
 .Sequence diagram of UI/Fleet manager interaction
 image::adr-81-ui-fleet_manager.png[UI/Fleet manager interaction]
 
-After the UI has discovered the available cloud providers and regions it would make another GET request `/api/kafkas_mgmt/v1/profile/{cloudId}/{cloudRegion}` to discover the profiles available in this cloud and region.
+After the UI has discovered the available cloud providers and regions it would make another GET request `/api/kafkas_mgmt/v1/instance_types/{cloudId}/{cloudRegion}` to discover the instance types available in this cloud and region.
 An example response JSON is shown below.
 
 [source,json]
-.Example profile available to a UI from the Fleet Manager's `GET /api/kafkas_mgmt/v1/profiles/{cloudId}/{cloudRegion}` endpoint
+.Example instance type available to a UI from the Fleet Manager's `GET /api/kafkas_mgmt/v1/instance_types/{cloudId}/{cloudRegion}` endpoint
 ----
-"profiles": [ <1>
+"instance_types": [ <1>
     { "id": "standard", <2>
       "parameters": { <3>
         "ingressThroughputPerSec" : { "name": "Ingress", "unit": "MiB/s" },
@@ -148,36 +151,36 @@ An example response JSON is shown below.
     // other profiles as necessary
 ]
 ----
-<1> The order of this list MAY be reflect the way that profiles are shown in the UI. 
-E.g. "Developer", "Standard" and "Enterprise" profiles might be shown in that order.
-<2> Each profile's `id` uniquely identifies the profile. 
+<1> The order of this list MAY be reflect the way that instance types are shown in the UI. 
+E.g. "Developer", "Standard" and "Enterprise" instance types might be shown in that order.
+<2> Each instance type's `id` uniquely identifies the instance type. 
 It MUST NOT change.
 It should be treated as an internal id and MUST NOT be exposed directly to a user.
-<3> Each profile defines a set of parameters, together with their units and descriptions. 
-Each size in the profile must give values for all the parameters that the profile defines. 
-Different profiles MAY define different parameters. 
+<3> Each instance type defines a set of parameters, together with their units and descriptions. 
+Each size in the instance type must give values for all the parameters that the instance type defines. 
+Different instance types MAY define different parameters. 
 The units and descriptions MAY be localized.
 <4> The size list MUST be ordered such that later items represent clusters with more capacity.
-<5> The size `id` uniquely identifies the size within the profile. 
+<5> The size `id` uniquely identifies the size within the instance type. 
 It MUST NOT change.
 It should be treated as an internal id and MUST NOT be exposed directly to a user.
 The unit or meaning of cost is not defined in this ADR. 
-<7> The `parameterValues` of a size MUST define the same properties as the profile's `parameters` object.
+<7> The `parameterValues` of a size MUST define the same properties as the instance type's `parameters` object.
 
-NOTE: The above is not intended as a detailed API specification, merely an illustration of how the profiles and their sizes are communicated from the Fleet Manager to a UI.
+NOTE: The above is not intended as a detailed API specification, merely an illustration of how the instance types and their sizes are communicated from the Fleet Manager to a UI.
 
-Because the profile and size ids never change a UI MAY use them as keys for localized user-facing names and descriptions.
+Because the instance type and size ids never change a UI MAY use them as keys for localized user-facing names and descriptions.
 
-Where it is necessary for a single string to be used to unambiguously refer to a given size within a profile the format `<profileId>.<sizeId>` SHOULD be used. 
-To avoid ambiguity profile and size ids MUST be a valid DNS subdomain.
+Where it is necessary to refer to a plan using a single string, the syntax `<InstanceTypeId>.<SizeId>` SHOULD be used. 
+To avoid ambiguity instance type and size ids MUST be a value RFC 1123 Label Name.
 
-It may be necessary, eventually, to distinguish the supported actions that are supported for a given profile and size.
-For example, we might want to prevent the creation of new instances of the "eval" profile while supporting existing instances. 
+It may be necessary, eventually, to distinguish the supported actions that are supported for a given instance type and size.
+For example, we might want to prevent the creation of new instances of the "eval" instance type while supporting existing instances. 
 So we might eventually want additional properties in the instance size schema.
 
 ==== Instance creation
 
-The `POST /api/kafkas_mgmt/v1/kafkas` endpoint would change to take the profile id and size id in addition to the existing parameters.
+The `POST /api/kafkas_mgmt/v1/kafkas` endpoint would change to take the instance type id and size id in addition to the existing parameters.
 
 [source,json]
 .Example `POST /api/kafkas_mgmt/v1/kafkas` made by a UI to the Fleet Manager to create an instance
@@ -185,28 +188,26 @@ The `POST /api/kafkas_mgmt/v1/kafkas` endpoint would change to take the profile 
 {
     "region": "us-east-1",
     "cloud_provider": "aws",
-    "profileId": "standard", <1>
-    "sizeId": "s", <2>
+    "plan": "standard.s", <1>
     "name": "serviceapitest"
 
 }
 ----
-<1> New property, the id refers to the id of the profile previously served from the profile discovery endpoint.
-<2> New property, the id refers to the id of the size in the given profile.
+<1> New property.
 
-To allow the API to evolve compatibly, the manager MAY use a default profile and size in the case that the `POST` request omits these properties.
+To allow the API to evolve compatibly, the manager MAY use a default instance type and size in the case that the `POST` request omits these properties.
 
-If the requested profile and/or size is not available in that cloud provider and region a HTTP 400 error response is returned.
+If the requested instance type and/or size is not available in that cloud provider and region a HTTP 400 error response is returned.
 
 ==== Getting instance state
 
-Similarly, the `GET /api/kafkas_mgmt/v1/kafkas/{id}` endpoint would change to include the profile and size.
+Similarly, the `GET /api/kafkas_mgmt/v1/kafkas/{id}` endpoint would change to include the instance type and size.
 
 === Fleet manager responsibilities
 
-The supported profiles are passed to the fleet manager via app interface.
+The supported instance types are passed to the fleet manager via app interface.
 
-When terraforming a shard, the manager needs to keep track of which profiles are/will be supported on that shard.
+When terraforming a shard, the manager needs to keep track of which instance types are/will be supported on that shard.
 
 Currently it is acceptable for the manager to embed knowledge of the machine types needed by the shard.
 The manager does not know how the nodes running on those machines will be used.
@@ -217,7 +218,7 @@ It is expected that a future ADR will describe a mechanism for the shard and man
 .Sequence diagram of Fleet shard operator/Fleet manager interaction
 image::adr-81-fso-manager.png[Fleet shard operator/Fleet manager interaction]
 
-When the manager includes an instance in the response to its `GET /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas` it does not include the profile or size.
+When the manager includes an instance in the response to its `GET /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas` it does not include the instance type or size.
 It instead passes the functional parameters corresponding to the size selected by the user via the Managed Custom Resource.
 This is basically the same as the existing contract.
 
@@ -248,7 +249,7 @@ No changes to existing threat models identified.
 
 == Alternatives Considered / Rejected
 
-A single profile::
+A single instance type::
 This would work fine initially, but:
 
 * We couldn't easily offer a size smaller than "small".
@@ -258,18 +259,18 @@ This would work fine initially, but:
 * It requires that we can provide the same sizes on other clouds, which could be problematic if performance parity between clouds could not be achieved.
 +
 An integer unit (1 unit, 2 unit etc)::
-Similar problems to those of having single profile.
+Similar problems to those of having single instance type.
 Note that although this ADR is using size names which follow T-shirt nomenclature, the names are really just labels and could be changed to "1 unit", "2 units" without loss of generality.
 +
 Provisioning only in multiples of integer units::
-E.g. a profile with sizes 100, 200, etc.
-This solves being able to insert new sizes between existing sizes in the future, but because it's a single scale it doesn't provide the flexibility of supporting multiple profiles.
+E.g. a instance type with sizes 100, 200, etc.
+This solves being able to insert new sizes between existing sizes in the future, but because it's a single scale it doesn't provide the flexibility of supporting multiple instance types.
 
 
 == Challenges
 // What are the costs/drawbacks of the proposed decision?
 
-Defining the _profile_ concept up-front (before we actually need it) imposes a small extra cost in terms of the initial implementation complexity of providing a scalable service. 
+Defining the _instance type_ concept up-front (before we actually need it) imposes a small extra cost in terms of the initial implementation complexity of providing a scalable service. 
 However, adopting this conceptual model early means
 
 * we can recognize and develop a collective understand of the fact that however we initially define how we scale the service is arbitrary and may be subject to change over time, between clouds, or as a result of our future desire to provide the service in a different way.
