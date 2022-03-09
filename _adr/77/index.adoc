@@ -1,7 +1,7 @@
 ---
 num: 77
 title: "Heterogeneous Kafka data plane"
-status: "Draft"
+status: "Accepted"
 authors:
   - "Tom Bentley"
 tags:
