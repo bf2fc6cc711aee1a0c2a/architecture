@@ -1,0 +1,23 @@
+---
+num: 13
+category: "DNS, network, bandwidth"
+title: "Waiting for DNS record creation"
+status: "Draft"
+authors:
+  - "Gerard Ryan"
+---
+
+When a component depends on a DNS record that it doesn't create itself, it
+should verify the existence of that record in the authoritative nameserver,
+before attempting to use it through the normal resolution path.
+The intention of this pattern is to avoid delays caused by negative DNS caching
+of the record in any resolvers on the normal resolution path, especially at
+service creation time.
+
+Checking the existence of the DNS record could be done as a wait loop in the
+start up routine of the component.
+Alternatively the wait can be added as a pre-condition before starting the
+component, such as by using an init container on a Pod in Kubernetes.
+The latter approach might be used, for example, where the upstream project has
+not released a version of the component with the ability, and it's undesirable
+to maintain a custom patch/fork of the component.
