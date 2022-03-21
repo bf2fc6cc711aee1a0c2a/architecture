@@ -44,7 +44,7 @@ A new machine pool will be created for each new managed service. A machine pool 
 
 This allows each new managed service to determine their own instance type that suits their needs. For example, M5 (general purpose), C5 (CPU optimised), R5 (Memory optimised) and at the size they would like.
 
-All machine pools will be created through the OpenShift Cluster Manager (OCM) API, not directly on the OpenShift Dedicated (OSD) clusters. Each machine pool will be created with a NoSchedule taint which will require all pods scheduled for that managed service to include the tolleration.
+All machine pools will be created through the OpenShift Cluster Manager (OCM) API, not directly on the OpenShift Dedicated (OSD) clusters. Each machine pool will be created with a `NoSchedule` taint which will require all pods scheduled for that managed service to include the toleration.
 
 While outside the scope of this ADR, it is worth noting that with a shared data plane fleet, a new micro service in the control plane would be ideal to control scaling machine pools, creation and deletion of data plane OSD clusters.
 
