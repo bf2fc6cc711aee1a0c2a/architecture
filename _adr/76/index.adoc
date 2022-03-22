@@ -1,0 +1,96 @@
+---
+num: 76
+title: "Handling usage of dynamically-async-created DNS records from dependent services"
+status: "Accepted"
+authors:
+  - "Gerard Ryan"
+tags:
+  - kafka
+applies_padrs: # What PADRs does this ADR apply?
+applies_patterns: # What APs does this ADR apply?
+---
+
+:link-adr-57: link:../57/index.html[ADR-57]
+:abbr-rhosak: pass:[<abbr title="Red Hat OpenShift Streams for Apache Kafka">RHOSAK</abbr>]
+// Top style tips:
+// * Use one sentence per line
+// * No unexpanded acronyms
+// * No undefined jargon
+
+// No need for a title heading, it's added by the template
+
+== Context and Problem Statement
+// What is the background against which this decision is being taken?
+
+For some services (such as {abbr-rhosak}), when a new instance is being created for a customer, we create new cluster-agnostic DNS records in Route53 via the control plane, pointing to resources that the customer needs access to.
+We also use those customer-facing domains to monitor availability (such as via the Strimzi Canary in the {abbr-rhosak} case).
+
+The problem is that the data plane components process may start continuously trying to connect the domain for a period of time before the domain has been created.
+This can lead to an issue called “negative DNS caching”, where DNS resolvers, between the querying process and the authoritative DNS servers for the domain, cache the non-existence of the domain for a few minutes.
+This can lead to a longer lead time to the monitoring process reporting availability metrics.
+If there’s a load-balanced caching DNS resolver setup involved, then some of them may negatively cache, but not others.
+This can lead to the additional problem where the domain eventually exists, and a DNS server replica that hasn’t negatively cached is hit and gives a successful response, but then after the TTL expires, another lookup is performed and hits one that is still negatively caching, then it can appear as though the service has become unavailable after initially being available.
+
+If a service (such as {abbr-rhosak}) is affected by this problem and does not address it, then it could affect any availability SLO reporting, and could also cause alerts to fire unnecessarily, causing unhappy SREs.
+
+== Goals
+// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+
+* Improve availability monitoring by preventing negative DNS caching.
+
+== Current situation
+// Where are we now?
+
+=== {abbr-rhosak}
+* Fleetshard operator in data plane decides what domains are needed, and passes the list back to fleet manager in the control plane, which creates the required records in AWS Route 53 (as described in {link-adr-57}).
+* Fleetshard operator provisions the Kafka instance, including the component that needs to dial the external address.
+* The component that needs to dial the external address starts trying to connect to the dependent service using the external address
+** The DNS lookups of the external address domain will fail continuously until the domain exists.
+
+
+== Proposal
+// What is the decision being proposed
+
+=== {abbr-rhosak}
+* Fleetshard operator in data plane decides what domains are needed, and passes the list back to fleet manager in the control plane, which creates the required records in AWS Route 53 (as described in {link-adr-57}).
+* Fleetshard operator provisions the Kafka instance including the component that needs to lookup the external address.
+The component itself is responsible for determining the authoritative DNS server for the external domain, and querying it for the domain in question periodically, until it indicates that the domain exists.
+This logic could be in the component’s initialization routine, or a script in an init container on the pod, or any other such approach.
+It’s suggested to log or expose metrics on the number of failed lookups for a host over time, as it could be useful for troubleshooting.
+
+[NOTE]
+====
+For our development clusters, for {abbr-rhosak} at least, we use OSD clusters on AWS, and we use subdomains on the cluster domain for the external address, rather than CNAMEs created asynchronously.
+These OSD clusters use split DNS, using two hosted zones in Route53, one public and one private.
+When the component tries to query the subdomain using the authoritative DNS server on the internal zone (it gets this because it’s querying from within the cluster), then it will get a REFUSED answer.
+In this case, either the authoritative DNS server will need to be determined from the external zone (or passed in), or the lookup wait behaviour should be inhibited somehow.
+====
+
+=== Threat model
+// Provide a link to the relevant threat model.
+// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+
+No threat model changes are expected here.
+
+== Alternatives Considered / Rejected
+* It was considered to get the control plane to inform the data plane when the domains have been created so that it could delay the creation of the canary deployment until ready.
+This would cause a more complex interaction between the control plane and data plane to get to the initial ready state, so it was rejected for the time being, in favour of the simpler approach detailed in this ADR.
+
+== Challenges
+// What are the costs/drawbacks of the proposed decision?
+
+* Development clusters use cluster-specific route domains, rather than CNAME records like stage/prod.
+OSD clusters are configured with split DNS, using two hosted zones in Route 53, one private and one public.
+In this case, when trying to determine an authoritative DNS server for the bootstrap domain, one from the internal zone will be returned.
+For some reason, these refuse lookup requests from the pod. For this reason, the init container will not be added for development clusters.
+
+== Dependencies
+// What are the knock-on effects if this decision is accepted?
+
+N/A
+
+== Consequences if not completed
+// What are the knock-on effects if this decision is not accepted?
+* Canary metrics will continue to sometimes report that the Kafka instance is unavailable for a few minutes after it is ready, causing:
+** Critical alerts to fire, paging SREs
+** Data plane SLO dashboards to report degraded performance against the SLO
