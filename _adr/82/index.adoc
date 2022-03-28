@@ -1,0 +1,87 @@
+---
+num: 82
+title: Streaming Unit Hour Metrics
+status: "Draft"
+authors:
+  - "Peter Braun"
+tags:
+  - "kafka"
+#applies_padrs: # What PADRs does this ADR apply?
+#applies_patterns: # What APs does this ADR apply?
+---
+
+## Context and problem statement
+
+Streaming Unit pricing will be accomplished by introducing a new concept called ‘Streaming Unit Hours’. This is defined as Cluster Hours multiplied by the Streaming Unit Size. Here Streaming Unit Size should not be confused with Quota usage which is required for prepaid pricing.
+
+Cluster Hours are currently recorded on the data plane clusters using a recording rule (kafka_id:strimzi_resource_state:max_over_time1h). We need a way to multiply the value of this with the Streaming Unit Size for a given instance.
+
+Other metrics don’t need to be multiplied: storage and traffic are billed independently of the Streaming Unit.
+
+## Goals
+
+* Modify the recording rule kafka_id:strimzi_resource_state:max_over_time1h to multiply its value by the Streaming Unit Size.
+
+## Non-goals
+
+* Changes on the Subwatch side. This ADR is only concerned with the Managed Kafka changes.
+* Define additional fields to hold the cost per Streaming Unit hour. The amount is simply multiplied by the instance size.
+
+Stakeholders
+
+* Eng
+* BU
+* QE
+
+## Current architecture
+
+Cluster Hours are defined in our link:https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk[Observability Resources] repository among other consumption related metrics. It is collected on the data plane and remote written to Observatorium. From there it is made available to Subscription Watch who use it to create invoices.
+
+Cluster Hours is based on the maximum-per-one-hour value of the underlying strimzi_resource_state metric which is 1 when a Kafka CR is present in the namespace. Thus, our billing is accurate to the hour.
+
+The Kafka instance size in Streaming Units is not taken into account at any point here.
+
+## Proposed architecture
+
+Proposed Architecture
+
+*Firstly*, the size in Streaming Units needs to be available to the data plane. That is currently not the case. The options to achieve this are:
+
+1. Include it in the Managed Kafka CR as an annotation. The CR is retrieved by the Fleetshard sync component via the /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas endpoint.
+2. Include it in the Managed Kafka CR Capacity spec. Also retrieved by the Fleetshard sync component via the /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas endpoint.
+
+*Secondly*, the Streaming Unit size needs to be exposed as a metric on the data plane. Components that could expose this are either the Fleetshard Operator, the Fleetshard Sync component or the Canary.
+
+Why a metric and not a label? It does not seem to be possible to multiply a Prometheus metric with a value retrieved from a label. Instead, the multiplication needs to happen as a join of two metrics, the existing Cluster Hours and the new Streaming Unit Size.
+
+*Thirdly*, the new Streaming Unit Hours metric needs to be scraped and made available to the cluster monitoring stack. It does not need to be sent to Observatorium as it will only be used in the recording rule to calculate the Cluster Hours (now Streaming Unit Hours). The query in the recording rule needs to be updated to multiply the value by the Streaming Unit size,e.g.
+
+....
+max_over_time(strimzi_resource_state[1h]) * on (resource_namespace) group_left sum by (resource_namespace) (kafka_instance_streaming_unit_size)
+....
+
+*Note*: the new metric is required to have the resource_namespace label for the join to work.
+
+## Threat model
+
+* No threat model changes are expected here.
+
+## Requires architecutral overview update
+
+* No architectural overview update anticipated.
+
+## Alternatives considered / rejected
+
+Alternatives to the described approach are multiple products and Streaming Unit metadata. They have been elaborated in link:https://docs.google.com/document/d/1fkeEqZ6JIclsgtynssBH43uphP2dVgvuPmsb-eaDKro/edit#heading=h.gn81l1rechyx[this document].
+
+## Challenges
+
+* A component that can expose the Streaming Unit size as a metric needs to be identified.
+
+## Dependencies
+
+* Testing and validation should be considered a dependency as this is a critical change that influences how customers are billed.
+
+## Consequences if not completed
+
+* We will not be able to bill customers correctly.
