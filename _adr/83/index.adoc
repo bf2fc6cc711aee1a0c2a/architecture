@@ -1,7 +1,7 @@
 ---
-num: 0 # allocate an id when the draft is created
+num: 83
 title: Permission API
-status: "Draft"
+status: "Accepted"
 authors:
   - "Massimiliano Ziccardi"
 tags:
@@ -15,7 +15,8 @@ Deciding whether a certain operation is allowed can be a complex matter and may 
 Consumers of the Kas Fleet Manager APIs have no way of verifying in advance whether a particular request will be successful.
 The only way to do that, is to perform the same checks that Kas Fleet Manager will do while executing the action.
 
-This brings complexities and duplications. For example, just to check whether the creation of a new kafka is possible or not, at least the following checks must be performed:
+This brings complexities and duplications. For example, just to check whether the creation of a new kafka is possible or not,
+currently UI and CLI have to perform at least the following checks:
 
 . Verify that the required terms and conditions have been accepted (this requires interaction with another service)
 . Make sure you have enough quota allocated. This requires:
@@ -30,7 +31,7 @@ This brings complexities and duplications. For example, just to check whether th
 Another point of attention is that currently, any change in the flow requires an update to all the actors/consumers who are carrying out those checks.
 
 ## Goals
-* API consumers can query KAS Fleet Manager Permission API to check if they can perform a certain action and receive a response with the outcome (granted/denied) containing all the granted resources or, eventually, any missing requirements.
+* API consumers can query a new KAS Fleet Manager Permission API to check if they can perform a certain action and receive a response with the outcome (allowed/denied) containing all the granted resources or, eventually, the missing requirements.
 
 ## Non-goals
 
@@ -50,17 +51,17 @@ Output of the API will be a JSON with the following structure:
 +
 ```
 {
-  outcome: string,           // enum: granted/denied
+  allowed: boolean,
   metadata: {
     {key string}:{value}
   }
-  errors: [{
+  reason: {
     code: string,
     description: string,
     metadata: {             // additional details
       {key string}: {value string}
     }
-  },...]
+  }
 }
 ```
 +
@@ -70,9 +71,9 @@ Some real world example for an invocation of the `/can/create/kafka` could be:
 +
 ```
 {
-  outcome: 'granted',
+  allowed: true,
   metadata: {
-    plans: ['standard.x1']
+    plans: ['standard.x1'],
     quota: {
       granted: 6,
       used: 5
@@ -85,9 +86,9 @@ Some real world example for an invocation of the `/can/create/kafka` could be:
 +
 ```
 {
-  outcome: 'granted',
+  allowed: true,
   metadata: {
-    plans: ['standard.x1', 'standard.x2']
+    plans: ['standard.x1', 'standard.x2'],
     quota: {
       granted: 6,
       used: 5
@@ -100,14 +101,14 @@ Some real world example for an invocation of the `/can/create/kafka` could be:
 +
 ```
 {
-  outcome: "denied",
-  errors: [{
+  allowed: false,
+  reason: {
     code: "ERR-TERMS-01",
     description: "Required terms have not been accepted",
     metadata: {
       acceptance_url: "https://url.to.accept.terms"
     }
-  }]
+  }
 }
 ```
 
