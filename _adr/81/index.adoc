@@ -1,7 +1,7 @@
 ---
 num: 81
 title: Kafka instance scaling
-status: "Draft"
+status: "Accepted"
 authors:
   - "Tom Bentley"
 tags:
