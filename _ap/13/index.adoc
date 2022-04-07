@@ -21,3 +21,5 @@ component, such as by using an init container on a Pod in Kubernetes.
 The latter approach might be used, for example, where the upstream project has
 not released a version of the component with the ability, and it's undesirable
 to maintain a custom patch/fork of the component.
+
+An example of this pattern in use can be seen in link:../../adr/76[ADR-76].
