@@ -1,6 +1,6 @@
 ---
 num: 83
-title: Permission API
+title: Can-I API
 status: "Accepted"
 authors:
   - "Massimiliano Ziccardi"
@@ -44,9 +44,10 @@ Another point of attention is that currently, any change in the flow requires an
 The API will be authenticated and will allow the caller to check in advance whether he can perform a certain operation:
 +
 ```
-/can/{verb}/{resource}
+/can/{verb}/{resource}?deep=true
 ```
 +
+The API will stop at the first error unless `deep=true` is specified
 Output of the API will be a JSON with the following structure:
 +
 ```
@@ -55,13 +56,13 @@ Output of the API will be a JSON with the following structure:
   metadata: {
     {key string}:{value}
   }
-  reason: {
+  reasons: [{
     code: string,
     description: string,
     metadata: {             // additional details
       {key string}: {value string}
     }
-  }
+  }]
 }
 ```
 +
@@ -102,13 +103,35 @@ Some real world example for an invocation of the `/can/create/kafka` could be:
 ```
 {
   allowed: false,
-  reason: {
+  reasons: [{
     code: "ERR-TERMS-01",
     description: "Required terms have not been accepted",
     metadata: {
       acceptance_url: "https://url.to.accept.terms"
     }
-  }
+  }]
+}
+```
+
+.. Terms not accepted and insufficient quota
++
+```
+{
+  allowed: false,
+  reasons: [{
+    code: "ERR-TERMS-01",
+    description: "Required terms have not been accepted",
+    metadata: {
+      acceptance_url: "https://url.to.accept.terms"
+    }, {
+    code: "ERR-QUOTA-01",
+    description: "No enough quota available",
+    metadata: {
+      quota_assigned: 10,
+      quota_available: 1,
+      quota_needed: 2
+    }
+  }]
 }
 ```
 
