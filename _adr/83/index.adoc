@@ -12,7 +12,9 @@ tags:
 ## Context and Problem Statement
 Deciding whether a certain operation is allowed can be a complex matter and may require interactions with different components.
 
-Consumers of the Kas Fleet Manager APIs have no way of verifying in advance whether a particular request will be successful.
+This new API will allow the clients to check whether a certain operation is allowed by simply passing the top-level verb (create,delete,list, etc) and receiving whether it is allowed and what are the granted resources.
+
+Currently, consumers of the Kas Fleet Manager APIs have no way of verifying in advance whether a particular request will be successful.
 The only way to do that, is to perform the same checks that Kas Fleet Manager will do while executing the action.
 
 This brings complexities and duplications. For example, just to check whether the creation of a new kafka is possible or not,
@@ -44,7 +46,7 @@ Another point of attention is that currently, any change in the flow requires an
 The API will be authenticated and will allow the caller to check in advance whether he can perform a certain operation:
 +
 ```
-/can/{verb}/{resource}?deep=true
+GET /api/v1/can/{verb}/{resource}?deep=true
 ```
 +
 The API will stop at the first error unless `deep=true` is specified
