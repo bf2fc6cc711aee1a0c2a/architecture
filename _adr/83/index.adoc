@@ -34,24 +34,24 @@ currently UI and CLI have to perform at least the following checks:
 Another point of attention is that currently, any change in the flow requires an update to all the actors/consumers who are carrying out those checks.
 
 ## Goals
-* API consumers can query a new KAS Fleet Manager Permission API to check if they can perform a certain action and receive a response with the outcome (allowed/denied) containing all the granted resources or, eventually, the missing requirements.
+* API consumers can query a new KAS Fleet Manager Can-I API to check if they can perform a certain action and receive a response with the outcome (allowed/denied) containing all the granted resources or, eventually, the missing requirements.
 
 ## Non-goals
 
 ## Current architecture
-* Kas Fleet Manager currently only allows the ‘try and see if it works’ approach: if what you are trying to do fails, Kas Fleet Manager gives you some details on went wrong, but you have no way of checking in advance if what you want to do is possible
-* API Consumers (like UI) are doing the required checkss into their codebase and every time a change occurs, both Kas Fleet Manager and UI have to be updated to reflect the change
+* Kas Fleet Manager currently only allows the ‘try and see if it works’ approach: if what you are trying to do fails, Kas Fleet Manager gives you some details on what went wrong, but you have no way of checking in advance if what you want to do is possible
+* API Consumers (like UI) are doing the required checks into their codebase and every time a change occurs, both Kas Fleet Manager and UI have to be updated to reflect the change
 
 ## Proposed architecture
 * We need to create a new API.
-The API will be authenticated and will allow the caller to check in advance whether he can perform a certain operation.
-A different endpoint will be provided for each verb-resource pair, wich, in turn, will provide a schema defining exactly what the answer will look like.
+The API will be authenticated and will allow the callers to check in advance whether they can perform a certain operation.
+A different endpoint will be provided for each verb-resource pair, which, in turn, will provide a schema defining exactly what the answer will look like.
 +
 ```
 GET /api/v1/can/{verb}/{resource}?deep=true
 ```
 +
-The API will stop at the first error unless `deep=true` is specified
+The API will stop at the first error unless `deep=true` is specified.
 Output of the API will be a JSON with at least the following content:
 +
 ```
@@ -112,7 +112,7 @@ Some real world example for an invocation of the `/can/create/kafka` could be:
 }
 ```
 
-.. Terms not accepted and insufficient quota
+.. Terms not accepted and insufficient quota (with deep=true)
 +
 ```
 {
@@ -146,7 +146,7 @@ Some real world example for an invocation of the `/can/create/kafka` could be:
 * Client application will have to be updated to take advantage of the new API
 
 ## Dependencies
-* Current check logic implemented in the Kas Fleet Manager needs to be moved to a common, reusable framework that will be used by both the Kas Fleet Manager middlewares and the new Permission API
+* Current check logic implemented in the Kas Fleet Manager needs to be moved to a common, reusable framework that will be used by both the Kas Fleet Manager middlewares and the new Can-I API
 
 ## Consequences if not completed
 
