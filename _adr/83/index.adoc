@@ -1,0 +1,155 @@
+---
+num: 83
+title: Can-I API
+status: "Accepted"
+authors:
+  - "Massimiliano Ziccardi"
+tags:
+  - "kafka"
+#applies_padrs: # What PADRs does this ADR apply?
+#applies_patterns: # What APs does this ADR apply?
+---
+## Context and Problem Statement
+Deciding whether a certain operation is allowed can be a complex matter and may require interactions with different components.
+
+The clients need to be able to check whether a certain operation is allowed without having all or any of the details about the instance the user wants to create (because the user hasn't completed the form yet).
+So the only available inputs are the top-level verb (create, delete, list, etc.) and the resource (e.g. kafka instance)
+
+Currently, consumers of the Kas Fleet Manager APIs have no way of verifying in advance whether a particular request will be successful.
+The only way to do that, is to perform the same checks that Kas Fleet Manager will do while executing the action.
+
+This brings complexities and duplications. For example, just to check whether the creation of a new kafka is possible or not,
+currently UI and CLI have to perform at least the following checks:
+
+. Verify that the required terms and conditions have been accepted (this requires interaction with another service)
+. Make sure you have enough quota allocated. This requires:
+.. Having knowledge of the AMS endpoints and how to deal with them
+.. Having knowledge of the AMS terms used for designing the instance types (RHOSAKTrial for eval/developer and RHOSAK for standard)
+.. Enquire the quota assigned using the AMS endpoints, loop through the resources and check that enough quota is still available for product RHOSAK and resource RHOSAK
+.. If you have no quota assigned for STANDARD instances (RHOSAK), fallback to EVAL
+.. If you have quota for STANDARD (RHOSAK), but it is 0, fallback to EVAL (RHOSAKTrial)
+.. If you have quota for STANDARD (RHOSAK) and it is greater than 0 but all the granted quota is consumed, the creation should fail
+. Verify that at least one OCD Cluster has capacity for the instance you are going to create
+
+Another point of attention is that currently, any change in the flow requires an update to all the actors/consumers who are carrying out those checks.
+
+## Goals
+* API consumers can query a new KAS Fleet Manager Can-I API to check if they can perform a certain action and receive a response with the outcome (allowed/denied) containing all the granted resources or, eventually, the missing requirements.
+
+## Non-goals
+
+## Current architecture
+* Kas Fleet Manager currently only allows the ‘try and see if it works’ approach: if what you are trying to do fails, Kas Fleet Manager gives you some details on what went wrong, but you have no way of checking in advance if what you want to do is possible
+* API Consumers (like UI) are doing the required checks into their codebase and every time a change occurs, both Kas Fleet Manager and UI have to be updated to reflect the change
+
+## Proposed architecture
+* We need to create a new API.
+The API will be authenticated and will allow the callers to check in advance whether they can perform a certain operation.
+A different endpoint will be provided for each verb-resource pair, which, in turn, will provide a schema defining exactly what the answer will look like.
++
+```
+GET /api/v1/can/{verb}/{resource}?deep=true
+```
++
+The API will stop at the first error unless `deep=true` is specified.
+Output of the API will be a JSON with at least the following content:
++
+```
+{
+  allowed: boolean,
+  reasons: [{
+    code: string,
+    description: string,
+    metadata: {             // additional details
+      {key string}: {value string}
+    }
+  }]
+}
+```
++
+The rest of the content will depend on the action-resource pair.
++
+Some real world example for an invocation of the `/can/create/kafka` could be:
+
+.. Just one quota available: `standard.x2` won't be returned
++
+```
+{
+  allowed: true,
+  plans: ['standard.x1'],
+  quota: {
+    granted: 6,
+    used: 5
+  }
+}
+```
+
+.. More than one quota available:
++
+```
+{
+  allowed: true,
+  plans: ['standard.x1', 'standard.x2'],
+  quota: {
+    granted: 6,
+    used: 5
+  }
+}
+```
+
+.. Terms not accepted
++
+```
+{
+  allowed: false,
+  reasons: [{
+    code: "ERR-TERMS-01",
+    description: "Required terms have not been accepted",
+    metadata: {
+      acceptance_url: "https://url.to.accept.terms"
+    }
+  }]
+}
+```
+
+.. Terms not accepted and insufficient quota (with deep=true)
++
+```
+{
+  allowed: false,
+  reasons: [{
+    code: "ERR-TERMS-01",
+    description: "Required terms have not been accepted",
+    metadata: {
+      acceptance_url: "https://url.to.accept.terms"
+    }}, {
+    code: "ERR-QUOTA-01",
+    description: "No enough quota available",
+    metadata: {
+      quota_assigned: 10,
+      quota_available: 1,
+      quota_needed: 2
+    }}
+  }]
+}
+```
+
+### Threat model
+
+* No threat model changes are expected here.
+
+## Alternatives Considered / Rejected
+
+* Using Authorino. This approach has been discarded because Authorino is more suited for a 'granted/denied' answer than for querying for permissions and producing complex responses
+
+## Challenges
+* Client application will have to be updated to take advantage of the new API
+
+## Dependencies
+* Current check logic implemented in the Kas Fleet Manager needs to be moved to a common, reusable framework that will be used by both the Kas Fleet Manager middlewares and the new Can-I API
+
+## Consequences if not completed
+
+* We will keep on having internal logic duplicated in client applications to perform the exact same checks Kas Fleet Manager does
+* We will keep on having to propagate any changes to the checks to all the client applications
+* We won't eliminate the risk of bugs in the implementation of the checks within the client applications
