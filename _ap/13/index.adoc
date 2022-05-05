@@ -2,7 +2,7 @@
 num: 13
 category: "DNS, network, bandwidth"
 title: "Waiting for DNS record creation"
-status: "Draft"
+status: "Accepted"
 authors:
   - "Gerard Ryan"
 ---
