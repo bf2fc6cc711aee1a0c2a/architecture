@@ -57,12 +57,6 @@ collections:
 include:
  - CNAME
 
-
- # Workaround: See https://github.com/redhat-developer/app-services-architecture/pull/11
-github:
-  repository_url: https://github.com/redhat-developer/app-services-architecture
-
-
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
