@@ -1,16 +1,15 @@
-# app-services-architecture
-
+= app-services-architecture
 
 Application Services Architecture Decision Records
 
-## Website
+== Website
 
 https://architecture.appservices.tech
 
 
-## Running Locally
+== Running Locally
 
-```
+----
 bundle install
 bundle exec jekyll serve
-```
+----
