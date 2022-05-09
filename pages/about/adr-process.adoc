@@ -3,26 +3,27 @@ layout: page
 title: About
 permalink: /about/adr-process
 layout: default
+liquid: true
 ---
 
 == Github Process
 
 === Proposed ADRs
 
-If you identify the need for an ADR please {{site.github.repository_url}}/issues/new[open an issue] describing the decision that needs to be taken.
+If you identify the need for an ADR please {{ site.github.repository_url }}/issues/new[open an issue] describing the decision that needs to be taken.
 
 The discussion of the issue should decide whether a new ADR really is needed.
 If so, it should also seek to identify.
 
-* Whether any {{site.url}}/padr/[platform ADRs] apply. 
-* What tags the ADR should have. 
-* What the _summary_ of the new ADR should be. 
+* Whether any {{ site.url }}/padr/[platform ADRs] apply.
+* What tags the ADR should have.
+* What the _summary_ of the new ADR should be.
 
 === Drafting an ADR
 
-If, following discussion on the issue, an ADR really is called-for then open a PR to allocate an ADR id. 
+If, following discussion on the issue, an ADR really is called-for then open a PR to allocate an ADR id.
 
-This PR will add a `_adr/__nnnn__/index.adoc` file (where __nnnn__ is the ADR id) to the {{site.github.repository_name}} repo, giving your draft ADR an id. 
+This PR will add a `_adr/__nnnn__/index.adoc` file (where __nnnn__ is the ADR id) to the {{site.github.repository_name}} repo, giving your draft ADR an id.
 You can use the template in link:/adr/0/[`_adr/0/index.adoc`], so the steps to opening the PR are:
 
 . Fork {{site.github.repository_url}}[this repo] on github
@@ -30,14 +31,14 @@ You can use the template in link:/adr/0/[`_adr/0/index.adoc`], so the steps to o
 . Create a branch (`git checkout -b adr-__nnnn__`)
 . Create your ADR file from the template (`cp -r _adr/0 _adr/__nnnn__`)
 . Update your ADR file:
-  * If the issue identified any applicable PADRs the `applies_padrs` property should be added to the front matter. 
+  * If the issue identified any applicable PADRs the `applies_padrs` property should be added to the front matter.
   It's an array of all the applicable PADRs.
-  * If the issue identified and tags, the `tags` property should be added to the front matter. 
+  * If the issue identified and tags, the `tags` property should be added to the front matter.
   It's an array of tags.
-  * The only content of the ADR at this point will be the _summary_ that the ADR proposal issue produced. 
-. Push your branch (`git push origin adr-_nnnn_`) and {{site.github.repository_url}}/compare[open the PR] on github. 
+  * The only content of the ADR at this point will be the _summary_ that the ADR proposal issue produced.
+. Push your branch (`git push origin adr-_nnnn_`) and {{site.github.repository_url}}/compare[open the PR] on github.
 
-This PR should be merged immediately, and the original issue closed. 
+This PR should be merged immediately, and the original issue closed.
 
 === Writing an ADR
 
@@ -80,7 +81,7 @@ tags:
 Blah blah blah...
 ```
 
-`num`:: The ADR number. 
+`num`:: The ADR number.
 This is allocated when the ADR is first drafted and never changes thereafter.
 The next available id should be the largest id in the link:/adr/[ADR index] plus one.
 `title`:: The ADR's title. The `<h1>` title of the ADR is defined in the ADR template to be `{{num}}: {{title}}`
@@ -90,5 +91,5 @@ The next available id should be the largest id in the link:/adr/[ADR index] plus
 `tags`:: A list of tags, for classifying the ADR.
 `applies_padrs`:: List of numbers, the ids of the PADRs which this ADR applies.
 These may be added retrospectively (after the ADR is accepted).
-`superseded_by`:: The id of a later ADR which supersedes this one. 
+`superseded_by`:: The id of a later ADR which supersedes this one.
 This may be added retrospectively (after the ADR is accepted).
