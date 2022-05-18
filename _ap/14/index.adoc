@@ -1,0 +1,41 @@
+---
+num: 14
+category: "SOPs"
+title: "Allowing specialization of public SOPs to a specific execution context"
+status: "Draft"
+authors:
+  - "Rachel Lawton"
+---
+
+
+When implementing a public upstream opensource SOPS repo, the proposed solution is to follow a two repository model. 
+One private repository that will contain SOPs that will have internal information specific to a company. 
+This could be infrastructure informaton, links to secrets and internal communciation for example. 
+The second side of the model is to have a public repository that will have SOPs consumable by anyone. 
+This model will allow other service operating group teams to use the private SOP repository without any information loss and allow upstream users to use and contribute to the SOP without riskinng altering the context of the content a company may have. 
+
+The recomeneded flow of using infomation contributed upstream repo in the internal downstream repo is through the use of automation. 
+The automation will pull from a branch in the upstream repo into a branch in the downstream repo. 
+The content of the upstream repo should be merged into a single directory in the downstream repo allowing engineers to eliminate the possibility of merge conflicts as much as possible. 
+From there to aid with seamless use and integration with the downstream repo the automation will create a file using a template with the new snippet of information from the upstream repo, this can then be decorated with additional information relevant to the downstream team only. 
+
+Some pitfalls that contributers have to be mindful of are,
+
+* When contributing to an upstream repository is what exactly should and shouldn't be said. 
+To help solve this issue a document with terms and personas should be created to make contributing in an open source way as easy as possible. 
+The upstream repository should also consider having multiple different locations reminding the user that it's a public repository.
+
+* In the scenario when an existing downstream internal repo already exists with previous work contributed to it, if the team would like to migrate some or all there previous existing SOPS upstream, care and consideration needs to be implmented when weighing up the path forward. 
+This scenerio is not the expected day to day pattern, as it would introduce an ongoing risk if content is written in the ‘private’ context. 
+In this scenario there are a few options to choose from to address this. 
+For example:
+
+** Leave all existing SOPs as-is downstream and start to write new content upstream. 
+Then when the content is approved upstream, follow the model to consume it downstream. 
+This approach eliminates any risk associated with making existing content public.
+
+** Extract content from existing downstream SOPs that is potentially relevant to the upstream project, taking care not to expose any potential sensitive information. 
+Then pull it back into the downstream, decorating it as required for downstream consumption. 
+This would be a once off ‘bulk’ extraction that exposes some risk of exposing sensitive content. 
+Though, as it is limited to a single event, it could be given extra scrutiny than would be required if it was a regular occurrence e.g. all content written downstream first.
+
