@@ -1,7 +1,7 @@
 ---
 num: 85
 title: Upstream SOPs
-status: "Draft"
+status: "Accepted"
 authors:
   - "Rachel Lawton"
   - "David Martin"
