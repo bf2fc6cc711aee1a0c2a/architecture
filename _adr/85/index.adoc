@@ -131,8 +131,12 @@ Having upstream content be written in a way that corresponds to a default instal
 *** Having an option to keep any existing downstream content private & introduce new upstream content as it’s created.
 This model also allows any new private content to be kept in the downstream repo only.
 
-** Example mitigation strategy:
-*** A team could create a template for their SOPS which would contain common formatting, style and information necessary for all of their SOPs. The template would not have sensitive data as sensitive data would be stored in variables in a database in a private domain. The data would then get pulled in and rendered.
+* How to avoid a user accidentally contributing sensitive content in the upstream repo?
+** Suggested ways of mitigating the concern:
+*** Create a doc downstream, specifically stating what content is allowed in upstream repos and what content is not permitted. This can include topics, terms and personas.
+*** Make it very clear in the upstream repo that this is a public repo. This can be said in README docs, PRs etc
+*** A team could create a template for their SOPS which would contain common formatting, style and information necessary for all of their SOPs. The template would not have sensitive data as sensitive data would be stored in a location (e.g Config, Database etc in a private domain. The data would then get pulled in and rendered downstream.
+
 
 == Alternatives Considered / Rejected
 * ADR 84: Upstream SOPs (RHOSAK)
