@@ -1,0 +1,57 @@
+---
+num: 15
+category: "Dynamic Scaling"
+title: "Dynamic Scaling of Data Plane clusters"
+status: "Draft"
+authors:
+  - "Manyanda Chitimbo"
+  - "Steven Hawkins"
+  - "Tom Bentley"
+  - "Peter Braun"
+  - "Ramesh Reddy"
+---
+
+
+== Context and Problem Statement
+
+In the context of both cost management, as well as having the ability to scale to a (virtually) infinite number of managed instances, 
+our services must have the capability to dynamically scale its underlying infrastructure. 
+This implies both scaling up the infrastructure to accommodate more customers, as well as scaling down the infrastructure to manage costs.
+
+There are a number of things to consider in the context of dynamic scaling:
+. Scaling up/down the number of nodes on an OpenShift Dedicated (OSD)[https://www.redhat.com/en/technologies/cloud-computing/openshift/dedicated] cluster 
+. Provisioning a new OSD cluster
+. Removing an OSD cluster
+. Pre-warm nodes to ensure standby capacity in order to maintain provisioning latency SLOs for managed instances
+
+== Proposed solution
+
+=== Autoscaling of nodes
+
+Cluster Autoscaler will be utilized to allow nodes to be created on demand and removed when they are no longer needed. 
+See https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler#introduction[cluster-autoscaler#introduction] for more information.
+
+=== Pre-warming of nodes using Pause pods
+
+In order to ensure that the managed instance provisioning latency is not impacted by the time it takes for a new node to be provisioned, 
+it's possible to reserve hot capacity by configuring overprovisioning: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#how-can-i-configure-overprovisioning-with-cluster-autoscaler[how to configure overprovisioning]
+
+
+=== Cluster Full
+
+==== Use node sizing formula
+
+For binpacked solutions, a node sizing formula can be used to determine if a cluster is full, or not, based on the current number of maximum nodes configured and the current workload. The fleetshard will then propagate the status of the cluster via the managed CR (custom resource) for the control plane to observe and act accordingly.
+
+==== Use metrics 
+
+It's also possible to use the exposed OSD cluster autoscaler metrics - see https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/proposals/metrics.md#metrics[cluster autoscaler metrics]
+to determine if the OSD cluster is full or not. The metrics will have to be scraped and stored in Observatorium for the Control Plane to continously poll from and do its logic. This is an advisable pattern for services that do not have a fleetshard. 
+
+
+==== Use the Cluster autoscaler events
+
+The cluster autoscaler emits some events - https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#what-events-are-emitted-by-ca[cluster autoscaler events]
+One of the events emitted on the pods is the `NotTriggerScaleUp` event which is emitted when autoscaler couldn't find node group that can be scaled up to make this pod schedulable. The fleetshard could then check for the emission of the event on any pod its trying to deploy to know if the cluster is full or not. The fleetshard will then communicate the `ClusterFull` information on the ManagedCR status to the control plane that will re-assign the managed instance to another OSD cluster or eventually create a new OSD cluster capable of accepting new managed instances. 
+
+It has to be noted that the last two patterns could be used when there are no concerns over impact of cluster full / over commit upon existing workloads i.e the possibility of new workload competing for resources with existing workloads whose Pods have been restarted for one reason or the other thus causing service disruption.
