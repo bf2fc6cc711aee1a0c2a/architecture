@@ -1,0 +1,11 @@
+---
+num: 79
+title: "Authorization for Control Planes"
+status: "Accepted"
+authors:
+  - "Miguel Soriano"
+  - "Guilherme Cassolato"
+tags: 
+  - kafka
+---
+https://docs.google.com/document/d/1LTqfQW6hKkD_Ls_YLbagTJ7FuG4AbNyGxLeUOsNWD3M/edit[Original doc]
