@@ -1,0 +1,33 @@
+---
+num: 86
+title: Canary Authentication in RHOSAK
+status: "Draft"
+authors:
+  - "Rajagopalan Ranganathan"
+tags:
+  - "kafka"
+  - "Canary"
+  - "Authentication"
+#applies_padrs: # What PADRs does this ADR apply?
+#applies_patterns: # What APs does this ADR apply?
+---
+## Context and Problem Statement
+
+## Goals
+
+## Non-goals
+
+## Current architecture
+
+## Proposed architecture
+
+### Threat model
+
+## Alternatives Considered / Rejected
+
+## Challenges
+
+## Dependencies
+
+## Consequences if not completed
+
