@@ -1,0 +1,39 @@
+---
+num: 0
+title: Template 
+status: Draft
+authors: 
+  - "" # One item for each author, as github id or "firstname lastname"
+tags:
+  - "" # e.g. kafka, connectors, registry
+---
+
+// Top style tips:
+// * Use one sentence per line
+// * No unexpanded acronyms
+// * No undefined jargon
+
+// You don't have to use the following sections, but they provide a 
+// useful structure for writing a clear document.
+
+## Intent
+// Summarize in a single sentence what the pattern tries to achieve
+
+## Motivation
+
+// In a few paragraphs describe the motivating factors for this pattern
+
+## Applicability
+
+// Call out when this pattern might apply (and when it should not apply, if relevant)
+
+## Structure
+
+// Describe the pattern
+
+## Participants
+
+## Consequences
+
+// Explain any consequences of using this pattern
+
