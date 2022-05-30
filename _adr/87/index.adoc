@@ -1,13 +1,13 @@
 ---
 num: 87 
-title: Prometheus endpoint APIs 
-status: "Draft" # One of Draft, Accepted, Rejected
+title: Exposing metrics via the KAS Fleet Manager API
+status: "Draft"
 authors:
-  - "JameelB" # One item for each author, as github id or "firstname lastname"
+  - "JameelB"
 tags:
-  - "kafka" # e.g. kafka, connectors, registry
+  - "kafka"
 applies_padrs: # What PADRs does this ADR apply?
-applies_patterns: # What APs does this ADR apply?
+applies_patterns: 16
 ---
 
 // Top style tips:
@@ -15,34 +15,214 @@ applies_patterns: # What APs does this ADR apply?
 // * No unexpanded acronyms
 // * No undefined jargon
 
-// No need for a title heading, it's added by the template
-
 ## Context and Problem Statement
-// What is the background against which this decision is being taken?
+The KAS Fleet Manager API provides the following endpoints which end users can use to collect metrics of their own Kafka instances:
+
+* https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByInstantQuery[/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query]: returns the most recent values for each metric associated with the specified Kafka.
+This returns metrics in a JSON format.
+* https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByRangeQuery[/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query_range]: returns values for each metric associated with the specified Kafka over a time range specified in the request.
+This returns metrics in a JSON format.
+* https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/federateMetrics[/api/kafkas_mgmt/v1/kafkas/{id}/metrics/federate]: returns the most recent values for each metric associated with the specified Kafka.
+This returns metrics in a Prometheus Text format and is scrapable by any monitoring systems that accepts this format.
+
+Each of these endpoints returns the exact same metrics.
+The only difference between these is the format of the response.
+
+The metrics returned in these endpoints are what we call customer facing metrics.
+All available customer facing metrics are documented in the app-services-guides: https://github.com/redhat-developer/app-services-guides/tree/main/docs/kafka/metrics-monitoring-kafka[Monitoring metrics in OpenShift Streams for Apache Kafka]. 
+
+We currently expose two different types of customer facing metrics:
+
+* Raw Kafka metrics -- exposed by Kafka instances.
+* Recording rules -- configured by us for any Kafka metrics requiring pre-computed aggregation.
+
+This results in multiple problems:
+
+* *Consistency*: These two types of metrics follow different naming schemes, resulting in inconsistent metric names.
+* *Repetition*: The raw Kafka metrics contain a lot of repetition i.e. `kafka_controller_kafkacontroller...`.
+* *Exposure of implementation details*: The name of the recording rules metrics exposes implementation details i.e. `kafka_namespace:haproxy_server_bytes_in_total:rate5m`, end users do not need to know about namespaces and OpenShift.
+
+Since we don't have a formal process and naming policy for adding customer facing metrics, we often reach a situation where the resulting metric names are confusing and misleading (i.e. https://github.com/bf2fc6cc711aee1a0c2a/kas-fleet-manager/issues/688[misleading metric name for kafka topic partitions count]).
+
 
 ## Goals
-// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+- Define a naming policy for existing and new customer facing metrics.
+- Define a process for requesting new customer facing metrics to the API.
+- Define a process for migrating the existing customer facing metrics to follow the new naming policy.
+
 
 ## Non-goals
-// Bulleted list of outcomes that this ADR is not trying to achieve.
+- Metrics API versioning
++
+The metrics API is currently part of the KAS Fleet Manager API.
+We need to consider KAS Fleet Manager API as a whole in order to have consistent versioning strategy for all of our endpoints, including customer facing metrics and the metrics API.
++
+
++
+This also includes different deprecation periods with different lifecycle tags and the idea of separating the metrics API from the rest of the KAS Fleet Manager API to have isolated versioning.
+This is out of scope of this ADR and should have its own separate discussion, epic or ADR.
++
+- Parameterize metric aggregation
+- Provide endpoint for metrics discovery
+
 
 ## Current situation
-// Where are we now?
+### Requesting new customer facing metrics
+There is currently no formal process that we follow when a new metric is requested to be added to the API. 
+
+The request is handled by the Control Plane team to add the metrics to the KAS Fleet Manager API as well as adding new recording rules to the Observability configuration if needed.
+However, the Kafka Integrations team would have the knowledge of what metrics to use and how it should be aggregated, if required.
+All discussions around which metric to use and how its aggregated is done via ad-hoc chat conversations, in the JIRA issue or the Github pull request.
+Discussion to reach a formal agreement cross teams for the metric name is not done.
+
+
+### Naming scheme
+The names of the current customer facing metrics are based on the following:
+
+* Raw Kafka metrics: The names of these metrics are not changed, they are taken directly from Kafka metrics. These have the following name format:
+** For example: `kafka_controller_kafkacontroller_offline_partitions_count`
+
+* Recording rules: We configure these and name them based on the following format `<level>:<metric name>:<aggregation>`
+** For example: `kafka_topic:kafka_log_log_size:sum`
+** This format is used for all of our recording rules, most are not exposed to end users.
+** This makes sense when you know how it's implemented but this exposes implementation details to end users.
+** A list of the customer facing recording rules can be seen in the https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk/blob/main/resources/prometheus/user-facing-recording-rules.yaml[observability-resources-mk] configuration repository.
+
+
+### Exposing new metrics in the KAS Fleet Manager API
+All of the customer facing metrics originate from the data plane cluster in which the Kafka instance is deployed in.
+A Prometheus instance is deployed in each of the data plane cluster which uses https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write[remote-write] to push these metrics to Observatorium.
+This acts as the central repository for all metrics, included in the remote-write configuration, from each data plane cluster.
+A list of the metrics included in the remote-write configuration can be found in the https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk/blob/main/resources/prometheus/remote-write.yaml[Observability resources] repository.
+
+KAS Fleet Manager acts as a proxy to Observatorium.
+It calls the Observatorium _/query_ and _/query_range_ endpoints to retrieve metrics we consider as 'customer facing'.
+A list of the metrics retrieved by KAS Fleet Manager can be found in the https://github.com/bf2fc6cc711aee1a0c2a/kas-fleet-manager/blob/main/pkg/client/observatorium/api.go[observatorium] client within the project. When new metrics are added to this list, they become available in the KAS Fleet Manager _/metrics/query_ and _/metrics/query_range_ endpoints. In order to make new metrics available to the _/metrics/federate_ endpoint, their metadata must be added to this https://github.com/bf2fc6cc711aee1a0c2a/kas-fleet-manager/blob/main/internal/kafka/constants/metrics.go[file] in KAS Fleet Manager.
+
+KAS Fleet Manager controls the labels exposed for each metric returned in all endpoints. 
+Metrics retrieved from Observatorium are also filtered so that end users will only receive metrics for their own Kafka instance.
+Apart from these, no additional aggregation, filtering or modification of the metric is done by KAS Fleet Manager.
 
 ## Proposal
-// What is the decision being proposed
+### Metric and Label Naming
+All metric and label names must adhere to the policy stated in link:../../_ap/16/index.adoc[AP-16: Naming Policy for Customer Facing Metrics].
 
-### Threat model
-// Provide a link to the relevant threat model. 
-// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+### Kafka Metric Categories
+The customer facing Kafka metrics can be divided into multiple categories.
+Categorizing these metrics into logical groups can help us formulate the metric name and document it.
+
+|===
+|Category | Description | Metric Prefix
+
+|Instance
+|General Kafka metrics not specific to any other categories.
+|`kas_instance_`
+
+|Broker
+|Metrics associated to Kafka brokers
+|`kas_broker_`
+
+|Topic
+|Metrics associated to Kafka topics
+|`kas_topic_` (Even though the topic metrics already have a 'topic' label, including this improves the clarity of the metric name)
+|===
+
+CAUTION: When adding new metric categories to the service, avoid using categories that exposes the implementation details of the service.
+Metric names are part of the API contract and will be documented.
+For example, categories like `topic` and `broker` are ok to use as they are foundational concepts in Kafka and are intrinsic to the service. 
+However, components where these metrics originated from, e.g. canary or kafka-exporter, are implementation details.
+These should not be used as a metric category.
+
+#### Labels
+At minimum, each metric should have a label that identifies the Kafka instance if possible.
+This would be useful if a user has multiple Kafka instances.
+If they want to integrate all of their Kafka metrics into one monitoring system, the label(s) can act as an identifier.
+
+### Process for requesting new customer facing metric
+When requesting for a new metric to be exposed in the KAS Fleet Manager API, a new issue in JIRA or Github must be created.
+The description of this issue should have sufficient information on what this new metric should provide in order to identify the metric to be used and how it should be documented in later stages.
+
+The issue created must have the following sub-tasks and they must be completed in order:
+
+. Identify the metric and labels to be used and how it will be aggregated if required.
+** This should be assigned to the team that has the knowledge of the requested metric.
+** [.underline]#Definition of Done#:
+*** Metric to be used is identified.
+*** (Optional) Aggregation of the metric determined.
+*** Category which this new metric belongs to is identified.
+**** See link:#kafka-metric-categories[Kafka Metric Categories] to view existing metric categories and notes on adding new ones to the service.
+*** Cardinality calculated
+*** New metric approved by the Running the Services team to be included in the remote-write to Observatorium.
+
+. Agreement on metric name and labels to be exposed
+** This should be assigned to the Control Plane team.
+** [.underline]#Definition of Done#:
+*** Labels to be exposed are identified.
+*** Name of the metric and labels exposed are determined.
+This should adhere to the metric and label naming policy as described above.
+*** The metric and exposed label names must be approved by the following people/teams:
+**** Requester
+**** Control Plane team
+**** Kafka Integrations team
+
+. Expose the metric in the KAS Fleet Manager API
+** This should be assigned to the Control Plane team.
+** Any tasks for adding the new metric to the API should be done in this stage.
+This includes adding the new metric to the Prometheus remote-write configuration and any code changes to the KAS Fleet Manager repository.
+** [.underline]#Definition of Done#:
+*** New customer facing metric should be included in the response of the following KAS Fleet Manager API endpoints:
+**** https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByInstantQuery[/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query]
+**** https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByRangeQuery[/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query_range]
+**** https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/federateMetrics[/api/kafkas_mgmt/v1/kafkas/{id}/metrics/federate]
+
+. Document the new metric
+** This should be assigned to the Documentation/Customer Content Support team.
+** [.underline]#Definition of Done#:
+*** New metric documented in the app-services-guides: https://github.com/redhat-developer/app-services-guides/tree/main/docs/kafka/metrics-monitoring-kafka[Monitoring metrics in OpenShift Streams for Apache Kafka].
+
+
+### Migrating existing metrics to the new naming policy
+KAS Fleet Manager does not support API versioning at the moment so we would need to support both existing and new metrics during the migration process.
+
+The Kafka console provides dashboards which can display data up to the last 7 days (see the design in https://redhat-developer.github.io/app-services-ui-components/?path=/story/kafka-metrics--all-ready[Storybook]).
+Since the revised metric names will be added as new metrics, they will have no history.
+However, there should be sufficient time between adding the metrics to KAS Fleet Manager and the UI team to start working on switching to the new metrics so that there would be no problem with the metric history.  
+Because of this we should be able to expose the new metrics in KAS Fleet Manager and mark the existing metrics as deprecated as soon as they're configured to be pushed to Observatorium. 
+
+The existing metrics shall be marked as deprecated as per the MAS API deprecation policy.
+The deprecation will be communicated as follows:
+
+* The KAS Fleet Manager OpenAPI specification will document the deprecated metrics and their alternatives in each of the endpoint descriptions.
+* The metrics listed in the https://github.com/redhat-developer/app-services-guides/tree/main/docs/kafka/metrics-monitoring-kafka[Monitoring metrics in OpenShift Streams for Apache Kafka] documentation shall be marked as 'deprecated', pointing the users to use the newly revised metrics.
+* An email will be sent out to mas-devel and mas-all mailing list as per the deprecation policy.
+* Deprecation period shall be 60 days.
+** This was agreed upon as there is currently not a lot of users using these metrics apart from the UI.
+Note that in the future, this may be based on the different deprecation periods agreed upon for individual API lifecycle tags (out of scope in this ADR) or based on usage analysis of the deprecated metric.
+** After this time has passed, the deprecated metrics shall be removed from the API and documentation.
+
+
+## Threat model
+Not Applicable.
+
 
 ## Alternatives Considered / Rejected
+* Renaming the metric and label names in the KAS Fleet Manager. 
+KAS Fleet Manager should only act as a proxy to Observatorium, it shouldn't do any additional filtering/aggregation.
 
 ## Challenges
 // What are the costs/drawbacks of the proposed decision?
+* Communicating the change to our consumers
+* Migration of existing metrics to the new naming policy.
+Since we will be following the deprecation policy, we will keep both existing and new metrics until the deprecation period is over.
+This results in duplicated metrics pushed to Observatorium during this period.
+
 
 ## Dependencies
 // What are the knock-on effects if this decision is accepted?
+* UI will need to migrate to the new metrics for the dashboards in the Kafka console.
+* Any other clients using the metrics API will need to migrate to the new metrics.
+
 
 ## Consequences if not completed
 // What are the knock-on effects if this decision is not accepted?
+* Metric name and labels will continue to be inconsistent, repetitive, misleading, confusing and expose implementation details.
