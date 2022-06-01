@@ -13,15 +13,79 @@ tags:
 ---
 ## Context and Problem Statement
 
+Canary tool is responsible to establish the health of the Kafka cluster. To learn more about the Strimzi Canary tool used in Kafka clusters, 
+please refer https://github.com/strimzi/strimzi-canary[here] . 
+
+Strimzi canary currently uses SASL/Plain (Simple Authentication and Security Layer - SASL) authentication mechanism in our Red Hat OpenShift Streams for Apache Kafka (RHOSAK) environment. Managed Application Services Single Sign On (MAS SSO) is used as the authentication service. As a part of the MAS SSO to sso.redhat.com migration, the existing Canary authentication mechanism will undergo some changes.
+
+The purpose of this ADR is to detail the existing authentication flow using MAS SSO and the authentication changes post migration to sso.redhat.com
+
 ## Goals
+
+* Secure Strimzi Canary authentication with sso.redhat.com 
 
 ## Non-goals
 
 ## Current architecture
 
+Currently, Kas Fleet Manager (KFM) creates a Canary service account client in MAS SSO upon a request to create and provision a Kafka cluster. These Canary service account clients are associated with the same organization as the user making the request to create a Kafka cluster. This information is contained in the `customClaimCheck` field in the Kafka Custom Resource (CR)
+
+```
+   - authentication:
+      customClaimCheck: '@.rh-org-id == ''testorgid''|| @.org_id == ''testorgid'''
+      tokenEndpointUri: >-
+            https://tokenendpointauri.com/token
+       ...
+    serviceAccounts:
+    - name: canary
+      password: **********
+      principal: canary-client-Id    
+```
+
+
+Strimzi Canary uses SASL/Plain authentication mechanism with the Kafka broker. Control plane i.e. KFM provides a canary service account client ID and secret in the Managed Kafka Custom Resource (CR) along with a Token Endpoint URI (Uniform Resource Identifier). Canary uses this information to authenticate with the Kafka brokers using SASL/Plain authentication mechanism, i.e. similar to username and password. Canary provides the client ID and secret as a part of its authentication request to the Kafka Broker. Kafka broker uses this information to authenticate with the service mentioned in the token endpoint URI. Currently, this token end point URI is configured to be the MAS SSO service. 
+
+Upon a successful authentication, MAS SSO provides a valid token back to the Kafka broker. Kafka brokers as a part of its authentication flow, upon a successful response, it introspects the token received and performs a custom claims check. It verifies that the "Canary Service account Client" belongs to the same organization as the creator or owner of the Kafka instance. Kafka brokers deem the authentication to be successful after this.
+
+image::adr-86-current-authentication-flow.png[Current authenticaion flow] 
+
 ## Proposed architecture
 
+When using sso.redhat.com as the single authentication post migration, KFM will create the Canary Service Account Clients in a "Special Management Organization". This would mean all the internal service accounts such as the Canary for all users (for all organizations) are created in this single organization that is managed and owned by Red hat. The reasons for this are, the limit on the number of service accounts an organization can create do not apply for this organization, and it provides more security by restricting these internal service accounts to the organization that is owned by red hat rather than the customer's organization.
+
+This would mean that all the Canary service accounts for all customers/users will be created/associated with this "Special Management Organization" when compared to the existing architecture where they were scoped to the user's organization. This requires some additional steps in authentical flow described in the current architecture section.
+
+- KFM when building the "CustomClaimCheck" includes the  Canary service account client ID "clientID" field as well
+
+```
+   - authentication:
+      customClaimCheck: '@.rh-org-id == ''testorgid''|| @.org_id == ''testorgid'' || @.clientId == ''canary-client-Id'''
+      tokenEndpointUri: >-
+            https://tokenendpointuri.com/token
+       ...
+    serviceAccounts:
+    - name: canary
+      password: **********
+      principal: canary-client-Id    
+```
+
+
+- Token Endpoint URI would now point to sso.redhat.com
+- The existing authentication flow up until receiving a valid token from the service mentioned in Token end point URI continues as it is.
+- During the Token introspection and performing the custom claim check validation, the following will be done:
+  - Verify that the "ClientID" in the custom claim check matches the expected Canary client ID
+
+
+image::adr-86-proposed-authentication-flow.png[Proposed authenticaion flow] 
+
+
+
 ### Threat model
+
+All the internal service accounts post migration to sso.redhat.com will be created under a single "Special Management Org" rather than the user's organization. This increases the threat landscape of a compromised Canary Service Account, i.e. the Canary Service Account for a Kafka cluster belonging to an Organization "A" can in theory be used against a Kafka cluster belonging to organization "B".
+
+To mitigate this threat, we have provided a solution to add the "ClientID" as well in the "customClaimCheck" field. This would enforce that
+the Kafka brokers only authenticate with the "Canary service account client" that is provided by the control plane pertaining for that particular Kafka cluster.
 
 ## Alternatives Considered / Rejected
 
@@ -30,4 +94,6 @@ tags:
 ## Dependencies
 
 ## Consequences if not completed
+* Canary authentication will fail and health of the Kafka clusters cannot be determined
+
 
