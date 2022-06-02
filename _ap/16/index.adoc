@@ -1,0 +1,68 @@
+---
+num: 0
+title: "Naming policy for customer facing metrics"
+status: "Draft"
+authors: 
+  - "JameelB" # One item for each author, as github id or "firstname lastname"
+tags:
+  - "kafka" # e.g. kafka, connectors, registry
+---
+
+// Top style tips:
+// * Use one sentence per line
+// * No unexpanded acronyms
+// * No undefined jargon
+
+// You don't have to use the following sections, but they provide a 
+// useful structure for writing a clear document.
+
+## Intent
+// Summarize in a single sentence what the pattern tries to achieve.
+// For example:
+//
+// Define a policy for exposing metrics to customers in a consistent way.
+
+## Motivation
+
+// In a few paragraphs describe the motivating factors for this pattern
+// For example:
+// 
+// Prometheus scrape endpoints are the defacto standard for exposing metric information for collection
+// However this format and the associated conventions are not sufficient in themselves to ensure
+// that metrics are exposed in a consistent way. Problems include:
+// * Insufficient guidance on metric and label naming to provide consistency and 
+//   establishing the principal of hiding implementation details.
+// * Treatment of this as a first-class API, with established mechanisms for API evolution
+// * etc.
+
+## Applicability
+
+// Call out when this pattern might apply (and when it should not apply, if relevant)
+// For example:
+//
+// This pattern applies to any service which exposes metrics as Prometheus-scrape endpoints.
+// It does not apply to services which provide access to metrics in other formats, or via
+// means other than an API (e.g. metric visualization via a system such as Grafana).
+
+## Structure
+
+// Describe the pattern.
+//
+// For this metrics example we might link to existing guidlines on naming, augment them with extra rules 
+// which apply to services, explain how the API would allow for graceful API evolution without "flag days".
+
+## Participants
+
+// What components and/or teams are directly involved
+//
+// For this metrics example this would include the customer and the control plane via which
+// the metrics are exposed
+
+## Consequences
+
+// Explain any consequences of using this pattern
+//
+// For this metrics example consequences would include:
+// * A mechanism for API evolution
+// * Consistency in naming of metrics and labels within this service
+// * Consistency with other services which also apply this AP
