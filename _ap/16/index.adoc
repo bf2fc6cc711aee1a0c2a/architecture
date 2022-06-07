@@ -3,7 +3,7 @@ num: 16
 title: "Naming policy for customer facing metrics"
 status: "Draft"
 authors: 
-  - "JameelB" # One item for each author, as github id or "firstname lastname"
+  - "JameelB"
 tags:
   - "kafka" # e.g. kafka, connectors, registry
 ---
@@ -13,56 +13,121 @@ tags:
 // * No unexpanded acronyms
 // * No undefined jargon
 
-// You don't have to use the following sections, but they provide a 
-// useful structure for writing a clear document.
 
 ## Intent
-// Summarize in a single sentence what the pattern tries to achieve.
-// For example:
-//
-// Define a policy for exposing metrics to customers in a consistent way.
+Define a policy for naming metrics exposed to users in a consistent way.
 
 ## Motivation
+Managed services may provide a metrics API to allow users to collect metrics of their own instances.
+Metrics exposed by the API can be used to build dashboards in the service's UI or allow users to integrate them with their own monitoring systems.
 
-// In a few paragraphs describe the motivating factors for this pattern
-// For example:
-// 
-// Prometheus scrape endpoints are the defacto standard for exposing metric information for collection
-// However this format and the associated conventions are not sufficient in themselves to ensure
-// that metrics are exposed in a consistent way. Problems include:
-// * Insufficient guidance on metric and label naming to provide consistency and 
-//   establishing the principal of hiding implementation details.
-// * Treatment of this as a first-class API, with established mechanisms for API evolution
-// * etc.
+The metrics API may have multiple endpoints to return metrics in different format.
+For example, the service may provide a `/query` or `/query_range` endpoints for users to query metrics, returning them in a JSON format.
+The service may also provide an endpoint that returns metrics in a Prometheus Text format, the defacto standard format used for scraping metrics in many monitoring systems.
+
+The associated conventions for these formats are not sufficient in themselves to ensure that the metrics are exposed in a consistent way. 
+There is insufficient guidance on metric naming schemes which may lead to lack of consistency, clarity and unintentional exposure of implementation details in the exposed metrics.
 
 ## Applicability
+This applies to any metrics that are exposed via an API to the end user of any managed service.
 
-// Call out when this pattern might apply (and when it should not apply, if relevant)
-// For example:
-//
-// This pattern applies to any service which exposes metrics as Prometheus-scrape endpoints.
-// It does not apply to services which provide access to metrics in other formats, or via
-// means other than an API (e.g. metric visualization via a system such as Grafana).
+This does not apply to any managed services which provides access to metrics in other means (e.g. metric visualization via a system such as Grafana)
+
+This does not have to apply to metrics that are used for internal monitoring systems like dashboards and alerts.
 
 ## Structure
 
-// Describe the pattern.
-//
-// For this metrics example we might link to existing guidlines on naming, augment them with extra rules 
-// which apply to services, explain how the API would allow for graceful API evolution without "flag days".
+### Metric Name
+The metric name should adhere to the format below:
+
+*<service-prefix>_<optional:category>_<descriptor>_<optional:base-unit>_<optional:type|aggregate>*
+
+* *service-prefix*: The metric name should be prefixed with the service prefix agreed on by the team (e.g. `kas` for Kafka, `srs` for Service Registry)
+* *category* (optional): The category that the metric belongs to.
+This should be used for logically grouping the metrics which will help with documentation and allow users to discover related metrics.
+The customer facing metric categories for the service must be agreed on by the team (e.g. `instance`, `broker`, `topic`).
++
+CAUTION: Avoid using categories that exposes implementation details of the service.
+Metric names are part of the API contract and will be documented.
+For example, categories like `topic` and `broker` in Kafka are ok to use as they are foundational concepts in Kafka and are intrinsic to the service. 
+However, components where these metrics originated from, e.g. canary or kafka-exporter, are implementation details.
+These should not be used as a metric category.
++
+* *descriptor*: Describes what is being measured.
+* *base-unit* (optional): Describes the unit used for measuring the metric (e.g. `seconds`, `bytes`). 
+This should be in plural form.
+See https://prometheus.io/docs/practices/naming/#base-units[Prometheus base units] for a list of units that can be used here.
+* *type|aggregate* (optional): Describes the type of or aggregate used for measuring the metric. (e.g. `total`, `rate<time>`, `info`, `bucket`)
+
+Metric names must also adhere to the following:
+
+* Must match the regex `[a-z_][a-z0-9_]*`.
+* Each word should be separated by `_` (e.g. the descriptor `availablevolume` should be seperated into `available_volume`).
+
+### Label Name
+
+Label names must adhere to the following:
+
+* Must match the regex `[a-z_][a-z0-9_]*`.
+* Each word should be separated by `_` (e.g. the label name `brokername` should be seperated into `broker_name`).
+* Must have consistent names across all metrics. 
+Avoid using different label names in different metrics that describes the same feature.
+
+
+### Things to avoid
+
+* Avoid having label names included in the metric name if possible.
+This introduces redundancy and will cause confusion if the respective labels are aggregated away.
+* Use *:* in the metric or label name. This is reserved for recording rules only.
+Even if the underlying metric is a recording rule, this should be avoided as this is an implementation detail and should not be exposed to the end user.
+* Use any other cases apart from snake_case.
+* Expose underlying components in the metric or label name.
+For example, avoid including project names like 'strimzi' or 'kafka-exporter' or OpenShift/Kubernetes resources like 'namespaces' or 'projects'.
+
+### Deprecating Metrics
+The team's API deprecation policy must be followed when deprecating metrics. 
+
+The length of the deprecation period should be agreed upon by the team and applied for all metrics exposed in their API.
+
+
+### Examples
+Here are some examples of Kafka metrics converted to this naming policy:
+
+* kubelet_volume_stats_available_bytes{persistentvolumeclaim="data-0-test-kafka-0"} 
++
+-> `kas_broker_volume_available_bytes{volume="data-0-test-kafka-0"}`
++
+
+* kafka_namespace:kafka_server_socket_server_metrics_connection_count:sum
++
+-> `kas_instance_connection_total`
++
+
+* kafka_namespace:haproxy_server_bytes_in_total:rate5m
++
+-> `kas_instance_incoming_bytes_rate5m`
++
+
+
+More examples can be seen in link:../../_adr/87/index.adoc#converted-metrics[ADR-87: Converted Metrics]
+
+
+### References
+The proposed metric and label naming policy above is based on the following existing guidelines from Prometheus:
+
+* https://prometheus.io/docs/practices/naming/[Prometheus naming best practices]
+* https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels[Prometheus metric names and labels]
+
 
 ## Participants
-
-// What components and/or teams are directly involved
-//
-// For this metrics example this would include the customer and the control plane via which
-// the metrics are exposed
+* Customers/Business Unit -- source of requests for new customer facing metrics.
+* Control Plane -- development team for the KAS Fleet Manager API.
+* Kafka Integrations -- team with knowledge on the available Kafka metrics.
+* Running the Services -- gates all metrics that is included in the Prometheus remote-write configuration to Observatorium.
+* UI/UX -- consumes customer facing metrics for Kafka dashboards in the UI.
+* Documentation/Customer Content Services -- documents the metrics in the product documentation.
 
 ## Consequences
-
-// Explain any consequences of using this pattern
-//
-// For this metrics example consequences would include:
-// * A mechanism for API evolution
-// * Consistency in naming of metrics and labels within this service
-// * Consistency with other services which also apply this AP
+* Consistent and coherent naming of customer facing metrics within the service.
+* Avoid unintentional exposure of implementation details.
+* Consistency with other services which also applies this architecture pattern.
