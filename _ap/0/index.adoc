@@ -18,6 +18,7 @@ tags:
 
 ## Intent
 // Summarize in a single sentence what the pattern tries to achieve.
+//
 // For example:
 //
 // Define a policy for exposing metrics to customers in a consistent way.
@@ -25,9 +26,10 @@ tags:
 ## Motivation
 
 // In a few paragraphs describe the motivating factors for this pattern
+//
 // For example:
 // 
-// Prometheus scrape endpoints are the defacto standard for exposing metric information for collection
+// Prometheus scrape endpoints are the defacto standard for exposing metric information for collection.
 // However this format and the associated conventions are not sufficient in themselves to ensure
 // that metrics are exposed in a consistent way. Problems include:
 // * Insufficient guidance on metric and label naming to provide consistency and 
@@ -44,11 +46,12 @@ tags:
 // It does not apply to services which provide access to metrics in other formats, or via
 // means other than an API (e.g. metric visualization via a system such as Grafana).
 
-## Structure
+## Description
 
-// Describe the pattern.
+// Describe the pattern in enough detail that a fresh pair of eyes can understand it
+// and apply it elsewhere.
 //
-// For this metrics example we might link to existing guidlines on naming, augment them with extra rules 
+// For this metrics example we might link to existing guidelines on naming, augment them with extra rules 
 // which apply to services, explain how the API would allow for graceful API evolution without "flag days".
 
 ## Participants
@@ -58,11 +61,19 @@ tags:
 // For this metrics example this would include the customer and the control plane via which
 // the metrics are exposed
 
-## Consequences
+## Trade-offs
 
-// Explain any consequences of using this pattern
+// Explain any consequences of using this pattern. 
+// Be sure to cover both pros and cons:
+// * what this pattern enables and the benefits it brings
+// * what this pattern prevents or makes harder
 //
-// For this metrics example consequences would include:
+// For this metrics example such benefits would include:
 // * A mechanism for API evolution
 // * Consistency in naming of metrics and labels within this service
 // * Consistency with other services which also apply this AP
+//
+// And on the down side:
+// * The Prometheus format eventually be superseded
+// * Naming and consistency is hard, so multiple versions of the API 
+//   might be needed to achieve those goals. 
