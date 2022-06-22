@@ -14,12 +14,12 @@ This could be infrastructure informaton, links to secrets and internal communcia
 The second side of the model is to have a public repository that will have SOPs consumable by anyone. 
 This model will allow other service operating group teams to use the private SOP repository without any information loss and allow upstream users to use and contribute to the SOP without riskinng altering the context of the content a company may have. 
 
-The recomeneded flow of using infomation contributed upstream repo in the internal downstream repo is through the use of automation. 
+The recommended flow of using information contributed upstream repo in the internal downstream repo is through the use of automation. 
 The automation will pull from a branch in the upstream repo into a branch in the downstream repo. 
 The content of the upstream repo should be merged into a single directory in the downstream repo allowing engineers to eliminate the possibility of merge conflicts as much as possible. 
 From there to aid with seamless use and integration with the downstream repo the automation will create a file using a template with the new snippet of information from the upstream repo, this can then be decorated with additional information relevant to the downstream team only. 
 
-Some pitfalls that contributers have to be mindful of are,
+Some pitfalls that contributors have to be mindful of are,
 
 * When contributing to an upstream repository is what exactly should and shouldn't be said. 
 To help solve this issue a document with terms and personas should be created to make contributing in an open source way as easy as possible. 
