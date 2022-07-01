@@ -1,7 +1,7 @@
 ---
 num: 82
 title: Streaming Unit Hour Metrics
-status: "Draft"
+status: "Accepted"
 authors:
   - "Peter Braun"
 tags:
