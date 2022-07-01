@@ -2,7 +2,7 @@
 num: 14
 category: "SOPs"
 title: "Allowing specialization of public SOPs to a specific execution context"
-status: "Draft"
+status: "Accepted"
 authors:
   - "Rachel Lawton"
 ---
