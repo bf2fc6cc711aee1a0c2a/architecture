@@ -1,0 +1,6 @@
+// glossary_links.adoc
+// The attributes defined provide links to anchors on the glossary page.  Please also remember to add the
+// corresponding definition to glossary.adoc.
+:glossary-businessstakeholder-: link:/glossary#glossary-businessstakeholder[Business Stakeholder]
+:glossary-customersupport: link:/glossary#glossary-customersupport[Customer Support]
+:glossary-sre: link:/glossary#glossary-sre[SRE]
