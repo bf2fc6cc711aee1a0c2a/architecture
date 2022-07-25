@@ -1,0 +1,12 @@
+{
+	"version": 3,
+	"file": "adr.css",
+	"sources": [
+		"adr.scss"
+	],
+	"sourcesContent": [
+		"// start content\n.tag {\n  background-color: #ddd;\n  border: none;\n  color: black;\n  padding: 2px 6px;\n  text-align: center;\n  text-decoration: none;\n  display: inline-block;\n  margin: 4px 2px;\n  border-radius: 16px;\n}\n\n.avatar {\n  border-radius: 50% !important;\n}\n\n.tag-kafka {\n  background-color: #884400;\n  color: white;\n}\n\n.tag-service-registry {\n  background-color: #008844;\n  color: white;\n}\n\n.tag-connectors {\n  background-color: #440088;\n  color: white;\n}\n\n.status-superseded {\n  text-decoration: line-through;\n}\n\n.edit {\n  float: right;\n}\n\n.post-toc {\n  border: 1px solid black;\n  border-radius: 5px;\n  padding: 10px;\n  margin: 10px;\n}\n\ndiv.post-toc h2 {\n  font-size: 28px;\n  margin-bottom: 0px;\n}"
+	],
+	"names": [],
+	"mappings": "AACA,AAAA,IAAI,CAAC,EACH,gBAAgB,EAAE,IAAI,EACtB,MAAM,EAAE,IAAI,EACZ,KAAK,EAAE,KAAK,EACZ,OAAO,EAAE,OAAO,EAChB,UAAU,EAAE,MAAM,EAClB,eAAe,EAAE,IAAI,EACrB,OAAO,EAAE,YAAY,EACrB,MAAM,EAAE,OAAO,EACf,aAAa,EAAE,IAAI,GACpB;;AAED,AAAA,OAAO,CAAC,EACN,aAAa,EAAE,cAAc,GAC9B;;AAED,AAAA,UAAU,CAAC,EACT,gBAAgB,EAAE,OAAO,EACzB,KAAK,EAAE,KAAK,GACb;;AAED,AAAA,qBAAqB,CAAC,EACpB,gBAAgB,EAAE,OAAO,EACzB,KAAK,EAAE,KAAK,GACb;;AAED,AAAA,eAAe,CAAC,EACd,gBAAgB,EAAE,OAAO,EACzB,KAAK,EAAE,KAAK,GACb;;AAED,AAAA,kBAAkB,CAAC,EACjB,eAAe,EAAE,YAAY,GAC9B;;AAED,AAAA,KAAK,CAAC,EACJ,KAAK,EAAE,KAAK,GACb;;AAED,AAAA,SAAS,CAAC,EACR,MAAM,EAAE,eAAe,EACvB,aAAa,EAAE,GAAG,EAClB,OAAO,EAAE,IAAI,EACb,MAAM,EAAE,IAAI,GACb;;AAED,AAAA,GAAG,AAAA,SAAS,CAAC,EAAE,CAAC,EACd,SAAS,EAAE,IAAI,EACf,aAAa,EAAE,GAAG,GACnB"
+}

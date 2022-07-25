@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>About | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="About" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<meta property="og:description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<link rel="canonical" href="https://architecture.appservices.tech/about/" />
+<meta property="og:url" content="https://architecture.appservices.tech/about/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="About" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"This site contains resources about the architecture and processes for Red Hat Application Services.","headline":"About","name":"Application Services Architecture","url":"https://architecture.appservices.tech/about/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.appservices.tech/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="sect1">
+<h2 id="document-types">Document types</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This pages describes the different kinds of content on this site.</p>
+</div>
+<div class="sect2">
+<h3 id="architecture-overview">Architecture Overview</h3>
+<div class="sect3">
+<h4 id="audience">Audience</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>External stakeholders</p>
+</li>
+<li>
+<p>People new to the project</p>
+</li>
+<li>
+<p>Anyone looking for a refresher on the general architecture</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="description">Description</h4>
+<div class="paragraph">
+<p>A living document that serves as an introduction and jumping off point
+for the managed service architecture. High level overview of the key
+contexts and components. Should link off to more detailed context
+overviews and also any key overarching ADRs. Should be kept high level
+to minimize the maintenance cost.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="process">Process</h4>
+<div class="paragraph">
+<p>Updating the Architectural overview is a step part of an ADR or an Epic
+Brief elaboration.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="context-overview">Context Overview</h3>
+<div class="sect3">
+<h4 id="audience-2">Audience</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>External Stakeholders</p>
+</li>
+<li>
+<p>New people joining the team particularly if working in a particular
+context</p>
+</li>
+<li>
+<p>Team members working in other contexts that want a better and deeper
+understanding of a particular context</p>
+</li>
+<li>
+<p>Anyone looking for a refresher on a particular context</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="description-2">Description</h4>
+<div class="paragraph">
+<p>Living document that is a focused and detailed architectural overview of
+a particular context. Example contexts would include the Control Plane
+and Data Plane. Should outline each of the components in that context
+(including important if not all sub components. Key interactions should
+also be outlined with a reasonable amount of detail while avoiding
+implementation details where possible. Should be kept high level to
+minimize the maintenance cost.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="process-2">Process</h4>
+<div class="paragraph">
+<p>Updating the Context overview is a step part of an ADR or an Epic Brief
+elaboration.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="architecture-decision-records-adr">Architecture Decision Records (ADR)</h3>
+<div class="sect3">
+<h4 id="audience-3">Audience</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Architects / Team Leads / Engineering from all services</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="description-3">Description</h4>
+<div class="paragraph">
+<p>Captures single important architectural decisions including the why and
+what but should avoid implementation details where possible that may
+soon become out of date or not apply to other services that want to
+follow the decision made in the ADR. ADRs should be addressing how to
+solve a problem, their title reflecting it. Other service teams would
+reuse these cookbooks.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="architectural-pattern">Architectural Pattern</h3>
+<div class="sect3">
+<h4 id="audience-4">Audience</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Architects / Team Leads / Engineering from all services</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="description-4">Description</h4>
+<div class="paragraph">
+<p>One of the goals of the MAS architecture group is to share patterns and solutions between services, to create consistency. Consistency enables efficiency (particularly for  supportability and operability) and a better user experience.</p>
+</div>
+<div class="paragraph">
+<p>An Architectural Pattern captures a single important architectural pattern. Allows for reuse of patterns by other ADRs and Platform ADRs. They focus on what (but should avoid implementation details where possible that may soon become out of date or not apply to other services that want to follow the decision made in the ADR). They should also describe when they can be applied.</p>
+</div>
+<div class="paragraph">
+<p>Many libraries of architectural patterns exist outside of this repository. An Architectural Pattern is encouraged to make use of them, and can depend and build on them by including a link to them.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="process-3">Process</h4>
+<div class="paragraph">
+<p>Architectural Patterns are created when patterns are identified. There are well known issues with attempting to create consistency too early as it can reduce innovation (by requiring people to stick to a standard) and create bad solutions (that worked for the first piece of software for which the standard was created). We attempt to balance this through not creating platform ADRs “too early”.</p>
+</div>
+<div class="paragraph">
+<p>At this point the pattern exists and service ADRs can refer to it, and note if they are not following it.</p>
+</div>
+<div class="paragraph">
+<p>A platform ADR is created when an architectural pattern has been successfully applied to (at least) three services. A platform ADR follows the same structure as a service ADR. Once a platform ADR is created, the architectural pattern must be used to solve that problem until the platform ADR is superseded.</p>
+</div>
+<div class="paragraph">
+<p>If an architectural pattern exists but is not required by a platform ADR, and a new service ADR wishes to implement a competing pattern there will be an enforced period during which neither can become required by a platform ADR to ensure we are not prematurely standardising. From the point at which the competing pattern is introduced at least 3 new services much choose a pattern for a platform ADR to be allowed.</p>
+</div>
+<div class="paragraph">
+<p>When service ADRs are reviewed by the MAS architecture group every reviewer should think whether they have seen this pattern before in a previous service ADR (or other work that wasn’t previously part of an ADR). If a pattern is identified, and the service ADR does not already refer to a platform ADR then: (a) the reviewer and the author of the ADR should collaborate to send an email to the <a href="mailto:mas-architecture@redhat.com">mas-architecture@redhat.com</a> list linking the relevant ADRs and highlight the pattern identified; and (b) this should be scheduled for discussion in the next MAS Architecture meeting.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="epic-brief">Epic Brief</h3>
+<div class="sect3">
+<h4 id="audience-5">Audience</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Architects / Team Leads / Engineering</p>
+</li>
+<li>
+<p>BU and PM</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="description-5">Description</h4>
+<div class="paragraph">
+<p>Focused design doc that dives into the details of how to execute on a
+given solution to the outlined problem. The problem will have often been</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/pages/about/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
