@@ -1,0 +1,48 @@
+---
+num: 88
+title: Authorization for control plane admin APIs
+status: "Draft" # One of Draft, Accepted, Rejected
+authors:
+  - "akoserwal"
+tags:
+  - "sso" # e.g. kafka, connectors, registry
+applies_padrs: # What PADRs does this ADR apply?
+applies_patterns: # What APs does this ADR apply?
+---
+
+// Top style tips:
+// * Use one sentence per line
+// * No unexpanded acronyms
+// * No undefined jargon
+
+// No need for a title heading, it's added by the template
+
+## Context and Problem Statement
+// What is the background against which this decision is being taken?
+
+## Goals
+// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+
+## Non-goals
+// Bulleted list of outcomes that this ADR is not trying to achieve.
+
+## Current situation
+// Where are we now?
+
+## Proposal
+// What is the decision being proposed
+
+### Threat model
+// Provide a link to the relevant threat model. 
+// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+
+## Alternatives Considered / Rejected
+
+## Challenges
+// What are the costs/drawbacks of the proposed decision?
+
+## Dependencies
+// What are the knock-on effects if this decision is accepted?
+
+## Consequences if not completed
+// What are the knock-on effects if this decision is not accepted?
