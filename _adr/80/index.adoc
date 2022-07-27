@@ -1,6 +1,6 @@
 ---
 num: 80
-title: "CEE diagnostic gathering mechanism"
+title: "Diagnostic Gathering"
 status: "Draft"
 authors:
   - "Keith Wall"
@@ -8,15 +8,83 @@ authors:
 
 ## Context and Problem Statement
 
-In order to provide support to customers of a Managed Service, CEE require a mechanism that allows them to capture the
-state of the instance of the service for diagnostic purposes.  CEE will use this information in conjunction with the
-problem statement provided by the customer in order to efficiently investigate the problem and determine a solution.
+In order to provide support to the customers of a Managed Service, a company offering the Managed Service will typically have a Support
+Organisation (SO) dedicated to this function.  In order to perform this function effectively the SO requires a mechanism that allows
+them to capture the state of the instance of the service for diagnostic purposes.
 
-The data gathering mechanism must consider the issue of Personally Identifiable Information (PII) or other sensitive
-information and ensure that it is handled appropriately.
+The SO will use the gathered information in conjunction with the problem statement provided by the customer in order to efficiently
+investigate the problem and determine a solution.
+
+The data gathering mechanism must consider the issue of Personally Identifiable Information (PII) or other sensitive information and ensure
+that it is handled appropriately.
 
 Authorization controls must be in place to ensure that the diagnostic gathering mechanism can only be used by suitably
 permissioned groups.
+
+## Goals
+
+* Identify the preferred solution for the diagnostic gathering mechanism.
+* Provide guidelines for content that should be included.
+
+## Non-goals
+
+None
+
+## Stakeholders
+* Eng
+* BU
+* SRE
+* SO
+
+## Current Architecture
+
+None
+
+## Proposed Architecture
+
+https://datatracker.ietf.org/doc/html/rfc2119[RFC-2119] keywords are used in this proposal.
+
+It is RECOMMENDED that managed services use https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_scripts[Back Plane]
+https://github.com/openshift/managed-scripts/[managed scripts] as the foundation of the data gathering mechanism. Backplane has an
+established https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_cluster_permissions[authorization model] that ensures
+that members of the SO have the permissions to run the scripts.
+
+Each Managed Service that implements this ADR MUST provide one or more backplane scripts that interrogate the state of a service instance.
+The exact way way the script will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
+RECOMMENDED that the script invoke the `oc adm inspect` command to gather Kubernetes state in addition to any other service specific
+state gathering commands.
+
+It is RECOMMENDED that the output from the backplane script be a UNIX tar stream.  This will allow the artifact to provide the diagnostic
+information in a structured form that can easily be processed using common command-line tools.
+
+It is RECOMMENDED that the script takes reasonable steps to avoid the collection of PII or other sensitive information. This may be done
+either by redacting artifacts known to contain secrets/keys etc, or not gathering certain information in the first place.  For
+example, in a Java based system where PII may be present in the Java heap, the safe option is not to collect heap dumps.
+
+The scripts MUST be non-mutating in nature.
+
+### Threat Model
+
+* <Provide a link to the relevant threat model. You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+
+* Take a copy of the threat model when the ADR is proposed, and merge those changes in once the ADR is accepted
+
+## Alternatives Considered / Rejected
+
+The option of providing an OpenShift MustGather Image was considered, however, as the approved access mechanism to the data-plane is backplane,
+utilising the backplane managed-scripts feature to perform the data gathering step minimised dependencies.
+
+## Challenges
+
+None.
+
+## Dependencies
+
+* None
+
+## Consequences if Not Completed
+
+Poor customer experience when raising support-cases.
 
 
 
