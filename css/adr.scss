@@ -52,3 +52,11 @@ div.post-toc h2 {
   font-size: 28px;
   margin-bottom: 0px;
 }
+
+.glossary dt {
+  font-weight: bold;
+}
+
+:target {
+  background-color: #ffa;
+}

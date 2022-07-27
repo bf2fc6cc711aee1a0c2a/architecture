@@ -1,0 +1,14 @@
+---
+title: Glossary
+permalink: /glossary/
+layout: page
+---
+:page-liquid:
+= Glossary
+
+// When adding new glossary definitions, add a corresponding attribute to _includes/glossary_links.adoc
+
+[glossary]
+Business Stakeholder:: [#glossary-businessstakeholder]#The team or individual responsible for setting the Service's overall strategy.#
+Customer Support:: [#glossary-customersupport]#The team responsible for providing support to a customer of the Service. Customer Support typically answer requests from customers of the service when they encounter difficulties using the Service.#
+Site Reliability Engineer:: [#glossary-sre]#The Site Reliability Engineer (SRE) is responsible for availability, latency, performance, efficiency, change management, monitoring, emergency response, and capacity planning of the Service.#

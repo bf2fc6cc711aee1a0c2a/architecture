@@ -10,10 +10,12 @@ applies_padrs: # What PADRs does this ADR apply?
 applies_patterns: # What APs does this ADR apply?
 ---
 
+include::/_includes/glossary_links.adoc[]
+
 // Top style tips:
 // * Use one sentence per line
 // * No unexpanded acronyms
-// * No undefined jargon
+// * No undefined jargon - use references to the glossary as appropiate e.g. {glossary-sre}
 
 // No need for a title heading, it's added by the template
 
