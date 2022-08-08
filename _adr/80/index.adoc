@@ -66,14 +66,12 @@ The scripts MUST be non-mutating in nature.
 
 ### Threat Model
 
-* <Provide a link to the relevant threat model. You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
-
-* Take a copy of the threat model when the ADR is proposed, and merge those changes in once the ADR is accepted
+This ADR does not alert the threat model.
 
 ## Alternatives Considered / Rejected
 
-The option of providing an OpenShift MustGather Image was considered, however, as the approved access mechanism to the data-plane is backplane,
-utilising the backplane managed-scripts feature to perform the data gathering step minimised dependencies.
+The option of providing an https://access.redhat.com/articles/4591521[OpenShift MustGather Image] was considered, however, as the approved access
+mechanism to the data-plane is backplane, utilising the backplane managed-scripts feature to perform the data gathering step minimised dependencies.
 
 ## Challenges
 
