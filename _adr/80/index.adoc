@@ -6,13 +6,15 @@ authors:
   - "Keith Wall"
 ---
 
+include::/_includes/glossary_links.adoc[]
+
 ## Context and Problem Statement
 
-In order to provide support to the customers of a Managed Service, a company offering the Managed Service will typically have a Support
-Organisation (SO) dedicated to this function.  In order to perform this function effectively the SO requires a mechanism that allows
-them to capture the state of the instance of the service for diagnostic purposes.
+In order to provide support to the customers of a Managed Service, a company offering the Managed Service will typically have a {glossary-customersupport}
+organisation.  In order to assist the customers, members of {glossary-customersupport} require a mechanism that allows them to capture the state of the
+instance of the service for diagnostic purposes.
 
-The SO will use the gathered information in conjunction with the problem statement provided by the customer in order to efficiently
+{glossary-customersupport} will use the gathered information in conjunction with the problem statement provided by the customer in order to efficiently
 investigate the problem and determine a solution.
 
 The data gathering mechanism must consider the issue of Personally Identifiable Information (PII) or other sensitive information and ensure
@@ -31,10 +33,9 @@ permissioned groups.
 None
 
 ## Stakeholders
-* Eng
-* BU
-* SRE
-* SO
+* {glossary-businessstakeholder}
+* {glossary-sre}
+* {glossary-customersupport}
 
 ## Current Architecture
 
@@ -47,7 +48,7 @@ https://datatracker.ietf.org/doc/html/rfc2119[RFC-2119] keywords are used in thi
 It is RECOMMENDED that managed services use https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_scripts[Back Plane]
 https://github.com/openshift/managed-scripts/[managed scripts] as the foundation of the data gathering mechanism. Backplane has an
 established https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_cluster_permissions[authorization model] that ensures
-that members of the SO have the permissions to run the scripts.
+that members of the {glossary-customersupport} have the permissions to run the scripts.
 
 Each Managed Service that implements this ADR MUST provide one or more backplane scripts that interrogate the state of a service instance.
 The exact way way the script will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
