@@ -48,7 +48,7 @@ https://datatracker.ietf.org/doc/html/rfc2119[RFC-2119] keywords are used in thi
 It is RECOMMENDED that managed services use https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_scripts[Back Plane]
 https://github.com/openshift/managed-scripts/[managed scripts] as the foundation of the data gathering mechanism. Backplane has an
 established https://source.redhat.com/groups/public/openshiftplatformsre/wiki/backplane_cluster_permissions[authorization model] that ensures
-that members of the {glossary-customersupport} have the permissions to run the scripts.
+that members of {glossary-customersupport} have the permissions to run the scripts.
 
 Each Managed Service that implements this ADR MUST provide one or more backplane scripts that interrogate the state of a service instance.
 The exact way way the script will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
