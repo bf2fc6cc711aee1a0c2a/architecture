@@ -51,14 +51,14 @@ established https://source.redhat.com/groups/public/openshiftplatformsre/wiki/ba
 that members of {glossary-customersupport} have the permissions to run the scripts.
 
 Each Managed Service that implements this ADR MUST provide one or more backplane scripts that interrogate the state of a service instance.
-The exact way way the script will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
-RECOMMENDED that the script invoke the `oc adm inspect` command to gather Kubernetes state in addition to any other service specific
+The exact way way the scripts will interrogate state will be service specific, however if the service provided on top of OpenShift, it is
+RECOMMENDED that the scripts invoke the `oc adm inspect` command to gather Kubernetes state in addition to any other service specific
 state gathering commands.
 
-It is RECOMMENDED that the output from the backplane script be a UNIX tar stream.  This will allow the artifact to provide the diagnostic
+It is RECOMMENDED that the output from the scripts be a UNIX tar stream.  This will allow the artifact to provide the diagnostic
 information in a structured form that can easily be processed using common command-line tools.
 
-It is RECOMMENDED that the script takes reasonable steps to avoid the collection of PII or other sensitive information. This may be done
+It is RECOMMENDED that the scripts takes reasonable steps to avoid the collection of PII or other sensitive information. This may be done
 either by redacting artifacts known to contain secrets/keys etc, or not gathering certain information in the first place.  For
 example, in a Java based system where PII may be present in the Java heap, the safe option is not to collect heap dumps.
 
