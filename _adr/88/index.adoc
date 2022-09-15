@@ -1,48 +1,88 @@
 ---
 num: 88
-title: Authorization for control plane admin APIs
-status: "Draft" # One of Draft, Accepted, Rejected
+title: Authorization for fleet-manager admin APIs
+status: "Draft"
 authors:
-  - "akoserwal"
+  - "ppaszki"
 tags:
-  - "sso" # e.g. kafka, connectors, registry
+  - "sso"
 applies_padrs: # What PADRs does this ADR apply?
 applies_patterns: # What APs does this ADR apply?
 ---
 
-// Top style tips:
-// * Use one sentence per line
-// * No unexpanded acronyms
-// * No undefined jargon
-
-// No need for a title heading, it's added by the template
-
 ## Context and Problem Statement
-// What is the background against which this decision is being taken?
+The purpose of this ADR is to define a standardized approach for securing admin API in a fleet manager
 
 ## Goals
-// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+* Provide standardized way to secure admin API endpoints for fleet managers
 
 ## Non-goals
-// Bulleted list of outcomes that this ADR is not trying to achieve.
 
 ## Current situation
-// Where are we now?
 
 ## Proposal
-// What is the decision being proposed
+
+image::adr-88-admin-api-architecture-diagram.png[architecture diagram]
+
+A Keycloak realm is used to authorize access to admin API endpoint(s). 
+Such realm contains roles that allow access to endpoints to the privileged API users.
+Recommended approach would be to create a set of realm roles per environment and name them in the way that indicates the permissions they grant as follows:
+
+* <unique-fleet-manager-prefix>-admin-read-stage
+* <unique-fleet-manager-prefix>-admin-write-stage
+* <unique-fleet-manager-prefix>-admin-full-stage
+
+* <unique-fleet-manager-prefix>-admin-read-prod
+* <unique-fleet-manager-prefix>-admin-write-prod
+* <unique-fleet-manager-prefix>-admin-full-prod
+
+Example roles for kas-fleet-manager in production environment along with their permissions:
+
+[cols="1,1"]
+|===
+|Role name|Allowed permissions
+
+|kas-fleet-manager-admin-read-prod
+|list permissions (HTTP GET)
+
+|kas-fleet-manager-admin-write-prod
+|list and update permissions (HTTP GET and PUT)
+
+|kas-fleet-manager-admin-full-prod
+|full permissions (HTTP GET, PUT and DELETE)
+|===
+
+1. Once Keycloak instance is set up, a privileged user uses their credentials to get a JWT token from Keycloak.
+2. The JWT token is sent to a admin API in a HTTP request.
+3. Admin API authorization middleware verifies token signature with Public JWKS Certificate and roles included in the JWT token are checked against roles specified in the fleet manager.
+4. Matching role for given admin endpoint grants access to the action associated with that endpoint.
+Failure to match the required role results in returning 404 error for given admin endpoint.
+
+image::adr-88-authentication-flow.png[architecture diagram]
+
+## Suggested implementation for Red Hat Internal Keycloak
+
+Instead of using dedicated Keycloak instance/ realm, roles allowing to access admin API endpoints are represented by membership in a Red Hat Rover Group(s).
 
 ### Threat model
-// Provide a link to the relevant threat model. 
-// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+Admin API endpoints are protected by realm roles, hence only users that are assigned these roles can access the endpoints.
+
+No additional mitigation is required.
 
 ## Alternatives Considered / Rejected
 
 ## Challenges
-// What are the costs/drawbacks of the proposed decision?
+
+### Pros
+1. Easier management of access to the admin API endpoints with the dedicated Keycloak roles.
+
+### Cons
+
+1. It needs to be ensured that the permissions are only assigned to the people that should be authorized to access protected resource(s).
+2. There should be a policy/ SOP in place for revoking access to the admin API roles.
+3. Potential issues with token size, if certain users are assigned many roles. This can may result in increased response time for admin API endpoints and/ or requests being blocked at the gateway.
 
 ## Dependencies
-// What are the knock-on effects if this decision is accepted?
 
 ## Consequences if not completed
-// What are the knock-on effects if this decision is not accepted?
+Multiple different solutions might be implemented for securing admin API endpoints across fleet managers
