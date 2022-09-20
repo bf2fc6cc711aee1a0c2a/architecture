@@ -61,13 +61,10 @@ Failure to match the required role results in returning 404 error for given admi
 image::adr-88-authentication-flow.png[architecture diagram]
 
 ## Suggested implementation for Red Hat Internal Keycloak
-
-Instead of using dedicated Keycloak instance/ realm, roles allowing to access admin API endpoints are represented by membership in a Red Hat Rover Group(s).
+The https://docs.google.com/document/d/18IUisqAZMvVXzzUoYR7Lz4W-VJHnkxFqRt-3hyOHeoE[following document] describes implementation of the admin API endpoints authorization for kas-fleet-manager using Internal Red Hat SSO
 
 ### Threat model
-Admin API endpoints are protected by realm roles, hence only users that are assigned these roles can access the endpoints.
-
-No additional mitigation is required.
+This is a generic ADR so there is no threat model to update. The application of this ADR to specific services will require updating the threat model for those services.
 
 ## Alternatives Considered / Rejected
 
@@ -77,7 +74,6 @@ No additional mitigation is required.
 1. Easier management of access to the admin API endpoints with the dedicated Keycloak roles.
 
 ### Cons
-
 1. It needs to be ensured that the permissions are only assigned to the people that should be authorized to access protected resource(s).
 2. There should be a policy/ SOP in place for revoking access to the admin API roles.
 3. Potential issues with token size, if certain users are assigned many roles. This can may result in increased response time for admin API endpoints and/ or requests being blocked at the gateway.
