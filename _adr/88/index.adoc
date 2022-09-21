@@ -26,7 +26,7 @@ image::adr-88-admin-api-architecture-diagram.png[architecture diagram]
 
 A Keycloak realm is used to authorize access to admin API endpoint(s). 
 Such realm contains roles that allow access to endpoints to the privileged API users.
-Recommended approach would be to create a set of realm roles per environment and name them in the way that indicates the permissions they grant as follows:
+Recommended approach is to create a set of realm roles per environment and name them in the way that indicates the permissions they grant as follows:
 
 * <unique-fleet-manager-prefix>-admin-read-stage
 * <unique-fleet-manager-prefix>-admin-write-stage
@@ -60,23 +60,12 @@ Failure to match the required role results in returning 404 error for given admi
 
 image::adr-88-authentication-flow.png[architecture diagram]
 
-## Suggested implementation for Red Hat Internal Keycloak
-The https://docs.google.com/document/d/18IUisqAZMvVXzzUoYR7Lz4W-VJHnkxFqRt-3hyOHeoE[following document] describes implementation of the admin API endpoints authorization for kas-fleet-manager using Internal Red Hat SSO
-
-### Threat model
-This is a generic ADR so there is no threat model to update. The application of this ADR to specific services will require updating the threat model for those services.
-
 ## Alternatives Considered / Rejected
 
 ## Challenges
-
-### Pros
-1. Easier management of access to the admin API endpoints with the dedicated Keycloak roles.
-
-### Cons
-1. It needs to be ensured that the permissions are only assigned to the people that should be authorized to access protected resource(s).
-2. There should be a policy/ SOP in place for revoking access to the admin API roles.
-3. Potential issues with token size, if certain users are assigned many roles. This can may result in increased response time for admin API endpoints and/ or requests being blocked at the gateway.
+1. It needs to be ensured that the permissions are only assigned to the people that should be authorized to access protected resource(s). Standard security practices must applied to both the management of the permissions as well as the management of the access to the Keycloak instance that provides the authorization for the admin API endpoints.
+2. A policy/ SOP for revoking access to the admin API roles is required.
+3. Potential issues with token size can occur, if certain users are assigned many roles. This can result in increased response time for admin API endpoints and/ or requests being blocked at the gateway.
 
 ## Dependencies
 
