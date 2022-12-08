@@ -1,7 +1,7 @@
 ---
 num: 89 
 title: A bf2 subdomain & wildcard certificate per data plane cluster 
-status: "Draft" # One of Draft, Accepted, Rejected
+status: "Accepted" # One of Draft, Accepted, Rejected
 authors:
   - "Manyanda Chitimbo"
   - "Steven Hawkins"
