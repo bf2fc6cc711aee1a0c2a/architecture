@@ -2,7 +2,7 @@
 num: 5
 title: "Kafka Cluster Certificate Generation"
 status: "Superseded"
-superseded_by: 31
+superseded_by: 89
 authors:
   - "David Ffrench"
   - "Paolo Patierno"
