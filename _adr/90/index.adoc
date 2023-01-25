@@ -1,0 +1,13 @@
+---
+num: 90
+title: "OpenAPI clients code generation - Kiota"
+status: "Draft"
+authors:
+  - "Andrea Peruffo"
+tags: 
+  - openapi
+  - generators
+  - kiota
+  - SDKs
+---
+https://docs.google.com/document/d/1WayfKKCvJn6gFmVRYbmBNTGixEF40vAMhdrlCDMLFuI/edit[Original doc]
