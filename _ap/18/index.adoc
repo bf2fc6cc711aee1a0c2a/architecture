@@ -1,5 +1,5 @@
 ---
-num: 17
+num: 18
 title: "OpenAPI clients code generation - Kiota"
 status: "Draft"
 authors:
