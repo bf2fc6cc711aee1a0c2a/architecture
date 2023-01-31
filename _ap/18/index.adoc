@@ -11,6 +11,9 @@ tags: []
 
 We are internally committed to using OpenAPI specification and encourage our customers to do the same with products like API Designer and Service Registry.
 
+The current approach to automatically generating client SDKs for Red Hat's application services has a number of problems/issues that need to be holistically addressed.
+This AP will document the challenges with our current approach and propose a solution using new technologies.
+
 In client-server architectures, servers are written using either a contract-first or code-first approach.
 However, we always have the need to interact with those APIs from clients.
 Generation of the API clients can (and should) be completely automated.
@@ -30,7 +33,7 @@ image::openapi-generator-gh.png[]
 
 Even our own attempts to fix known bugs have been ineffective:
 https://github.com/OpenAPITools/openapi-generator/pull/13616
-https://github.com/OpenAPITools/openapi-generator/pull/13616
+
 It's also pretty common to have breaking changes in the generator tooling, which results in breaking changes in the generated code.
 When this happens it can be hard to detect and often happens without a clear migration path.
 
