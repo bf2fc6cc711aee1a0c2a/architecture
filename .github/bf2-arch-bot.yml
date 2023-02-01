@@ -1,0 +1,13 @@
+# Github login name of the bot itself
+botUserLogin: bf2-arch-bot
+
+# The time, in hours, to wait between checking for stalled discussions
+# 1440 minutes = 24 hours
+stalledDiscussionPollTimeMins: 1440
+
+# Github logins of people who can do "/create adr" etc on issues
+recordCreationApprovers:
+- emmanuelbernard
+- tombentley
+
+publishedUrl: https://architecture.appservices.tech
