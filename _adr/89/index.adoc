@@ -1,7 +1,8 @@
 ---
 num: 89 
 title: A bf2 subdomain & wildcard certificate per data plane cluster 
-status: "Accepted" # One of Draft, Accepted, Rejected
+status: "Superseded"
+superseded_by: 90
 authors:
   - "Manyanda Chitimbo"
   - "Steven Hawkins"
@@ -24,8 +25,8 @@ applies_patterns: # What APs does this ADR apply?
 The Kafka cluster deployed on the data plane cluster should be reachable via TLS.
 It means that we should provide a way to the clients to verify and validate the TLS connection with the related handshake with the Kafka brokers exposed outside of the data plane cluster.
 The Strimzi operator has its own cluster CA for signing the brokers' certificates but it should be used just for internal communication.
-This problem is the same as the one exposed https://architecture.bf2.dev/adr/5/[ADR-5: Kafka Cluster Certificate Generation] whose solution only works for managed data plane clusters but it is not an acceptable solution for when users brings / registers their own data plane clusters.
-Additionally, the proposed solution in https://architecture.bf2.dev/adr/5/[ADR-5] lacked a lot of automation on certificate management which is an area the present ADR intends to address.
+This problem is the same as the one exposed link:../5/index.adoc[ADR-5: Kafka Cluster Certificate Generation] whose solution only works for managed data plane clusters but it is not an acceptable solution for when users brings / registers their own data plane clusters.
+Additionally, the proposed solution in link:../5/index.adoc[ADR-5] lacked a lot of automation on certificate management which is an area the present ADR intends to address.
 
 ## Goals
 // Bulleted list of outcomes that this ADR, if accepted, should help achieve
@@ -41,7 +42,7 @@ Additionally, the proposed solution in https://architecture.bf2.dev/adr/5/[ADR-5
 ## Current situation
 // Where are we now?
 
-The https://architecture.bf2.dev/adr/5/[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate SOP]
+The link:../5/index.adoc[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate SOP]
 
 ## Proposal
 // What is the decision being proposed
@@ -76,15 +77,15 @@ Instead a secret is created and only references to the secrets will be added bef
 // Provide a link to the relevant threat model. 
 // You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
 
-Once the certificate are in the data plane in form of a Kubernetes secret, a priviledged users can still see them. 
+Once the certificate are in the data plane in form of a Kubernetes secret, a privileged users can still see them. 
 If this is on a enterprise data plane cluster without good security standards/policy, then anyone with the private key can impersonate the server or eavesdrop on a connection with the server. 
-For non enterprise data plane clusters, this is mitigated by only allowing SREs to have the priviledge / permissions to see these secrets.
+For non enterprise data plane clusters, this is mitigated by only allowing SREs to have the privilege / permissions to see these secrets.
 For enterprise data plane clusters, customers will be advised to do so as well.
 
 Morever, since there will be a different certificate per data plane clusters, if one certificate is compromised, it won't affect others and it can be safely revoked. 
 The proposed solution also limits the possibility of an owner of a enterprise data plane cluster, eavesdropping on another data plane cluster that they do not own as the certificate keys will be different. 
 
-NOTE: If the shared certificate for an existing data plane cluster is to be compromised, then it opens up a securiry risk on all the Kafkas on these existing data plane clusters. However, the chances of this security breach occurring is mitigateg by first and foremost ensuring only SREs have priviledged access to data plane clusters. And second, if a the security issue is detected then certificates can be easily revoked via the GitOps flow and new ones autocreated 
+NOTE: If the shared certificate for an existing data plane cluster is to be compromised, then it opens up a securiry risk on all the Kafkas on these existing data plane clusters. However, the chances of this security breach occurring is mitigateg by first and foremost ensuring only SREs have privileged access to data plane clusters. And second, if a the security issue is detected then certificates can be easily revoked via the GitOps flow and new ones autocreated 
 
 ## Alternatives Considered / Rejected
 

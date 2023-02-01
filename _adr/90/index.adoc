@@ -1,0 +1,136 @@
+---
+num: 90 
+title: Automatic certificate management per Kafka instance 
+status: "Accepted" # One of Draft, Accepted, Rejected
+authors:
+  - "Manyanda Chitimbo"
+tags:
+  - "kafka" # e.g. kafka, connectors, registry
+applies_padrs: # What PADRs does this ADR apply?
+applies_patterns: # What APs does this ADR apply?
+---
+
+// Top style tips:
+// \* Use one sentence per line
+// \* No unexpanded acronyms
+// \* No undefined jargon
+
+// No need for a title heading, it's added by the template
+
+## Context and Problem Statement
+// What is the background against which this decision is being taken?
+The Kafka cluster deployed on the data plane cluster should be reachable via TLS.
+It means that we should provide a way to the clients to verify and validate the TLS connection with the related handshake with the Kafka brokers exposed outside of the data plane cluster.
+The Strimzi operator has its own cluster CA for signing the brokers' certificates but it should be used just for internal communication.
+This problem is the same as the one exposed link:../5/index.adoc[ADR-5: Kafka Cluster Certificate Generation] whose solution only works for managed data plane clusters but it is not an acceptable solution for when users brings / registers their own data plane clusters.
+Additionally, the proposed solution in link:../5/index.adoc[ADR-5] lacked a lot of automation on certificate management which is an area the present ADR intends to address.
+
+## Goals
+// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+- Automated certificate management (generation, renewal, revocation) per Kafka instance
+- Avoid sharing same certificate between Kafka instances
+- Avoid exposing domain registrar & certificate issuers credentials onto enterprise data plane clusters 
+
+## Non-goals
+// Bulleted list of outcomes that this ADR is not trying to achieve.
+- Creating a pattern for and/or developing a central certificate management service
+
+## Current situation
+// Where are we now?
+
+The https://architecture.appservices.tech/adr/5/[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate SOP]
+
+The link:../89/index.adoc[ADR-89: A bf2 subdomain & wildcard certificate per data plane cluster] proposed a solution of automatic certificate management per data plane cluster, the solution however made the Kafka URLs non portable i.e the URLs are non deployment location agnostic.
+URLs portability is the design intention we do not want to loose - as it allows migrating a Kafka from one data plane to another becoming only an infrastructure change that the consumer of the Kafka won't need to be soo much concerned about and be required to update the various kafka URLs (admin server API & bootstrap server host).
+
+## Proposal
+// What is the decision being proposed
+The proposed solution is going to use https://Letsencrypt.org[Letsencrypt] to automatically manage certificates.
+The solution consists of: 
+
+1. Generating one wildcard certificate per Kafka instance .
+For each new `standard` Kafka instance, there will be a wildcard certificate for the `*.<kafka-id>.kafka.bf2.dev` subdomain where `<kafka-id>` is unique for each Kafka.
+For each new `developer` Kafka instance, a shared wildcard certificate `*.trial.kafka.bf2.dev` used for all developer instances will be generated and automatically managed. 
+
+2. The fleet manager in its reconcilers will use https://github.com/caddyserver/certmagic[certmagic library] to generate certificate for each new Kafka and store them in a secure Storage. 
+During Kafka reconciliation between the Fleetshard and the Fleet manager, certificates will be fetched from the secure storage by the fleet manager and they'll be passed down to the data plane via the existing certificate passing mechanism i.e via the ManagedKafka CR.
+The fleet manager will implement this logic in a way that it can be easily extracted & packaged in form of a library and shared with others managed services builders.
+The kas-fleet-manager certificate reconciliation will have to handle the two different cases below: 
+a. When a `standard` kafka is assigned to a given data plane, all routes created will be under the `*.<kafka-id>.kafka.bf2.dev` domain. 
+For example, if the kafka id is `12345` then Kafka boostrap host will have the form of `foobar-xsqhyyza.12345.kafka.bf2.dev`.
+b. When a `developer` kafka is assigned to a given data plane, all routes created will be under the `*.trial.kafka.bf2.dev` domain. 
+For example, if the kafka id is `12345` then Kafka boostrap host will have the form of `foobar-sqfsazk.trial.kafka.bf2.dev`.
+
+3. No migration to be performed for Kafkas.
+The proposed solution will be applied to only new Kafkas.  
+Existing Kafkas will continue to share the wildcard certificate on the `*.kafka.bf2.dev` domain.  
+The shared certificate for the already existing Kafkas will now be automatically renewed by the fleet manager.
+
+4. Certificate renewals will also be handled automatically by the fleet manager using the https://github.com/caddyserver/certmagic[certmagic library]. 
+Renewals will be blast radius aware to renew certificates in small runs on per Kafka basis.
+Renewals of each certificate will happen 30 days before the certificate expires. 
+The intention is to reduce the risk of compromising all our certificates in case there is an outage or an issue with the renewal system in Letsencrypt. 
+It also removes the chances of bombarding Letsencrypt with bulk requests or rollout of all the Kafkas in one big batch after renewals. 
+
+5. Revocation will be handled per Kafka instance.
+It will follow a GitOps approach where SRE will request to revoke a certificate for a Kafka.
+Once the compromised certificate has been revoked, a new certificate for that Kafka will be generated.
+For already existing Kafkas, they'll continue to share the newly generated certificate: see proposal number (3). 
+
+6. When a standard Kafka is removed from the fleet manager, its corresponding certificate will also be revoked. 
+This is with an exception for all Kafkas that uses a shared certificate i.e Kafkas that existed before the solution is in place or all new developer Kafkas that uses a shared wildcard `*.trial.kafka.dev` certificate.
+
+7. There will be separate Letsencrypt's account per kas-fleet-manager environment. 
+For each of these acccounts, a request to overrides the various https://Letsencrypt.org/docs/rate-limits[Letsencrypt limits] will be done by following https://Letsencrypt.org/docs/rate-limits/#a-id-overrides-a-overrides[Letsencrypt limits overrides].
+There are two main limits that we should be aware of and are of interests: (1) Certificates per Registered Domain which has a default of 50 certificates per week (2) You can create a maximum of 300 New Orders per account per 3 hours.
+Each of these two limits needs to be bumped to a bigger value after capacity planning for certificate generation has been done.
+
+NOTE: There is an existing logic in the data plane that ensures that all sensitive parts in the ManagedKafka CR are not written in plain text. 
+Instead a secret is created and only references to the secrets will be added before the ManagedKafka is created in the data plane.
+
+### Threat model
+// Provide a link to the relevant threat model. 
+// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+
+Once the certificate are in the data plane in form of a Kubernetes secret, a privileged users can still see them. 
+If this is on a enterprise data plane cluster without good security standards/policy, then anyone with the private key can impersonate the server or eavesdrop on a connection with the server. 
+For non enterprise data plane clusters, this is mitigated by only allowing SREs to have the privilege / permissions to see these secrets.
+For enterprise data plane clusters, customers will be advised to do so as well.
+Morever, since there will be a different certificate per kafka instance, if one certificate is compromised, it won't affect others and it can be safely revoked. 
+The proposed solution also limits the possibility of an owner of a enterprise data plane cluster, eavesdropping on another data plane cluster that they do not own as the certificate keys will be different. 
+
+NOTE: If the shared certificate for an existing Kafka is to be compromised, then it opens up a securiry risk on all existing Kafkas. However, the chances of this security breach occurring is mitigated by first and foremost ensuring only SREs have privileged access to data plane clusters. And second, if a the security issue is detected then certificates can be easily revoked and new ones autocreated 
+
+## Alternatives Considered / Rejected
+
+1. Deploying https://www.redhat.com/sysadmin/cert-manager-operator-openshift[cert-manager operator] to the data plane. Rejected to avoid exposing domain registrar credentials and to avoid adding another component that consumes data plane resources and that needs to be monitored.
+
+2. Migrating existing their Kafkas. This change is disruptive to existing customers hence why it was rejected. 
+The Kafka fleet manager will thus ensure that existing Kafkas continue to operate using a shared wildcard certificate on the `*.kafka.bf2.dev` domain i.e the proposed solution will only be applied to new Kafkas.
+
+3. Deploying https://www.redhat.com/sysadmin/cert-manager-operator-openshift[cert-manager operator] in the Control Plane. 
+The Control plane then handles the pushing of the Certificate request CR, watching for the created secrets and storing them securely. 
+Rejected because this is technically complex and has no clear benefit over the propsed solution of using a library.
+It also violates the design intentions of the fleet manager by turning into an Kubernetes operator. 
+Finally, it's another component deployed that has to be monitored and managed in the control plane which forces every one (especially dev environments) to have a running Kubernetes cluster running during development
+
+## Challenges
+// What are the costs/drawbacks of the proposed decision?
+1. The drawback is that the solution can't or won't handle the migration of already existing Kafkas.
+This is based on the fact that the proposal intends to make this change a transparent one to existing Kafka instances. 
+For this, the Kafka fleet manager will ensure that existing Kafkas continue to operate using a shared wildcard certificate on the `\*.kafka.bf2.dev` domain. 
+All standard Kafkas will have a wildcard certificate on the `*.<kafka-id>.kafka.bf2.dev` subdomain where the `kafka-id` is unique for each Kafka.
+All new developer Kafkas (short living instances of 48 hours) will have a wildcard certificate on the `*.trial.kafka.bf2.dev` subdomain, and they will share the same wildcard certificate. This is done so as to keep our usage of the https://Letsencrypt.org/[Letsencrypt] sane and avoid frequently reaching their https://Letsencrypt.org/docs/rate-limits/[limits] due to spikes in creation of developer kafkas.
+2. Reaching the various advertised https://Letsencrypt.org/docs/rate-limits/[Letsencrypt limits] is also a challenge.
+However, the various limits once reached can be overridden via a request as described in https://Letsencrypt.org/docs/rate-limits/#a-id-overrides-a-overrides[Letsencrypt limits overrides]. The usage of the https://Letsencrypt.org/[Letsencrypt] is kept sane by sharing an auto managed wildcard certificate for all new developer Kafkas.
+
+## Dependencies
+// What are the knock-on effects if this decision is accepted?
+
+Depedency on Letsencyrpt and its limits 
+
+## Consequences if not completed
+// What are the knock-on effects if this decision is not accepted?
+
+1. Living up with the toil related to the manual certificate handling. 
+2. Certificate shared between Kafaks and potentially exposing it to customers the data planes.
