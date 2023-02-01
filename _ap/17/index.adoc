@@ -5,6 +5,7 @@ title: "Fleet shard status"
 status: "Draft"
 authors:
   - "Steven Hawkins"
+  - "Luca Burgazzoli"
 tags:
   - "kafka"
 ---
@@ -88,7 +89,14 @@ How much time to give an error to resolve is up to the control plane and relevan
 ### Current vs. Desired State
 
 Especially in instances where spec changes are rolled into dependent resources the desired state will not be fully realized until some point in the future.  It is appropriate for the status to provide additional information about this transition.  As per the Kubernetes guidelines that could be represented via a condition, or similar to the standard Deployment resource additional status fields such as ready or available replicas, allow for the control plane or a user to infer the progress of the transition.
-Frequency Of Status Changes
+
+### generation and observedGeneration
+
+In kubernetes, each object should have a generation field which is defined as a sequence number - set by the system and monotonically increased per resource on a spec change. Some resources include a field named observedGeneration as part of the status, which is the generation most recently observed by the component responsible for acting upon changes to the desired state of the resource. This can be used, for instance, to ensure that the reported status reflects the most recent desired state. The observedGeneration field is also part of metav1.Conditions and represents the spec generation that the condition was set based upon.
+
+Similar concepts with fields that mirror their kubernetes couterparts can be introduced to MAS resources to offer a standard way for clients and control planes to figure out when a specific desired state has been taken into account. 
+
+### Frequency Of Status Changes
 
 Rapid changes to a status should be avoided.  Each status change is an update that the local Kuberentes instance must process and is generally also relayed to the control plane, which can lead to a substantial amount of overhead for a large number of resources.  For controllers that implement fixed interval resolving this is generally not an issue.  Event driven controllers though should be designed to minimize unnecessary updates - in particular updates which do not imply a status change should leave the existing status unmodified.
 
