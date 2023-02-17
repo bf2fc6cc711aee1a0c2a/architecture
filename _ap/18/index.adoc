@@ -132,7 +132,6 @@ Kiota https://github.com/microsoft/kiota/issues/2020[compatibility matrix] cover
 * Go
 * Python
 * TypeScript
-* TypeScript
 
 The generator doesn't need to stitch or even know about specific frameworks and/or libraries as they rely only on interfaces (called “abstractions”), and implementation libraries are swappable.
 
