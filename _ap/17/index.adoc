@@ -92,7 +92,7 @@ Especially in instances where spec changes are rolled into dependent resources t
 
 ### generation and observedGeneration
 
-In kubernetes, each object should have a generation field which is defined as a sequence number - set by the system and monotonically increased per resource on a spec change. Some resources include a field named observedGeneration as part of the status, which is the generation most recently observed by the component responsible for acting upon changes to the desired state of the resource. This can be used, for instance, to ensure that the reported status reflects the most recent desired state. The observedGeneration field is also part of metav1.Conditions and represents the spec generation that the condition was set based upon.
+In kubernetes, each object should have a `metadata.generation` field which is defined as a sequence number - set by the system and monotonically increased per resource on a spec change. Some resources include a field named `status.observedGeneration`, which is the generation most recently observed by the component responsible for acting upon changes to the desired state of the resource. This can be used, for instance, to ensure that the reported status reflects the most recent desired state. The observedGeneration field is also part of metav1.Conditions and represents the spec generation that the condition was set based upon.
 
 Similar concepts with fields that mirror their kubernetes couterparts can be introduced to MAS resources to offer a standard way for clients and control planes to figure out when a specific desired state has been taken into account. 
 
