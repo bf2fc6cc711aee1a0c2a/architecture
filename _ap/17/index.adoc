@@ -62,10 +62,13 @@ status:
 
 The meaning of any condition or status field is up to the controller / resource and should be a documented part of the API contract.  
 
-For example the ManagedKafka status Ready condition refers to the operator’s view of the resource.  A ManagedKafka is only ready when all of the dependent resources are observed to be in their desired / ready state.  This will not always be the same notion of readiness from an end user’s observation of managed kafka service.  In particular, the restart of a broker pods, a temporary networking issue, etc. may not be reflected in ManagedKafka status.  It follows that a ManagedKafka status Ready condition alone is insufficient to show the user the state of their service.  For ManagedKafka canary and other kafka metrics provide a more exact representation of cluster functioning.
-Error States
+For example the ManagedKafka status Ready condition refers to the operator’s view of the resource.  A ManagedKafka is only ready when all of the dependent resources are observed to be in their desired / ready state.  This will not always be the same notion of readiness from an end user’s observation of managed kafka service.  In particular, the restart of a broker pods, a temporary networking issue, etc. may not be reflected in ManagedKafka status.  It follows that a ManagedKafka status Ready condition alone is insufficient to show the user the state of their service.  ManagedKafka canary and other kafka metrics provide a more exact representation of cluster functioning.
 
-An operator in general may not consider any problem with a valid resource as terminal - one from which the resource can never recover.  The operator’s job is to implement the desired state whenever possible.  If at a given time additional resources are needed, other necessary system parts aren’t installed, etc.  - it doesn’t mean the conditions won’t be correct at a later time.  From the perspective of a managed service though we do have more rigid expectations.  For example a ManagedKafka should only be created with a Strimzi version that has an operator installed to manage.  For a fleet shard operator if such conditions are violated it is acceptable for the operator and the status handling to assume the resource is in a terminal state.
+### Error States
+
+An operator in a fleetshard _usually_ lacks sufficient context to determine whether a valid resource is in a terminal state. The operator’s job is simply to implement the desired state whenever possible. For example, if at a given time additional resources are needed, other necessary system parts aren’t installed, etc. - it doesn’t mean the conditions won’t be correct at a later time as a result of some action outside the context of the operator.
+
+In cases where the operator does have sufficient context to determine terminality, for example violation of preconditions in installed versions of APIs, then it is acceptable for the operator and the status handling to assume the resource is in a terminal state.
 
 When status is conveying an error that is not known to be terminal, it follows that the error may resolve on its own with additional time.  Control planes should assume such errors are ephemeral and not immediately react as if a hard failure has occurred.  If there are further actions that the control plane may take, the condition reason or other status fields should make that easy to determine.  This allows the data plane logic to remain straightforward and not have to fully understand every possible error condition.
 
@@ -82,13 +85,15 @@ status:
       type: Ready
 ----
 
-Rather than interpreting this as a hard failure, it should be assumed that with additional time and reconciliations that it will resolve on its own.
+Rather than interpreting this as a hard failure, it should be assumed that with additional time and reconciliations that it may resolve on its own.
 
 How much time to give an error to resolve is up to the control plane and relevant SLOs.  During installation this may include waiting until the SLO has been exceeded.  For other operations it may mean waiting at least 1 additional resolution time window if the operator or dependent operators uses a time based mechanism.
 
 ### Current vs. Desired State
 
 Especially in instances where spec changes are rolled into dependent resources the desired state will not be fully realized until some point in the future.  It is appropriate for the status to provide additional information about this transition.  As per the Kubernetes guidelines that could be represented via a condition, or similar to the standard Deployment resource additional status fields such as ready or available replicas, allow for the control plane or a user to infer the progress of the transition.
+
+For example the upgrade of ManagedKafka kafka version requires a rolling update of brokers where each broker is taken off-line and replace with one that has an updated version.  This is a relatively long-running process.  The status ManagedKafka Ready condition during this time will have a reason of KafkaUpdating, rather than simply indicating Ready based upon the Strimzi Kafka resource being updated to the desired state.
 
 ### generation and observedGeneration
 
