@@ -26,7 +26,7 @@ We do generate/write clients for several purposes, the most relevant are:
 * UI (e.g. console.dot)
 * Provisioning Tools (Ansible, Terraform)
 
-Most of our toolchains are (in some ways) using openapi-generator, the official tool supported by the OpenAPI org.
+Most of our toolchains are (in some ways) using `openapi-generator`, developed and maintained by the "OpenAPI Tools" organization (which is NOT affiliated with the OpenAPI initiative).
 
 Unfortunately, OpenAPI Generator is not a well maintained OSS project:
 image::openapi-generator-gh.png[]
