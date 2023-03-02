@@ -25,11 +25,11 @@ The current Service Tech Leads are:
 
 The process to contribute to this repository looks as follows:
 
-1. Identify the possible need for an ADR/AP/PADR
-2. Open an [issue](https://github.com/bf2fc6cc711aee1a0c2a/architecture/issues)
-3. The Service Tech Leads agree on opening an ADR/AP/PADR and assign an ID to it
-4. The original issue gets closed
-5. A PR with the actual content of the proposal is opened
+1. Someone identifies the possible need for an ADR/AP/PADR
+2. They open an [issue](https://github.com/bf2fc6cc711aee1a0c2a/architecture/issues)
+3. One or several of the Service Tech Leads agree on opening an ADR/AP/PADR; they assign an author (likely the person from step 1, above) and use the phrase `create adr` (or `create ap`, `create padr`). 
+4. A bot open and merge a PR that assigns the id for the ADR/AP/PADR, creates a draft and closes the original issue.
+5. The author opens a PR with the actual content of the proposal
 5. The Service Tech Leads identify the relevant stakeholders and assign the reviewers
 6. The Service Tech Leads review or delegate the review of the proposal
-7. After the needed rounds of comments/discussions/updates of the PR a decision is taken to either Merge and accept the proposal or Reject it
+7. After the needed rounds of comments/discussions/updates of the PR a decision is taken to either Accept the proposal or Reject it. The outcome is recorded via the ADR/AP/PADR's `status` field. In either case, one of Service Tech Leads the merges the PR
