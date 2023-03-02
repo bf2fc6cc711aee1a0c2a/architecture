@@ -185,6 +185,8 @@ We have had extensive discussions with IBM regarding their approach to https://g
 The IBM openapi-codegen(closed source) is a fork of the “official” generator.
 IBM does maintain an https://cloud.ibm.com/docs/api-handbook[API Handbook] and they verify the compatibility running the tooling on all of their OpenApi specifications (similar to what is explained https://github.com/microsoft/kiota/issues/2020[in this open ticket for Kiota]).
 
+Full text of this section is available as a [private Addendum](https://docs.google.com/document/d/1x97PVV0rF00SlbMeC8mVy4e7sl5zYcUtME6KC-TEJOU/edit).
+
 ==== Per language tooling
 
 There are a number of independent projects to generate code specifically for one language (often written in the same).
