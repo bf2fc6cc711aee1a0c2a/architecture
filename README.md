@@ -14,7 +14,7 @@ https://architecture.appservices.tech
 
 The current Service Tech Leads are listed in the following GH Team:
 
-https://github.com/orgs/bf2fc6cc711aee1a0c2a/teams/service-leads
+@bf2fc6cc711aee1a0c2a/service-leads
 
 ## Contributing
 
