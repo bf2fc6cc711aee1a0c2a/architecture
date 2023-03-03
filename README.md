@@ -12,14 +12,9 @@ https://architecture.appservices.tech
 
 ## Service Tech Leads
 
-The current Service Tech Leads are:
+The current Service Tech Leads are listed in the following GH Team:
 
-- @tombentley
-- @maleck13
-- @EricWittmann
-- @lburgazzoli
-- @danielezonca
-- @emmanuelbernard
+https://github.com/orgs/bf2fc6cc711aee1a0c2a/teams/service-leads
 
 ## Contributing
 
@@ -32,4 +27,4 @@ The process to contribute to this repository looks as follows:
 5. The author opens a PR with the actual content of the proposal
 5. The Service Tech Leads identify the relevant stakeholders and assign the reviewers
 6. The Service Tech Leads review or delegate the review of the proposal
-7. After the needed rounds of comments/discussions/updates of the PR a decision is taken to either Accept the proposal or Reject it. The outcome is recorded via the ADR/AP/PADR's `status` field. In either case, one of Service Tech Leads the merges the PR
+7. After the needed rounds of comments/discussions/updates of the PR a decision is taken to either Accept the proposal or Reject it. The outcome is recorded via the ADR/AP/PADR's `status` field. In either case, one of Service Tech Leads merges the PR
