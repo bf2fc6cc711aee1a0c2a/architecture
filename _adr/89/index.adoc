@@ -42,7 +42,7 @@ Additionally, the proposed solution in link:../5/index.adoc[ADR-5] lacked a lot 
 ## Current situation
 // Where are we now?
 
-The link:../5/index.adoc[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate SOP]
+The link:../5/index.adoc[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate standard operationg procedure (SOP)]: the SOP link points to a private repository and requires membership permission to see it.
 
 ## Proposal
 // What is the decision being proposed
