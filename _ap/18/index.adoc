@@ -123,7 +123,7 @@ Creating alternatives for the provided default libraries is doable in a very rea
 https://github.com/andreaTP/kiota-utils/blob/1a7dcecd92ce8794fe479e9c37c71d5733a39ff6/http/jdk-http/src/main/java/io/apicurio/kiota/http/JdkHttpRequestAdapter.java#L1[Here] you can find an alternative implementation of the Java HttpClient interface that is based on the client embedded in JDK 11+ (vs. the out-of-the-box implementation that is based on OkHttp).
 We expect to provide:
 
-- one `RHTokenProvider` that will work automatically with [offline tokens](https://access.redhat.com/articles/3626371) and SSO like [we did for Java](https://github.com/andreaTP/kiota-utils/blob/93083650e0374f511abefd099033f05276927deb/rh-auth/src/main/java/com/github/andreatp/kiota/auth/RHAccessTokenProvider.java#L24) for each supported language.
+- one `RHTokenProvider` that will work automatically with https://access.redhat.com/articles/3626371[offline tokens] and SSO like https://github.com/andreaTP/kiota-utils/blob/93083650e0374f511abefd099033f05276927deb/rh-auth/src/main/java/com/github/andreatp/kiota/auth/RHAccessTokenProvider.java#L24[we did for Java] for each supported language.
 - a Java Vert-X HTTP client implementation (as opposed to the default OkHttp)
 - a Java JSON serialization based on Jackson (as opposed to the default Gson)
 
