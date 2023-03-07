@@ -175,7 +175,7 @@ image::threat-model.png[]
 
 The DevExp team has identified as a major piece of maintenance the upgrade of the currently outdated https://github.com/OpenAPITools/openapi-generator[openapi-generator].
 The current SDKs are full of quirks and edge cases in most cases hacked around to end up with a working implementation.
-Having to keep hacks and workarounds to keep the SDKs working is a major blocker to updating toward newer versions of the generator.
+Having to maintain hacks and workarounds to keep the SDKs working is a major blocker to updating toward newer versions of the generator.
 
 The monolithic approach to a generation used by openapi-generator also offers challenges in a modular approach to bug fixes and improvements.
 
