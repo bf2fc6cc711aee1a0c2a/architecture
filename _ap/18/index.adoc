@@ -69,7 +69,7 @@ Inside Red Hat we are mostly relying (in various ways) on OpenAPI Generator to g
 
 == Proposed Architecture
 
-We propose to switch to alternative OSS tooling provided by Microsoft called https://github.com/microsoft/kiota[Kiota].
+We propose to switch to an alternative OSS tooling provided by Microsoft called https://github.com/microsoft/kiota[Kiota].
 
 === Advantages:
 
