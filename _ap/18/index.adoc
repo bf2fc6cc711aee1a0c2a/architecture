@@ -7,196 +7,45 @@ authors:
 tags: []
 ---
 
-== Context and Problem Statement
+## Intent
 
-We are internally committed to using OpenAPI specification and encourage our customers to do the same with products like API Designer and Service Registry.
+Define a consistent technology to be used for client code generation from OpenAPI specifications.
 
-The current approach to automatically generating client SDKs for Red Hat's application services has a number of problems/issues that need to be holistically addressed.
-This AP will document the challenges with our current approach and propose a solution using new technologies.
+## Motivation
 
-In client-server architectures, servers are written using either a contract-first or code-first approach.
-However, we always have the need to interact with those APIs from clients.
-Generation of the API clients can (and should) be completely automated.
-This represents a contract-first approach to creating API clients.
+* Have a uniform and good quality SDK layer to be used for APIs access
+* Be able to maintain the generated code and the necessary libraries
+* Ability to fix bugs and eventually improve the generator codebase
 
-We do generate/write clients for several purposes, the most relevant are:
+## Applicability
 
-* Service SDKs
-* CLI tools
-* UI (e.g. console.dot)
-* Provisioning Tools (Ansible, Terraform)
+This pattern applies to any service using a client/SDK to access REST API endpoints.
 
-Most of our toolchains are (in some ways) using `openapi-generator`, developed and maintained by the "OpenAPI Tools" organization (which is NOT affiliated with the OpenAPI initiative).
+Exceptions are:
+ - a service is already successfully using an alternative generator
+ - a service is using the current `quarkus-openapi-extension` (the current plan is to move the extension to use Kiota as well)
 
-Unfortunately, OpenAPI Generator is not a well maintained OSS project:
-image::openapi-generator-gh.png[]
+## Description
 
-Even our own attempts to fix known bugs have been ineffective:
-https://github.com/OpenAPITools/openapi-generator/pull/13616
+We propose to use OSS tooling provided by Microsoft called https://github.com/microsoft/kiota[Kiota] for client and SDKs generations.
 
-It's also pretty common to have breaking changes in the generator tooling, which results in breaking changes in the generated code.
-When this happens it can be hard to detect and often happens without a clear migration path.
+To apply Kiota in a project follow the https://microsoft.github.io/kiota/get-started/[Official "Get Started" guides].
 
-For these reasons we are often https://github.com/redhat-developer/app-services-sdk-go/blob/13d1cad9a937c456a9623ad188c44790e3370d83/openapitools.json#L5[stuck on old versions], preventing (in some cases) the opportunity to fix CVEs and issues by keeping transitive dependencies and used frameworks updated.
+## Participants
 
-Following are a variety of critical/important issues we currently have due to our OpenAPI Generator based approach to API Client generation.
+The DevExp team is currently providing SDKs for all of the MAS services, all of them will be converted to use Kiota and serve as an example that can be applied more broadly.
 
-=== Security
+## Trade-offs
 
-We should be able to keep our dependency trees under control and update/refresh whenever a vulnerability in the stack is detected.
+PROS:
+* consistency across languages
+* great OSS support from Microsoft
+* generated code doesn't depend on specific dependencies
+* tooling is easy to use
+* generated code is high quality
+* auth mechanism is very flexible
 
-=== Technical debt
-
-We want to be able to improve the quality of the generated clients and SDKs and improve them over time, introducing even structural bug fixes and improvements.  Overall we strive for our code to be well structured and maintainable, even when that code is being generated (to the best extent possible).
-
-=== Community
-
-We want our community of customers to be able to use best-in-class tools to perform their day-to-day work. OpenAPI generation is an important piece of tooling and we should be able to provide a much better OSS experience than the one we are right now.
-
-== Goals
-
-* Identify alternative tooling that can be used in place of the current OpenAPI generator
-* Validate and improve the integration patterns and the user experience
-* Use up-to-date tooling and libraries for our customer-facing API clients
-
-== Non-goals
-
-* Dictate a technical decision for internal usage or for projects that are successfully rolling their own SDKs and clients (e.g. by manually curating them)
-
-== Current Architecture
-
-Inside Red Hat we are mostly relying (in various ways) on OpenAPI Generator to generate clients, we also maintain a https://github.com/quarkiverse/quarkus-openapi-generator[Quarkus Extension] based on the same generator.
-
-== Proposed Architecture
-
-We propose to switch to an alternative OSS tooling provided by Microsoft called https://github.com/microsoft/kiota[Kiota].
-
-=== Advantages:
-
-* Community
-* Better design/architecture
-* Better developer experience
-* Maintenance
-* Swappable implementation libraries
-* Compatibility matrix
-
-=== Disadvantages:
-
-* Not GA (yet)
-* External Owners (Microsoft)
-* Core Generator codebase is .NET
-
-==== Community
-
-The responses in the community are quick and provide context https://github.com/microsoft/kiota-java/issues/121#issuecomment-1372248993[above expectations].
-
-Collaboration is actively fostered and contributing to both the core generator and the auxiliary libraries is facilitated and encouraged with active and timely feedback.
-
-Cross-project integrations are facilitated and https://github.com/microsoft/kiota/discussions/2154[healthy conversations] are initiated on both (RH and Microsoft) sides.
-
-==== Better design/architecture
-
-Kiota design is extremely principled and follows https://microsoft.github.io/kiota/extending/[good and detailed guidelines] throughout the project.
-The project leadership shows broad and deep experience in building successful code generators, which are pragmatic and extensible.
-
-==== Better developer experience
-
-The project's architectural design decisions are supported and embraced throughout all of the different implementations so that the user is going to have a consistent and uniform experience while using the generated code across different languages.
-Additionally, the fluent code style of the generated clients provides a better experience for consumers, resulting in higher levels of developer joy.
-
-==== Maintenance
-
-Experience shows that issues are answered within hours, PRs are continuously accepted and merged, and guidance is provided when needed.
-
-Transitive dependencies are kept up to date in a timely manner.
-
-Improvements and bugs are continuously integrated into both the generator and the auxiliary libraries' repositories.
-
-==== Swappable implementation libraries
-
-The design of Kiota allows consumers of the code generator to provide their own https://microsoft.github.io/kiota/extending/corelibrary.html[“opinionated” implementations] of core generated client functionality.
-This is done via a set of interfaces to core functionality that all generated clients leverage (e.g. a Java HTTP client interface).  Default implementations of these interfaces are provided, but alternatives can easily be created and used.
-
-Specifically for the Red Hat use case, we are free to roll out our own implementations of the core libraries to better support Red Hat products and strategy (e.g. Quarkus specific implementations of certain functionality).
-
-Creating alternatives for the provided default libraries is doable in a very reasonable amount of time.
-https://github.com/andreaTP/kiota-utils/blob/1a7dcecd92ce8794fe479e9c37c71d5733a39ff6/http/jdk-http/src/main/java/io/apicurio/kiota/http/JdkHttpRequestAdapter.java#L1[Here] you can find an alternative implementation of the Java HttpClient interface that is based on the client embedded in JDK 11+ (vs. the out-of-the-box implementation that is based on OkHttp).
-We expect to provide:
-
-- one `RHTokenProvider` that will work automatically with https://access.redhat.com/articles/3626371[offline tokens] and SSO like https://github.com/andreaTP/kiota-utils/blob/93083650e0374f511abefd099033f05276927deb/rh-auth/src/main/java/com/github/andreatp/kiota/auth/RHAccessTokenProvider.java#L24[we did for Java] for each supported language.
-- a Java Vert-X HTTP client implementation (as opposed to the default OkHttp)
-- a Java JSON serialization based on Jackson (as opposed to the default Gson)
-
-In the long term, we expect that most of the bug fixes are going to happen in those shared libraries, and being able to maintain and release them at our own pace is a key element for success.
-
-==== Compatibility matrix
-
-Kiota https://github.com/microsoft/kiota/issues/2020[compatibility matrix] covers the current Red Hat use-cases, specifically:
-
-* Java
-* Go
-* Python
-* TypeScript
-
-The generator doesn't need to stitch or even know about specific frameworks and/or libraries as they rely only on interfaces (called “abstractions”), and implementation libraries are swappable.
-
-==== External Owners (Microsoft)
-
-The project is maintained and owned by Microsoft, specifically by the team working on Microsoft Graph.
-We will be having some direct discussions with them soon around their plans for the project and a possible collaboration.
-Initial impressions indicate that they are very receptive to improvements and collaborations.
-But, of course, they will always own the project in the same way that Red Hat owns our first-party OSS projects.
-
-On the flip side, this is a possible occasion for a strong collaboration between two of the major players in the Software industry that can drive more and more community adoption of the technology/stack.
-
-Using OpenAPI Tools we are in a very similar situation except from the fact that it's more a "pure" Open Source project.
-
-==== Legal Requirements (Terms Acceptance and Export Control)
-
-Kiota and the relevant component are released under the MIT license.
-
-=== Additional Reading
-
-Kiota design: https://microsoft.github.io/kiota/extending/
-Some libraries are already used [in Red Hat projects](https://github.com/microsoft/kiota-abstractions-go/network/dependents).
-
-=== Threat Model
-
-image::threat-model.png[]
-
-* Given that Kiota is going to produce source code and runs on the client side there are no specific threats for RH SaaS
-* A Code Generator could produce malicious or corrupted generated code.
-* Clients with large numbers of dependencies could be vulnerable if not refreshed
-* A swapped implementation may not be well supported
-
-=== Alternatives Considered / Rejected
-
-==== Keep going with the current generator
-
-The DevExp team has identified as a major piece of maintenance the upgrade of the currently outdated https://github.com/OpenAPITools/openapi-generator[openapi-generator].
-The current SDKs are full of quirks and edge cases in most cases hacked around to end up with a working implementation.
-Having to maintain hacks and workarounds to keep the SDKs working is a major blocker to updating toward newer versions of the generator.
-
-The monolithic approach to a generation used by openapi-generator also offers challenges in a modular approach to bug fixes and improvements.
-
-==== IBM
-
-We have had extensive discussions with IBM regarding their approach to https://github.com/IBM/ibm-cloud-sdk-common[client SDK] generation and we very much like their governance model over APIs produced in the company.
-The IBM openapi-codegen(closed source) is a fork of the “official” generator.
-IBM does maintain an https://cloud.ibm.com/docs/api-handbook[API Handbook] and they verify the compatibility running the tooling on all of their OpenApi specifications (similar to what is explained https://github.com/microsoft/kiota/issues/2020[in this open ticket for Kiota]).
-
-Full text of this section is available as a [private Addendum](https://docs.google.com/document/d/1x97PVV0rF00SlbMeC8mVy4e7sl5zYcUtME6KC-TEJOU/edit).
-
-==== Per language tooling
-
-There are a number of independent projects to generate code specifically for one language (often written in the same).
-On average those tools are much better than the “official” openapi-generator counterpart, but it is extremely challenging to provide a cohesive result out of disparate tools for the users and engage with various communities at different levels of maturity/openness.
-
-=== Challenges
-
-* There are improvements to be done and we would require to publish alternative core libraries to fully integrate the experience and the support.
-
-=== Consequences if Not Completed
-
-* It will be extremely hard to fix timely security issues in the current SDKs, Clients, UIs
-* It's almost impossible to contribute to the design and implement new features for the client-generated code
+CONS:
+* the CLI is written in .NET and might be hard to nicely embed it
+* is not yet GA (will be soon)
+* scarce extra tooling provided by third-party
