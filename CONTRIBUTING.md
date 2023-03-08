@@ -5,6 +5,35 @@ We try to make it easy, and all contributions, even the smaller ones, are more t
 This includes bug reports, fixes, documentation, examples... 
 But first, read this page (including the small print at the end).
 
+## Build and run locally
+
+*Note:*
+The `jekyll-github-metadata` plugin will perform some API requests to GitHub, which can lead to rate-limiting warnings.
+To avoid seeing these, create a GitHub personal access token with `public_repo` scope, and set it as the value of the `JEKYLL_GITHUB_TOKEN` environment variable.
+
+
+Building and running locally requires Ruby and bundler.
+You can either bring your own, or use the Jekyll container image.
+
+### Bring your own Ruby & bundler
+
+```bash
+bundle install
+bundle exec jekyll serve --incremental
+```
+
+### Using a container image with Podman or Docker
+
+```bash
+docker run -ti --rm \
+    -v .:/srv/jekyll \
+    -p 4000:4000 \
+    -e JEKYLL_ROOTLESS=1 \
+    -e JEKYLL_GITHUB_TOKEN \
+    docker.io/jekyll/jekyll \
+    jekyll serve --incremental
+```
+
 ## Legal
 
 All original contributions to this repo are licensed under the
