@@ -14,13 +14,14 @@ Lower the burden of code generation from OpenAPI specifications
 
 ## Motivation
 
+* Offer a client or SDK for Services APIs that CLI, UI and customers can rely on
 * Have a uniform and good quality SDK layer to be used for APIs access
 * Be able to maintain the generated code and the necessary libraries
 * Ability to fix bugs and eventually improve the generator codebase
 
 ## Applicability
 
-This pattern applies to any service using a client/SDK to access REST API endpoints.
+This pattern applies to any service using or providing a client/SDK to access REST API endpoints.
 
 Exceptions are:
  - a service is already successfully using an alternative generator
