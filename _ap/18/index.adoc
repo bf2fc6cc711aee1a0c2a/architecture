@@ -9,7 +9,8 @@ tags: []
 
 ## Intent
 
-Define a consistent technology to be used for client code generation from OpenAPI specifications.
+Describe a path to generate client code from OpenAPI specification for our service APIs.
+Lower the burden of code generation from OpenAPI specifications
 
 ## Motivation
 
