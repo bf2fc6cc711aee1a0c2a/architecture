@@ -34,7 +34,7 @@ To apply Kiota in a project follow the https://microsoft.github.io/kiota/get-sta
 
 ## Participants
 
-The DevExp team is currently providing SDKs for all of the MAS services, all of them will be converted to use Kiota and serve as an example that can be applied more broadly.
+The DevExp team is currently providing SDKs for all of the bf2 services, all of them will be converted to use Kiota and serve as an example that can be applied more broadly.
 
 ## Trade-offs
 
