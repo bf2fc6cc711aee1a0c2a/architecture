@@ -1,6 +1,6 @@
 ---
 num: 91
-title: OpenAPI clients code generation - Kiota
+title: Generating clients code from OpenAPI contracts for our service APIs
 status: "Draft" # One of Draft, Accepted, Rejected
 authors:
   - "Andrea Peruffo"
