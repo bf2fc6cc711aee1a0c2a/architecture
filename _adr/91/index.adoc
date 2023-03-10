@@ -1,7 +1,7 @@
 ---
 num: 91
 title: Generating clients code from OpenAPI contracts for our service APIs
-status: "Draft" # One of Draft, Accepted, Rejected
+status: "Accepted"
 authors:
   - "Andrea Peruffo"
 tags: [] # e.g. kafka, connectors, registry
