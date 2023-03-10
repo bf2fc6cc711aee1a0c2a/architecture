@@ -1,7 +1,7 @@
 ---
 num: 18
 title: "OpenAPI clients code generation - Kiota"
-status: "Draft"
+status: "Accepted"
 authors:
 - "Andrea Peruffo"
 tags:
