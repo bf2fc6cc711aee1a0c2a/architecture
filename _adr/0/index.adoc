@@ -12,39 +12,39 @@ applies_patterns: # What APs does this ADR apply?
 
 include::/_includes/glossary_links.adoc[]
 
-// Top style tips:
-// * Use one sentence per line
-// * No unexpanded acronyms
-// * No undefined jargon - use references to the glossary as appropiate e.g. {glossary-sre}
-
-// No need for a title heading, it's added by the template
+ // Top style tips:
+ // * Use one sentence per line
+ // * No unexpanded acronyms
+ // * No undefined jargon - use references to the glossary as appropiate e.g. {glossary-sre}
+ 
+ // No need for a title heading, it's added by the template
 
 ## Context and Problem Statement
-// What is the background against which this decision is being taken?
+ // What is the background against which this decision is being taken?
 
 ## Goals
-// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+ // Bulleted list of outcomes that this ADR, if accepted, should help achieve
 
 ## Non-goals
-// Bulleted list of outcomes that this ADR is not trying to achieve.
+ // Bulleted list of outcomes that this ADR is not trying to achieve.
 
 ## Current situation
-// Where are we now?
+ // Where are we now?
 
 ## Proposal
-// What is the decision being proposed
+ // What is the decision being proposed
 
 ### Threat model
-// Provide a link to the relevant threat model. 
-// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
+ // Provide a link to the relevant threat model. 
+ // You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
 
 ## Alternatives Considered / Rejected
 
 ## Challenges
-// What are the costs/drawbacks of the proposed decision?
+ // What are the costs/drawbacks of the proposed decision?
 
 ## Dependencies
-// What are the knock-on effects if this decision is accepted?
+ // What are the knock-on effects if this decision is accepted?
 
 ## Consequences if not completed
-// What are the knock-on effects if this decision is not accepted?
+ // What are the knock-on effects if this decision is not accepted?
