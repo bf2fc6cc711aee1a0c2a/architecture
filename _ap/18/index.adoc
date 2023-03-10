@@ -4,13 +4,16 @@ title: "OpenAPI clients code generation - Kiota"
 status: "Draft"
 authors:
 - "Andrea Peruffo"
-tags: []
+tags:
+- "ADR91"
 ---
 
 ## Intent
 
 Describe a path to generate client code from OpenAPI specification for our service APIs.
-Lower the burden of code generation from OpenAPI specifications
+Lower the burden of code generation from OpenAPI specifications.
+
+Linked to link:_adr/91/index.adoc[ADR 91]
 
 ## Motivation
 
