@@ -18,7 +18,7 @@ include::/_includes/glossary_links.adoc[]
  // 
  // So assume your reader is not an expert in the problem.
  // Keep it succinct to help readability, feedback received while writing it will tend to make it bigger so start small.
- // Limit the scope of an ADR to be focused but self contained:
+ // Limit the scope of an ADR to be focused but self-contained:
  // - I can read and understand the decision and its context
  // - it is not a bucket list of decisions in a given area
  //
