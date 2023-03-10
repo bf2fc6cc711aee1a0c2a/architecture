@@ -22,7 +22,7 @@ include::/_includes/glossary_links.adoc[]
  // - I can read and understand the decision and its context
  // - it is not a bucket list of decisions in a given area
  //
- // The context is particularly important do make sure to answer the following:
+ // The context is particularly important so make sure to answer the following:
  // - why is this decision necessary
  // - what made it tip towards this decision given the context
  // 
