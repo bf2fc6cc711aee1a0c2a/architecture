@@ -16,7 +16,7 @@ Define a pattern for fleet shard status representation and interpretation.
 
 ## Motivation
 
-A fleet shard must convey the status of the data plane resources it is responsible for back to the control plane.  This is typically done using mechanisms built around the Kubernetes status sub-resource.  There should be consistency around the design and usage of that status information that conforms to Kuberentes guidelines and so that control planes, SREs, and developers can quickly and appropriately reason over the status. 
+A fleet shard must convey the status of the data plane resources it is responsible for back to the control plane.  This is typically done using mechanisms built around the Kubernetes status sub-resource.  There should be consistency around the design and usage of that status information that conforms to Kubernetes guidelines and so that control planes, SREs, and developers can quickly and appropriately reason over the status. 
 
 ## Status Guidelines
 
