@@ -15,9 +15,11 @@ tags:
  // * wants to understand and use good practices
  // * has to read 90 other documents like that in the course of a week
  //
- // So clear, simple, appealing is paramount. Bite size is awesome (it's ok to create several of these document to stay focus in each). Aim to provide as early and clearly as possible the following:
- // * why it's useful (value)
+ // So clear, simple, concise and appealing is paramount. 
+ // Bite size is awesome (it's ok to create several of these document to stay focused in each).
+ // Aim to provide as early and clearly as possible the following:
  // * what for (context)
+ // * why it's useful (value)
  // * how it is done (with examples)
  //
  // Your title should describe what the document *solves*: `How to write guidelines useful for noobs`
