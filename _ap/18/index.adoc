@@ -1,78 +1,56 @@
 ---
 num: 18
 title: "OpenAPI clients code generation - Kiota"
-status: "Draft"
+status: "Accepted"
 authors:
-- "andreaTP"
-tags: []
+- "Andrea Peruffo"
+tags:
+- "ADR91"
 ---
 
-// Top style tips:
-// * Use one sentence per line
-// * No unexpanded acronyms
-// * No undefined jargon
-
-// You don't have to use the following sections, but they provide a 
-// useful structure for writing a clear document.
-
 ## Intent
-// Summarize in a single sentence what the pattern tries to achieve.
-//
-// For example:
-//
-// Define a policy for exposing metrics to customers in a consistent way.
+
+Describe a path to generate client code from OpenAPI specification for our service APIs.
+Lower the burden of code generation from OpenAPI specifications.
+
+Linked to link:_adr/91/index.adoc[ADR 91]
 
 ## Motivation
 
-// In a few paragraphs describe the motivating factors for this pattern
-//
-// For example:
-// 
-// Prometheus scrape endpoints are the defacto standard for exposing metric information for collection.
-// However this format and the associated conventions are not sufficient in themselves to ensure
-// that metrics are exposed in a consistent way. Problems include:
-// * Insufficient guidance on metric and label naming to provide consistency and 
-//   establishing the principal of hiding implementation details.
-// * Treatment of this as a first-class API, with established mechanisms for API evolution
-// * etc.
+* Offer a client or SDK for Services APIs that CLI, UI and customers can rely on
+* Have a uniform and good quality SDK layer to be used for APIs access
+* Be able to maintain the generated code and the necessary libraries
+* Ability to fix bugs and eventually improve the generator codebase
 
 ## Applicability
 
-// Call out when this pattern might apply (and when it should not apply, if relevant)
-// For example:
-//
-// This pattern applies to any service which exposes metrics as Prometheus-scrape endpoints.
-// It does not apply to services which provide access to metrics in other formats, or via
-// means other than an API (e.g. metric visualization via a system such as Grafana).
+This pattern applies to any service using or providing a client/SDK to access REST API endpoints.
+
+Exceptions are:
+ - a service is already successfully using an alternative generator
+ - a service is using the current `quarkus-openapi-extension` (the current plan is to move the extension to use Kiota as well)
 
 ## Description
 
-// Describe the pattern in enough detail that a fresh pair of eyes can understand it
-// and apply it elsewhere.
-//
-// For this metrics example we might link to existing guidelines on naming, augment them with extra rules 
-// which apply to services, explain how the API would allow for graceful API evolution without "flag days".
+We propose to use OSS tooling provided by Microsoft called https://github.com/microsoft/kiota[Kiota] for client and SDKs generations.
+
+To apply Kiota in a project follow the https://microsoft.github.io/kiota/get-started/[Official "Get Started" guides].
 
 ## Participants
 
-// What components and/or teams are directly involved
-//
-// For this metrics example this would include the customer and the control plane via which
-// the metrics are exposed
+The DevExp team is currently providing SDKs for all of the bf2 services, all of them will be converted to use Kiota and serve as an example that can be applied more broadly.
 
 ## Trade-offs
 
-// Explain any consequences of using this pattern. 
-// Be sure to cover both pros and cons:
-// * what this pattern enables and the benefits it brings
-// * what this pattern prevents or makes harder
-//
-// For this metrics example such benefits would include:
-// * A mechanism for API evolution
-// * Consistency in naming of metrics and labels within this service
-// * Consistency with other services which also apply this AP
-//
-// And on the down side:
-// * The Prometheus format eventually be superseded
-// * Naming and consistency is hard, so multiple versions of the API 
-//   might be needed to achieve those goals. 
+PROS:
+* consistency across languages
+* great OSS support from Microsoft
+* generated code doesn't depend on specific dependencies
+* tooling is easy to use
+* generated code is high quality
+* auth mechanism is very flexible
+
+CONS:
+* the CLI is written in .NET and might be hard to nicely embed it
+* is not yet GA (will be soon)
+* scarce extra tooling provided by third-party
