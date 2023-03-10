@@ -8,7 +8,7 @@ tags:
   - "" # e.g. kafka, connectors, registry
 ---
 
- // Let's set some key guidelines and audience
+ // Let's set some key guidelines and define the audience
  // 
  // This Architecture Patterns is to be read by a person 
  // * not expert in the field of services
