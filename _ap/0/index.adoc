@@ -8,13 +8,30 @@ tags:
   - "" # e.g. kafka, connectors, registry
 ---
 
-// Top style tips:
-// * Use one sentence per line
-// * No unexpanded acronyms
-// * No undefined jargon
-
-// You don't have to use the following sections, but they provide a 
-// useful structure for writing a clear document.
+ // Let's set some key guidelines and audience
+ // 
+ // This Architecture Patterns is to be read by a person 
+ // * not expert in the field of services
+ // * that want to understand and pick from good practices
+ // * that has to read 90 other documents like that in the course of a week
+ //
+ // So clear, simple, appealing is paramount. Bite size is awesome (it's ok to create several of these document to stay focus in each). Aim to provide as early and clearly as possible the following:
+ // * why it's useful (value)
+ // * what for (context)
+ // * how it is done (with examples)
+ //
+ // Your title should describe what the document *solves*: `How to write guidelines useful for noobs`
+ // If you have several recommendations, try to separate them visually (paragraphs) as it makes them stand out and can be read / parsed faster.
+ // Use examples for minds that can extrapolate rules from concrete example, it's an anchor to understand the problem and the solution.
+ // 
+ // More writing style tips:
+ // * Use one sentence per line
+ // * No unexpanded acronyms
+ // * No undefined jargon
+ // * avoid Red Hat specific lingo, this is community centric
+ //  
+ // You don't have to use the following sections, but they provide a 
+ // useful structure for writing a clear document.
 
 ## Intent
 // Summarize in a single sentence what the pattern tries to achieve.
