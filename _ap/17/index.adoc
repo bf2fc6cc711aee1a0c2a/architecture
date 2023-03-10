@@ -1,7 +1,7 @@
 ---
 num: 17
 category: "Fleet manager, fleet shard and instance operators"
-title: "Fleet shard status"
+title: "How to build fleet shard status"
 status: "Accepted"
 authors:
   - "Steven Hawkins"
