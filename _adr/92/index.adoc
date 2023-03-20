@@ -18,10 +18,10 @@ applies_patterns: # What APs does this ADR apply?
 
 The integration of the Enterprise/Hybrid option of RHOSAK in UI, SDKs and CLI has shown that there is a margin for improvement in how we expose and consume our services APIs.
 
-* the current services are offering the bare functionality leaving room for integration code to live in the services' consumer codebases
+* the services are exposing APIs for the offered specific functionality, but we lack an integration layer
 * the data aggregation logic is duplicated, scattered, and eventually diverging in various codebases (especially UI and CLI)
 * there is no "single source of truth" for data aggregated from various services
-* the current REST API layer exposes the user to the entire complexity of the underlying infrastructure
+* the current REST API layer exposes the user to the entire complexity of the underlying architecture
 
 We want to deduplicate the development effort and provide a more cohesive UX to the users.
 
@@ -90,6 +90,7 @@ We want the current microservices to stay vertical and opinionated toward a mini
 * Caching while guaranteeing multitenancy
 * Shared ownership of the component across different teams
 * Avoid API proliferation after the first BFF is in place
+* Potential lack of control over APIs being aggregated
 
 ## Dependencies
 
