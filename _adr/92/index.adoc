@@ -92,6 +92,7 @@ We want the current microservices to stay vertical and opinionated toward a mini
 * Shared ownership of the component across different teams
 * Avoid API proliferation after the first BFF is in place
 * Potential lack of control over APIs being aggregated
+* The introduction of private data planes can introduce additional issues because of backend APIs reachability
 
 ## Dependencies
 
