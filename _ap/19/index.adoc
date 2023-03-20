@@ -1,78 +1,58 @@
 ---
 num: 19
-title: "[AP proposal] Toward a more unified UX: BFF \U0001f495 "
+title: "Toward a more unified UX: BFF"
 status: "Draft"
 authors:
-- "andreaTP"
+  - "Andrea Peruffo"
+  - "Riccardo Forina"
+  - "Eric Wittmann"
 tags: []
 ---
 
-// Top style tips:
-// * Use one sentence per line
-// * No unexpanded acronyms
-// * No undefined jargon
-
-// You don't have to use the following sections, but they provide a 
-// useful structure for writing a clear document.
-
 ## Intent
-// Summarize in a single sentence what the pattern tries to achieve.
-//
-// For example:
-//
-// Define a policy for exposing metrics to customers in a consistent way.
+
+Define an architectural component to better decouple backend services and frontend needs offering a more cohesive UX across devices and tools (such as UI and CLI).
 
 ## Motivation
 
-// In a few paragraphs describe the motivating factors for this pattern
-//
-// For example:
-// 
-// Prometheus scrape endpoints are the defacto standard for exposing metric information for collection.
-// However this format and the associated conventions are not sufficient in themselves to ensure
-// that metrics are exposed in a consistent way. Problems include:
-// * Insufficient guidance on metric and label naming to provide consistency and 
-//   establishing the principal of hiding implementation details.
-// * Treatment of this as a first-class API, with established mechanisms for API evolution
-// * etc.
+UI and CLI needs to poll information from multiple separate sources causing:
+
+* poor UX, there is need for multiple network calls to offer simple functionalities
+* code duplication, data aggregation logic is scattered and duplicated across different users
+* testing and mocking, decoupling frontend and backend systems with only one component
 
 ## Applicability
 
-// Call out when this pattern might apply (and when it should not apply, if relevant)
-// For example:
-//
-// This pattern applies to any service which exposes metrics as Prometheus-scrape endpoints.
-// It does not apply to services which provide access to metrics in other formats, or via
-// means other than an API (e.g. metric visualization via a system such as Grafana).
+This pattern applies when the functionality offered by frontend/CLI/etc. needs to access various APIs and do data-aggregation logic in various forms.
+In those cases placing a frontend opinionated component in front can be an appropriate solution to speed up development and be a single source of truth for integration logic.
 
 ## Description
 
-// Describe the pattern in enough detail that a fresh pair of eyes can understand it
-// and apply it elsewhere.
-//
-// For this metrics example we might link to existing guidelines on naming, augment them with extra rules 
-// which apply to services, explain how the API would allow for graceful API evolution without "flag days".
+Implementing a https://samnewman.io/patterns/architectural/bff/[BFF] for the backend services to better decouple and centralize the integration logic.
+
+image::with_BFF.png[Proposed Architecture]
 
 ## Participants
 
-// What components and/or teams are directly involved
-//
-// For this metrics example this would include the customer and the control plane via which
-// the metrics are exposed
+For this pattern to apply you should have more than one "frontend" application:
+
+* UI
+* CLI
+* SDKs
+* mobile apps
+
+and multiple backend services offering together a piece of functionality.
 
 ## Trade-offs
 
-// Explain any consequences of using this pattern. 
-// Be sure to cover both pros and cons:
-// * what this pattern enables and the benefits it brings
-// * what this pattern prevents or makes harder
-//
-// For this metrics example such benefits would include:
-// * A mechanism for API evolution
-// * Consistency in naming of metrics and labels within this service
-// * Consistency with other services which also apply this AP
-//
-// And on the down side:
-// * The Prometheus format eventually be superseded
-// * Naming and consistency is hard, so multiple versions of the API 
-//   might be needed to achieve those goals. 
+A single component in front of the backend, exclusively designed for frontend usage has a number of advantages:
+
+* better decoupling
+* looser frontend/backend dependency
+* a single point for shared/integration logic
+* caching
+
+At the cost of:
+
+* an additional backend component
+* risk of APIs proliferation

@@ -11,7 +11,8 @@ tags:
   - UX
   - Dev Exp
 applies_padrs: # What PADRs does this ADR apply?
-applies_patterns: # What APs does this ADR apply?
+applies_patterns:
+  - 19
 ---
 
 ## Context and Problem Statement
