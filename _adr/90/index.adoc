@@ -30,10 +30,10 @@ Additionally, the proposed solution in link:../5/index.adoc[ADR-5] lacked a lot 
 
 ## Current situation
 
-The https://architecture.appservices.tech/adr/5/[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate standard operationg procedure (SOP)]: the SOP link points to a private repository and requires membership permission to see it..
+The link:../5/index.adoc[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate standard operationg procedure (SOP)]: the SOP link points to a private repository and requires membership permission to see it..
 
 The link:../89/index.adoc[ADR-89: A bf2 subdomain & wildcard certificate per data plane cluster] proposed a solution of automatic certificate management per data plane cluster, the solution however made the Kafka URLs non portable i.e the URLs are non deployment location agnostic.
-URLs portability is the design intention we do not want to loose - as it allows migrating a Kafka from one data plane to another becoming only an infrastructure change that the consumer of the Kafka won't need to be soo much concerned about and be required to update the various kafka URLs (admin server API & bootstrap server host).
+URLs portability is the design intention we do not want to loose - as it allows migrating a Kafka from one data plane to another becoming only an infrastructure change that the consumer of the Kafka won't need to be so much concerned about and be required to update the various kafka URLs (admin server API & bootstrap server host).
 
 ## Proposal
 
