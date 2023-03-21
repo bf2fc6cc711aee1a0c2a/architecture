@@ -13,15 +13,8 @@ applies_padrs: # What PADRs does this ADR apply?
 applies_patterns: # What APs does this ADR apply?
 ---
 
-// Top style tips:
-// \* Use one sentence per line
-// \* No unexpanded acronyms
-// \* No undefined jargon
-
-// No need for a title heading, it's added by the template
-
 ## Context and Problem Statement
-// What is the background against which this decision is being taken?
+
 The Kafka cluster deployed on the data plane cluster should be reachable via TLS.
 It means that we should provide a way to the clients to verify and validate the TLS connection with the related handshake with the Kafka brokers exposed outside of the data plane cluster.
 The Strimzi operator has its own cluster CA for signing the brokers' certificates but it should be used just for internal communication.
@@ -29,23 +22,22 @@ This problem is the same as the one exposed link:../5/index.adoc[ADR-5: Kafka Cl
 Additionally, the proposed solution in link:../5/index.adoc[ADR-5] lacked a lot of automation on certificate management which is an area the present ADR intends to address.
 
 ## Goals
-// Bulleted list of outcomes that this ADR, if accepted, should help achieve
+
 - Automated certificate management (generation, renewal, revocation) per data plane cluster
 - Avoid sharing same certificate between enterprise data plane clusters
 - Avoid exposing domain registrar & certificate issuers credentials onto enterprise data plane clusters 
 
 ## Non-goals
-// Bulleted list of outcomes that this ADR is not trying to achieve.
+
 - Automated certificate management per kafka instance.
 - Creating a pattern for and/or developing a central certificate management service
 
 ## Current situation
-// Where are we now?
 
 The link:../5/index.adoc[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate standard operationg procedure (SOP)]: the SOP link points to a private repository and requires membership permission to see it.
 
 ## Proposal
-// What is the decision being proposed
+
 The proposed solution is going to use https://Letsencrypt.org[Letsencrypt] to automatically manage certificates.
 The solution consists of: 
 
@@ -74,8 +66,6 @@ NOTE: There is an existing logic in the data plane that ensures that all sensiti
 Instead a secret is created and only references to the secrets will be added before the ManagedKafka is created in the data plane.
 
 ### Threat model
-// Provide a link to the relevant threat model. 
-// You must either update an existing threat model(s) to cover the changes made by this ADR, or add a new threat model.
 
 Once the certificate are in the data plane in form of a Kubernetes secret, a privileged users can still see them. 
 If this is on a enterprise data plane cluster without good security standards/policy, then anyone with the private key can impersonate the server or eavesdrop on a connection with the server. 
@@ -101,7 +91,7 @@ It also violates the design intentions of the fleet manager by turning into an K
 Finally, it's another component deployed that has to be monitored and managed in the control plane which forces every one (especially dev environments) to have a running Kubernetes cluster running during development
 
 ## Challenges
-// What are the costs/drawbacks of the proposed decision?
+
 1. The drawback is that the solution can't or won't handle the migration of already existing data plane clusters that have Kafkas on them.
 This is based on the fact that the proposal intends to make this change a transparent one to existing Kafka instances. 
 For this, the Kafka fleet manager will ensure that existing data planes clusters continue to operate using a shared wildcard certificate on the `\*.kafka.bf2.dev` domain. 
@@ -110,12 +100,10 @@ All new data planes will have a wildcard certificate on the `*.<cluster-id>.kafk
 However, the various limits once reached can be overridden via a request as described in https://Letsencrypt.org/docs/rate-limits/#a-id-overrides-a-overrides[Letsencrypt limits overrides] 
 
 ## Dependencies
-// What are the knock-on effects if this decision is accepted?
 
 Depedency on Letsencyrpt and its limits e.g a 50 certificates limits per domain per week 
 
 ## Consequences if not completed
-// What are the knock-on effects if this decision is not accepted?
 
 1. Living up with the toil related to the manual certificate handling. 
 2. Certificate shared between data planes and potentially exposing it to customers the data planes.
