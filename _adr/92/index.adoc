@@ -1,6 +1,6 @@
 ---
 num: 91
-title: "Toward a more unified UX: BFF"
+title: "Toward a more unified UX: BFF (Backends For Frontends)"
 status: "Draft"
 authors:
   - "Andrea Peruffo"
