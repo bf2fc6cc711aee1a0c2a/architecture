@@ -75,12 +75,14 @@ Regarding multitenancy, it can be achieved, in the first prototype by re-using t
 
 ### GraphQL
 
-Is a well known technical platform for implementing BFFs.
+Is a well known technical platform for implementing BFFs, especially strong for composing data from multiple services but it doesn't magically solves the problem by itself.
+When comparing a possible OpenAPI solution to a GraphQL one, for this specific problem, the real advantage in favor of the latter is the possibility for dynamic fields selections in the client.
+We do not consider this upside strong enough to outweighs some of the challenges:
 
-* Lack of expertise
-* We don't want a generic API
-* Challenges in caching
-* Poor support for "commands"(as opposed to queries)
+* Lack of expertise in the technology - one of the objective of this component is to enable multiple teams collaboration on the repo
+* Challenges with Observability - Support for partial failures compromise the usage of "generic" REST APIs monitoring tools
+
+We leave the doors open to re-evaluate the choice of GraphQL in the future and/or in different contexts.
 
 ### Expand the current services APIs
 
