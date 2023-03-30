@@ -2,7 +2,7 @@
 
 This repository is intended to collect and keep up to date the proposals and decisions taken into the context of the Managed Application Services group.
 
-https://architecture.appservices.tech
+https://architecture.bf2.dev
 
 ## Terminology cheat sheet
 

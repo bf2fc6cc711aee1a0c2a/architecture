@@ -24,7 +24,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   This site contains resources about the architecture and processes for
   Red Hat Application Services.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://architecture.appservices.tech" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://architecture.bf2.dev" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 #github_username:  jekyll
 
