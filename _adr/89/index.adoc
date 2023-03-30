@@ -24,8 +24,8 @@ applies_patterns: # What APs does this ADR apply?
 The Kafka cluster deployed on the data plane cluster should be reachable via TLS.
 It means that we should provide a way to the clients to verify and validate the TLS connection with the related handshake with the Kafka brokers exposed outside of the data plane cluster.
 The Strimzi operator has its own cluster CA for signing the brokers' certificates but it should be used just for internal communication.
-This problem is the same as the one exposed https://architecture.appservices.tech/adr/5/[ADR-5: Kafka Cluster Certificate Generation] whose solution only works for managed data plane clusters but it is not an acceptable solution for when users brings / registers their own data plane clusters.
-Additionally, the proposed solution in https://architecture.appservices.tech/adr/5/[ADR-5] lacked a lot of automation on certificate management which is an area the present ADR intends to address.
+This problem is the same as the one exposed https://architecture.bf2.dev/adr/5/[ADR-5: Kafka Cluster Certificate Generation] whose solution only works for managed data plane clusters but it is not an acceptable solution for when users brings / registers their own data plane clusters.
+Additionally, the proposed solution in https://architecture.bf2.dev/adr/5/[ADR-5] lacked a lot of automation on certificate management which is an area the present ADR intends to address.
 
 ## Goals
 // Bulleted list of outcomes that this ADR, if accepted, should help achieve
@@ -41,7 +41,7 @@ Additionally, the proposed solution in https://architecture.appservices.tech/adr
 ## Current situation
 // Where are we now?
 
-The https://architecture.appservices.tech/adr/5/[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate SOP]
+The https://architecture.bf2.dev/adr/5/[ADR-5: Kafka Cluster Certificate Generation] describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc[data plane certificate SOP]
 
 ## Proposal
 // What is the decision being proposed
