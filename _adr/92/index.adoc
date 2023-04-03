@@ -60,6 +60,7 @@ The API layer is designed using API Designer(RHOAD) and conforming to the OpenAP
 The development is driven by a "Contract First" approach leveraging the [Apicurio Codegen Quarkus Extension](https://github.com/Apicurio/apicurio-codegen/tree/main/quarkus-extension) and re-using the Java SDKs(based on Kiota) provided by the DevExp Team.
 The BFF have to to be stateless so that it can easily be scaled up and down according to the needs.
 All of the exposed endpoints are going to perform 1+ REST APIs calls to the underlying services and provide back the result.
+Access to the underlying services will be done by propagating the original(user) access token to simplify development and to keep the security model similar to the current architecture.
 
 ### Threat model
 
