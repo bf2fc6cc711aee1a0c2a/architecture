@@ -44,7 +44,7 @@ See ADR 91 for more details.
 
 The implementation choice went for a custom REST endpoint implementation as opposed to using GraphQL.
 GraphQL is a popular technology built to address this or a similar set of use cases.
-The team's experience lead tot he choice of a custom REST endpoint but could be revisited by this or another team.
+The team's experience led to the choice of a custom REST endpoint but could be revisited by this or another team.
 
 The API exposed will not be considered a stable contract usable by customers.
 Only its usage through sanctioned clients (UI, CLI, SDK) are going to be supported.
