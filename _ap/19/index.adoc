@@ -1,6 +1,6 @@
 ---
 num: 19
-title: "Toward a more unified UX: BFF"
+title: "Use a BFF component in front of our APIs to unify UX and client support"
 status: "Draft"
 authors:
   - "Andrea Peruffo"
@@ -11,7 +11,7 @@ tags: []
 
 ## Intent
 
-Define an architectural component to better decouple backend services and frontend needs offering a more cohesive UX across devices and tools (such as UI and CLI).
+Define an architectural approach to better decouple backend services and frontend needs offering a more cohesive UX across devices and tools (such as UI and CLI).
 
 ## Motivation
 
@@ -23,7 +23,7 @@ UI and CLI needs to poll information from multiple separate sources causing:
 
 ## Applicability
 
-This pattern applies when the functionality offered by frontend/CLI/etc. needs to access various APIs and do data-aggregation logic in various forms.
+This pattern applies when the functionality offered by frontend/CLI/etc. needs to access various APIs and do data aggregation logic in various forms.
 In those cases placing a frontend opinionated component in front can be an appropriate solution to speed up development and be a single source of truth for integration logic.
 
 ## Description
