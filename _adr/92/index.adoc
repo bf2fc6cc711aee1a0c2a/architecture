@@ -70,7 +70,14 @@ Being it a publicly accessible service the generic service Threat model applies,
 * Circuit Breaking
 * Caching
 
-Regarding multitenancy, it can be achieved, in the first prototype by re-using the Access Token for the initial API request to issue the following requests to the backend services.
+Regarding multitenancy, it is achieved by re-using the Access Token for the initial API request to issue the following requests to the backend services.
+Access token propagation is the preferred model because:
+
+* it keeps the security model unchanged: the alternative impose a carefully hardened BFF component to avoid escalation of privilege)
+* it is similar to the usage without BFF (e.g. the UI would send the access token to each of the services)
+
+Note that it could be come more difficult if we were to embrace https://datatracker.ietf.org/doc/html/draft-ietf-oauth-dpop[sender-constrained tokens] or https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures[signed HTTP requests].
+This is a problem for later.
 
 ## Alternatives Considered / Rejected
 
