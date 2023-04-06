@@ -19,7 +19,7 @@ Align all application services under the same implementation of that pattern (se
 UI and CLI needs to poll information from multiple separate sources causing:
 
 * poor UX, there is need for multiple network calls to offer simple functionalities
-* code duplication, data aggregation logic is scattered and duplicated across different users
+* code duplication, data aggregation logic is scattered and duplicated across different frontend codebases
 * testing and mocking, decoupling frontend and backend systems with only one component
 
 ## Applicability
