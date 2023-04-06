@@ -1,6 +1,6 @@
 ---
 num: 19
-title: "Toward a more unified UX: BFF"
+title: "Use a BFF component in front of our APIs to unify UX and client support"
 status: "Draft"
 authors:
   - "Andrea Peruffo"
@@ -11,7 +11,8 @@ tags: []
 
 ## Intent
 
-Define an architectural component to better decouple backend services and frontend needs offering a more cohesive UX across devices and tools (such as UI and CLI).
+Define an architectural approach to better decouple backend services and frontend needs offering a more cohesive UX across devices and tools (such as UI and CLI).
+Align all application services under the same implementation of that pattern (see description).
 
 ## Motivation
 
@@ -23,14 +24,33 @@ UI and CLI needs to poll information from multiple separate sources causing:
 
 ## Applicability
 
-This pattern applies when the functionality offered by frontend/CLI/etc. needs to access various APIs and do data-aggregation logic in various forms.
+This pattern applies when the functionality offered by frontend/CLI/etc. needs to access various APIs and do data aggregation logic in various forms.
 In those cases placing a frontend opinionated component in front can be an appropriate solution to speed up development and be a single source of truth for integration logic.
+
+A single BFF component is planned to host the API interactions of our various application services (Kafka, Connectors, Service registry etc).
+This is a simplification choice that could be revisited if it becomes burdensome.
+Until it is, alignment is expected.
 
 ## Description
 
 Implementing a https://samnewman.io/patterns/architectural/bff/[BFF] for the backend services to better decouple and centralize the integration logic.
 
 image::with_BFF.png[Proposed Architecture]
+
+Following are key contextual information to understand the pattern and its potential limitations.
+
+Access to the underlying services will be done by propagating the original (user) access token to simplify development and to keep the security model similar to the current architecture.
+See ADR 91 for more details.
+
+The implementation choice went for a custom REST endpoint implementation as opposed to using GraphQL.
+GraphQL is a popular technology built to address this or a similar set of use cases.
+The team's experience lead tot he choice of a custom REST endpoint but could be revisited by this or another team.
+
+The API exposed will not be considered a stable contract usable by customers.
+Only its usage through sanctioned clients (UI, CLI, SDK) are going to be supported.
+This can be revisited with experience.
+
+This proposal has not explored in detail the impact of private data plane clusters and could be impacted by that architectural evolution.
 
 ## Participants
 
