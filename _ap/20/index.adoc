@@ -1,0 +1,97 @@
+---
+num: 20
+title: "AP Proposal - Addons Monitoring"
+status: "Draft"
+authors:
+- "laurafitzgerald"
+tags: []
+---
+
+ // Let's set some key guidelines and define the audience
+ // 
+ // This Architecture Pattern is to be read by a person who
+ // * is not expert in the field of services
+ // * wants to understand and use good practices
+ // * has to read 90 other documents like that in the course of a week
+ //
+ // So clear, simple, concise and appealing is paramount. 
+ // Bite size is awesome (it's ok to create several of these document to stay focused in each).
+ // Aim to provide as early and clearly as possible the following:
+ // * what for (context)
+ // * why it's useful (value)
+ // * how it is done (with examples)
+ //
+ // Your title should describe what the document *solves*: `How to write guidelines useful for noobs`
+ // If you have several recommendations, try to separate them visually (paragraphs) as it makes them stand out and can be read / parsed faster.
+ // Use examples for minds that can extrapolate rules from concrete example, it's an anchor to understand the problem and the solution.
+ // 
+ // More writing style tips:
+ // * Use one sentence per line
+ // * No unexpanded acronyms
+ // * No undefined jargon
+ // * avoid Red Hat specific lingo, this is community centric
+ //  
+ // You don't have to use the following sections, but they provide a 
+ // useful structure for writing a clear document.
+
+## Intent
+ // Summarize in a single sentence what the pattern tries to achieve.
+ //
+ // For example:
+ //
+ // Define a policy for exposing metrics to customers in a consistent way.
+
+## Motivation
+
+ // In a few paragraphs describe the motivating factors for this pattern
+ //
+ // For example:
+ // 
+ // Prometheus scrape endpoints are the defacto standard for exposing metric information for collection.
+ // However this format and the associated conventions are not sufficient in themselves to ensure
+ // that metrics are exposed in a consistent way. Problems include:
+ // * Insufficient guidance on metric and label naming to provide consistency and 
+ //   establishing the principal of hiding implementation details.
+ // * Treatment of this as a first-class API, with established mechanisms for API evolution
+ // * etc.
+
+## Applicability
+
+ // Call out when this pattern might apply (and when it should not apply, if relevant)
+ // For example:
+ //
+ // This pattern applies to any service which exposes metrics as Prometheus-scrape endpoints.
+ // It does not apply to services which provide access to metrics in other formats, or via
+ // means other than an API (e.g. metric visualization via a system such as Grafana).
+
+## Description
+
+ // Describe the pattern in enough detail that a fresh pair of eyes can understand it
+ // and apply it elsewhere.
+ //
+ // For this metrics example we might link to existing guidelines on naming, augment them with extra rules 
+ // which apply to services, explain how the API would allow for graceful API evolution without "flag days".
+
+## Participants
+
+ // What components and/or teams are directly involved
+ //
+ // For this metrics example this would include the customer and the control plane via which
+ // the metrics are exposed
+
+## Trade-offs
+
+ // Explain any consequences of using this pattern. 
+ // Be sure to cover both pros and cons:
+ // * what this pattern enables and the benefits it brings
+ // * what this pattern prevents or makes harder
+ //
+ // For this metrics example such benefits would include:
+ // * A mechanism for API evolution
+ // * Consistency in naming of metrics and labels within this service
+ // * Consistency with other services which also apply this AP
+ //
+ // And on the down side:
+ // * The Prometheus format eventually be superseded
+ // * Naming and consistency is hard, so multiple versions of the API 
+ //   might be needed to achieve those goals. 
