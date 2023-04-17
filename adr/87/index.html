@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Exposing metrics via the KAS Fleet Manager API | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Exposing metrics via the KAS Fleet Manager API" />
+<meta name="author" content="JameelB" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<meta property="og:description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/87/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/87/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Exposing metrics via the KAS Fleet Manager API" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"JameelB"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"This site contains resources about the architecture and processes for Red Hat Application Services.","headline":"Exposing metrics via the KAS Fleet Manager API","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/87/"},"url":"https://architecture.bf2.dev/adr/87/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Exposing metrics via the KAS Fleet Manager API</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-87: Exposing metrics via the KAS Fleet Manager API</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-draft">Draft</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      JameelB
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-kafka">kafka</span>
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#current-situation">Current situation</a>
+<ul class="sectlevel2">
+<li><a href="#requesting-new-customer-facing-metrics">Requesting new customer facing metrics</a></li>
+<li><a href="#naming-scheme">Naming scheme</a></li>
+<li><a href="#exposing-new-metrics-in-the-kas-fleet-manager-api">Exposing new metrics in the KAS Fleet Manager API</a></li>
+</ul>
+</li>
+<li><a href="#proposal">Proposal</a>
+<ul class="sectlevel2">
+<li><a href="#metric-and-label-naming">Metric and Label Naming</a></li>
+<li><a href="#kafka-metric-categories">Kafka Metric Categories</a></li>
+<li><a href="#process-for-requesting-new-customer-facing-metric">Process for requesting new customer facing metric</a></li>
+<li><a href="#migrating-existing-metrics-to-the-new-naming-policy">Migrating existing metrics to the new naming policy</a></li>
+</ul>
+</li>
+<li><a href="#threat-model">Threat model</a></li>
+<li><a href="#alternatives-considered-rejected">Alternatives Considered / Rejected</a></li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if not completed</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="context-and-problem-statement">Context and Problem Statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The KAS Fleet Manager API provides the following endpoints which end users can use to collect metrics of their own Kafka instances:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByInstantQuery">/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query</a>: returns the most recent values for each metric associated with the specified Kafka.
+This returns metrics in a JSON format.</p>
+</li>
+<li>
+<p><a href="https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByRangeQuery">/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query_range</a>: returns values for each metric associated with the specified Kafka over a time range specified in the request.
+This returns metrics in a JSON format.</p>
+</li>
+<li>
+<p><a href="https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/federateMetrics">/api/kafkas_mgmt/v1/kafkas/{id}/metrics/federate</a>: returns the most recent values for each metric associated with the specified Kafka.
+This returns metrics in a Prometheus Text format and is scrapable by any monitoring systems that accepts this format.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each of these endpoints returns the exact same metrics.
+The only difference between these is the format of the response.</p>
+</div>
+<div class="paragraph">
+<p>The metrics returned in these endpoints are what we call customer facing metrics.
+All available customer facing metrics are documented in the app-services-guides: <a href="https://github.com/redhat-developer/app-services-guides/tree/main/docs/kafka/metrics-monitoring-kafka">Monitoring metrics in OpenShift Streams for Apache Kafka</a>.</p>
+</div>
+<div class="paragraph">
+<p>We currently expose two different types of customer facing metrics:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Raw Kafka metrics&#8201;&#8212;&#8201;exposed by Kafka instances.</p>
+</li>
+<li>
+<p>Recording rules&#8201;&#8212;&#8201;configured by us for any Kafka metrics requiring pre-computed aggregation.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This results in multiple problems:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Consistency</strong>: These two types of metrics follow different naming schemes, resulting in inconsistent metric names.</p>
+</li>
+<li>
+<p><strong>Repetition</strong>: The raw Kafka metrics contain a lot of repetition i.e. <code>kafka_controller_kafkacontroller&#8230;&#8203;</code>.</p>
+</li>
+<li>
+<p><strong>Exposure of implementation details</strong>: The name of the recording rules metrics exposes implementation details i.e. <code>kafka_namespace:haproxy_server_bytes_in_total:rate5m</code>, end users do not need to know about namespaces and OpenShift.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Since we don&#8217;t have a formal process and naming policy for adding customer facing metrics, we often reach a situation where the resulting metric names are confusing and misleading (i.e. <a href="https://github.com/bf2fc6cc711aee1a0c2a/kas-fleet-manager/issues/688">misleading metric name for kafka topic partitions count</a>).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Define a naming policy for existing and new customer facing metrics.</p>
+</li>
+<li>
+<p>Define a process for requesting new customer facing metrics to the API.</p>
+</li>
+<li>
+<p>Define a process for migrating the existing customer facing metrics to follow the new naming policy.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Metrics API versioning</p>
+<div class="paragraph">
+<p>The metrics API is currently part of the KAS Fleet Manager API.
+We need to consider KAS Fleet Manager API as a whole in order to have consistent versioning strategy for all of our endpoints, including customer facing metrics and the metrics API.</p>
+</div>
+<div class="paragraph">
+<p>This also includes different deprecation periods with different lifecycle tags and the idea of separating the metrics API from the rest of the KAS Fleet Manager API to have isolated versioning.
+This is out of scope of this ADR and should have its own separate discussion, epic or ADR.</p>
+</div>
+</li>
+<li>
+<p>Parameterize metric aggregation</p>
+</li>
+<li>
+<p>Provide endpoint for metrics discovery</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-situation">Current situation</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="requesting-new-customer-facing-metrics">Requesting new customer facing metrics</h3>
+<div class="paragraph">
+<p>There is currently no formal process that we follow when a new metric is requested to be added to the API.</p>
+</div>
+<div class="paragraph">
+<p>The request is handled by the Control Plane team to add the metrics to the KAS Fleet Manager API as well as adding new recording rules to the Observability configuration if needed.
+However, the Kafka Integrations team would have the knowledge of what metrics to use and how it should be aggregated, if required.
+All discussions around which metric to use and how its aggregated is done via ad-hoc chat conversations, in the JIRA issue or the Github pull request.
+Discussion to reach a formal agreement cross teams for the metric name is not done.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="naming-scheme">Naming scheme</h3>
+<div class="paragraph">
+<p>The names of the current customer facing metrics are based on the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Raw Kafka metrics: The names of these metrics are not changed, they are taken directly from Kafka metrics. These have the following name format:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>For example: <code>kafka_controller_kafkacontroller_offline_partitions_count</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Recording rules: We configure these and name them based on the following format <code>&lt;level&gt;:&lt;metric name&gt;:&lt;aggregation&gt;</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>For example: <code>kafka_topic:kafka_log_log_size:sum</code></p>
+</li>
+<li>
+<p>This format is used for all of our recording rules, most are not exposed to end users.</p>
+</li>
+<li>
+<p>This makes sense when you know how it&#8217;s implemented but this exposes implementation details to end users.</p>
+</li>
+<li>
+<p>A list of the customer facing recording rules can be seen in the <a href="https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk/blob/main/resources/prometheus/user-facing-recording-rules.yaml">observability-resources-mk</a> configuration repository.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="exposing-new-metrics-in-the-kas-fleet-manager-api">Exposing new metrics in the KAS Fleet Manager API</h3>
+<div class="paragraph">
+<p>All of the customer facing metrics originate from the data plane cluster in which the Kafka instance is deployed in.
+A Prometheus instance is deployed in each of the data plane cluster which uses <a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write">remote-write</a> to push these metrics to Observatorium.
+This acts as the central repository for all metrics, included in the remote-write configuration, from each data plane cluster.
+A list of the metrics included in the remote-write configuration can be found in the <a href="https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk/blob/main/resources/prometheus/remote-write.yaml">Observability resources</a> repository.</p>
+</div>
+<div class="paragraph">
+<p>KAS Fleet Manager acts as a proxy to Observatorium.
+It calls the Observatorium <em>/query</em> and <em>/query_range</em> endpoints to retrieve metrics we consider as 'customer facing'.
+A list of the metrics retrieved by KAS Fleet Manager can be found in the <a href="https://github.com/bf2fc6cc711aee1a0c2a/kas-fleet-manager/blob/main/pkg/client/observatorium/api.go">observatorium</a> client within the project. When new metrics are added to this list, they become available in the KAS Fleet Manager <em>/metrics/query</em> and <em>/metrics/query_range</em> endpoints. In order to make new metrics available to the <em>/metrics/federate</em> endpoint, their metadata must be added to this <a href="https://github.com/bf2fc6cc711aee1a0c2a/kas-fleet-manager/blob/main/internal/kafka/constants/metrics.go">file</a> in KAS Fleet Manager.</p>
+</div>
+<div class="paragraph">
+<p>KAS Fleet Manager controls the labels exposed for each metric returned in all endpoints.
+Metrics retrieved from Observatorium are also filtered so that end users will only receive metrics for their own Kafka instance.
+Apart from these, no additional aggregation, filtering or modification of the metric is done by KAS Fleet Manager.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposal">Proposal</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="metric-and-label-naming">Metric and Label Naming</h3>
+<div class="paragraph">
+<p>All metric and label names must adhere to the policy stated in <a href="../../_ap/16/index.adoc">AP-16: Naming Policy for Customer Facing Metrics</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="kafka-metric-categories">Kafka Metric Categories</h3>
+<div class="paragraph">
+<p>The customer facing Kafka metrics can be divided into multiple categories.
+Categorizing these metrics into logical groups can help us formulate the metric name and document it.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Category</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Metric Prefix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">General Kafka metrics not specific to any other categories.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kas_instance_</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Broker</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics associated to Kafka brokers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kas_broker_</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics associated to Kafka topics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kas_topic_</code> (Even though the topic metrics already have a 'topic' label, including this improves the clarity of the metric name)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Caution</div>
+</td>
+<td class="content">
+When adding new metric categories to the service, avoid using categories that exposes the implementation details of the service.
+Metric names are part of the API contract and will be documented.
+For example, categories like <code>topic</code> and <code>broker</code> are ok to use as they are foundational concepts in Kafka and are intrinsic to the service.
+However, components where these metrics originated from, e.g. canary or kafka-exporter, are implementation details.
+These should not be used as a metric category.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="labels">Labels</h4>
+<div class="paragraph">
+<p>At minimum, each metric should have a label that identifies the Kafka instance if possible.
+This would be useful if a user has multiple Kafka instances.
+If they want to integrate all of their Kafka metrics into one monitoring system, the label(s) can act as an identifier.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="process-for-requesting-new-customer-facing-metric">Process for requesting new customer facing metric</h3>
+<div class="paragraph">
+<p>When requesting for a new metric to be exposed in the KAS Fleet Manager API, a new issue in JIRA or Github must be created.
+The description of this issue should have sufficient information on what this new metric should provide in order to identify the metric to be used and how it should be documented in later stages.</p>
+</div>
+<div class="paragraph">
+<p>The issue created must have the following sub-tasks and they must be completed in order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Identify the metric and labels to be used and how it will be aggregated if required.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This should be assigned to the team that has the knowledge of the requested metric.</p>
+</li>
+<li>
+<p><span class="underline">Definition of Done</span>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Metric to be used is identified.</p>
+</li>
+<li>
+<p>(Optional) Aggregation of the metric determined.</p>
+</li>
+<li>
+<p>Category which this new metric belongs to is identified.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>See <a href="#kafka-metric-categories">Kafka Metric Categories</a> to view existing metric categories and notes on adding new ones to the service.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Cardinality calculated</p>
+</li>
+<li>
+<p>New metric approved by the Running the Services team to be included in the remote-write to Observatorium.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Agreement on metric name and labels to be exposed</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This should be assigned to the Control Plane team.</p>
+</li>
+<li>
+<p><span class="underline">Definition of Done</span>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Labels to be exposed are identified.</p>
+</li>
+<li>
+<p>Name of the metric and labels exposed are determined.
+This should adhere to the metric and label naming policy as described above.</p>
+</li>
+<li>
+<p>The metric and exposed label names must be approved by the following people/teams:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Requester</p>
+</li>
+<li>
+<p>Control Plane team</p>
+</li>
+<li>
+<p>Kafka Integrations team</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Expose the metric in the KAS Fleet Manager API</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This should be assigned to the Control Plane team.</p>
+</li>
+<li>
+<p>Any tasks for adding the new metric to the API should be done in this stage.
+This includes adding the new metric to the Prometheus remote-write configuration and any code changes to the KAS Fleet Manager repository.</p>
+</li>
+<li>
+<p><span class="underline">Definition of Done</span>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>New customer facing metric should be included in the response of the following KAS Fleet Manager API endpoints:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByInstantQuery">/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query</a></p>
+</li>
+<li>
+<p><a href="https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/getMetricsByRangeQuery">/api/kafkas_mgmt/v1/kafkas/{id}/metrics/query_range</a></p>
+</li>
+<li>
+<p><a href="https://api.openshift.com/?urls.primaryName=kafka%20service%20fleet%20manager%20service#/default/federateMetrics">/api/kafkas_mgmt/v1/kafkas/{id}/metrics/federate</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Document the new metric</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This should be assigned to the Documentation/Customer Content Support team.</p>
+</li>
+<li>
+<p><span class="underline">Definition of Done</span>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>New metric documented in the app-services-guides: <a href="https://github.com/redhat-developer/app-services-guides/tree/main/docs/kafka/metrics-monitoring-kafka">Monitoring metrics in OpenShift Streams for Apache Kafka</a>.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="migrating-existing-metrics-to-the-new-naming-policy">Migrating existing metrics to the new naming policy</h3>
+<div class="paragraph">
+<p>KAS Fleet Manager does not support API versioning at the moment so we would need to support both existing and new metrics during the migration process.</p>
+</div>
+<div class="paragraph">
+<p>The Kafka console provides dashboards which can display data up to the last 7 days (see the design in <a href="https://redhat-developer.github.io/app-services-ui-components/?path=/story/kafka-metrics&#8212;&#8203;all-ready">Storybook</a>).
+Since the revised metric names will be added as new metrics, they will have no history.
+However, there should be sufficient time between adding the metrics to KAS Fleet Manager and the UI team to start working on switching to the new metrics so that there would be no problem with the metric history.
+Because of this we should be able to expose the new metrics in KAS Fleet Manager and mark the existing metrics as deprecated as soon as they&#8217;re configured to be pushed to Observatorium.</p>
+</div>
+<div class="paragraph">
+<p>The existing metrics shall be marked as deprecated as per the MAS API deprecation policy.
+The deprecation will be communicated as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The KAS Fleet Manager OpenAPI specification will document the deprecated metrics and their alternatives in each of the endpoint descriptions.</p>
+</li>
+<li>
+<p>The metrics listed in the <a href="https://github.com/redhat-developer/app-services-guides/tree/main/docs/kafka/metrics-monitoring-kafka">Monitoring metrics in OpenShift Streams for Apache Kafka</a> documentation shall be marked as 'deprecated', pointing the users to use the newly revised metrics.</p>
+</li>
+<li>
+<p>An email will be sent out to mas-devel and mas-all mailing list as per the deprecation policy.</p>
+</li>
+<li>
+<p>Deprecation period shall be 60 days.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This was agreed upon as there is currently not a lot of users using these metrics apart from the UI.
+Note that in the future, this may be based on the different deprecation periods agreed upon for individual API lifecycle tags (out of scope in this ADR) or based on usage analysis of the deprecated metric.</p>
+</li>
+<li>
+<p>After this time has passed, the deprecated metrics shall be removed from the API and documentation.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="threat-model">Threat model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Not Applicable.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="alternatives-considered-rejected">Alternatives Considered / Rejected</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Renaming the metric and label names in the KAS Fleet Manager.
+KAS Fleet Manager should only act as a proxy to Observatorium, it shouldn&#8217;t do any additional filtering/aggregation.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="challenges">Challenges</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Communicating the change to our consumers</p>
+</li>
+<li>
+<p>Migration of existing metrics to the new naming policy.
+Since we will be following the deprecation policy, we will keep both existing and new metrics until the deprecation period is over.
+This results in duplicated metrics pushed to Observatorium during this period.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies">Dependencies</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>UI will need to migrate to the new metrics for the dashboards in the Kafka console.</p>
+</li>
+<li>
+<p>Any other clients using the metrics API will need to migrate to the new metrics.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences-if-not-completed">Consequences if not completed</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Metric name and labels will continue to be inconsistent, repetitive, misleading, confusing and expose implementation details.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/87/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

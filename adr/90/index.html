@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Automatic certificate management per Kafka instance | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Automatic certificate management per Kafka instance" />
+<meta name="author" content="Manyanda Chitimbo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Context and Problem Statement" />
+<meta property="og:description" content="Context and Problem Statement" />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/90/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/90/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Automatic certificate management per Kafka instance" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Manyanda Chitimbo"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"Context and Problem Statement","headline":"Automatic certificate management per Kafka instance","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/90/"},"url":"https://architecture.bf2.dev/adr/90/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Automatic certificate management per Kafka instance</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-90: Automatic certificate management per Kafka instance</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-accepted">Accepted</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Manyanda Chitimbo
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-kafka">kafka</span>
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#current-situation">Current situation</a></li>
+<li><a href="#proposal">Proposal</a>
+<ul class="sectlevel2">
+<li><a href="#threat-model">Threat model</a></li>
+</ul>
+</li>
+<li><a href="#alternatives-considered-rejected">Alternatives Considered / Rejected</a></li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if not completed</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="context-and-problem-statement">Context and Problem Statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Kafka cluster deployed on the data plane cluster should be reachable via TLS.
+It means that we should provide a way to the clients to verify and validate the TLS connection with the related handshake with the Kafka brokers exposed outside of the data plane cluster.
+The Strimzi operator has its own cluster CA for signing the brokers' certificates but it should be used just for internal communication.
+This problem is the same as the one exposed <a href="../5/index.adoc">ADR-5: Kafka Cluster Certificate Generation</a> whose solution only works for managed data plane clusters but it is not an acceptable solution for when users brings / registers their own data plane clusters.
+Additionally, the proposed solution in <a href="../5/index.adoc">ADR-5</a> lacked a lot of automation on certificate management which is an area the present ADR intends to address.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Automated certificate management (generation, renewal, revocation) per Kafka instance</p>
+</li>
+<li>
+<p>Avoid sharing same certificate between Kafka instances</p>
+</li>
+<li>
+<p>Avoid exposing domain registrar &amp; certificate issuers credentials onto enterprise data plane clusters</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Creating a pattern for and/or developing a central certificate management service</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-situation">Current situation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="../5/index.adoc">ADR-5: Kafka Cluster Certificate Generation</a> describes the current situation where one certificate is shared across data planes. The certificate is renewed manually using the <a href="https://github.com/bf2fc6cc711aee1a0c2a/kas-sre-sops/blob/main/sops/key_management/control_plane/dataplane_certificate.asciidoc">data plane certificate standard operationg procedure (SOP)</a>: the SOP link points to a private repository and requires membership permission to see it..</p>
+</div>
+<div class="paragraph">
+<p>The <a href="../89/index.adoc">ADR-89: A bf2 subdomain &amp; wildcard certificate per data plane cluster</a> proposed a solution of automatic certificate management per data plane cluster, the solution however made the Kafka URLs non portable i.e the URLs are non deployment location agnostic.
+URLs portability is the design intention we do not want to loose - as it allows migrating a Kafka from one data plane to another becoming only an infrastructure change that the consumer of the Kafka won&#8217;t need to be so much concerned about and be required to update the various kafka URLs (admin server API &amp; bootstrap server host).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposal">Proposal</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The proposed solution is going to use <a href="https://Letsencrypt.org">Letsencrypt</a> to automatically manage certificates.
+The solution consists of:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Generating one wildcard certificate per Kafka instance .
+For each new <code>standard</code> Kafka instance, there will be a wildcard certificate for the <code><strong>.&lt;kafka-id&gt;.kafka.bf2.dev</code> subdomain where <code>&lt;kafka-id&gt;</code> is unique for each Kafka.
+For each new <code>developer</code> Kafka instance, a shared wildcard certificate <code></strong>.trial.kafka.bf2.dev</code> used for all developer instances will be generated and automatically managed.</p>
+</li>
+<li>
+<p>The fleet manager in its reconcilers will use <a href="https://github.com/caddyserver/certmagic">certmagic library</a> to generate certificate for each new Kafka and store them in a secure Storage.
+During Kafka reconciliation between the Fleetshard and the Fleet manager, certificates will be fetched from the secure storage by the fleet manager and they&#8217;ll be passed down to the data plane via the existing certificate passing mechanism i.e via the ManagedKafka CR.
+The fleet manager will implement this logic in a way that it can be easily extracted &amp; packaged in form of a library and shared with others managed services builders.
+The kas-fleet-manager certificate reconciliation will have to handle the two different cases below:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha">
+<li>
+<p>When a <code>standard</code> kafka is assigned to a given data plane, all routes created will be under the <code>*.&lt;kafka-id&gt;.kafka.bf2.dev</code> domain.
+For example, if the kafka id is <code>12345</code> then Kafka boostrap host will have the form of <code>foobar-xsqhyyza.12345.kafka.bf2.dev</code>.</p>
+</li>
+<li>
+<p>When a <code>developer</code> kafka is assigned to a given data plane, all routes created will be under the <code>*.trial.kafka.bf2.dev</code> domain.
+For example, if the kafka id is <code>12345</code> then Kafka boostrap host will have the form of <code>foobar-sqfsazk.trial.kafka.bf2.dev</code>.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>No migration to be performed for Kafkas.
+The proposed solution will be applied to only new Kafkas.
+Existing Kafkas will continue to share the wildcard certificate on the <code>*.kafka.bf2.dev</code> domain.
+The shared certificate for the already existing Kafkas will now be automatically renewed by the fleet manager.</p>
+</li>
+<li>
+<p>Certificate renewals will also be handled automatically by the fleet manager using the <a href="https://github.com/caddyserver/certmagic">certmagic library</a>.
+Renewals will be blast radius aware to renew certificates in small runs on per Kafka basis.
+Renewals of each certificate will happen 30 days before the certificate expires.
+The intention is to reduce the risk of compromising all our certificates in case there is an outage or an issue with the renewal system in Letsencrypt.
+It also removes the chances of bombarding Letsencrypt with bulk requests or rollout of all the Kafkas in one big batch after renewals.</p>
+</li>
+<li>
+<p>Revocation will be handled per Kafka instance.
+It will follow a GitOps approach where SRE will request to revoke a certificate for a Kafka.
+Once the compromised certificate has been revoked, a new certificate for that Kafka will be generated.
+For already existing Kafkas, they&#8217;ll continue to share the newly generated certificate: see proposal number (3).</p>
+</li>
+<li>
+<p>When a standard Kafka is removed from the fleet manager, its corresponding certificate will also be revoked.
+This is with an exception for all Kafkas that uses a shared certificate i.e Kafkas that existed before the solution is in place or all new developer Kafkas that uses a shared wildcard <code>*.trial.kafka.dev</code> certificate.</p>
+</li>
+<li>
+<p>There will be separate Letsencrypt&#8217;s account per kas-fleet-manager environment.
+For each of these acccounts, a request to overrides the various <a href="https://Letsencrypt.org/docs/rate-limits">Letsencrypt limits</a> will be done by following <a href="https://Letsencrypt.org/docs/rate-limits/#a-id-overrides-a-overrides">Letsencrypt limits overrides</a>.
+There are two main limits that we should be aware of and are of interests: (1) Certificates per Registered Domain which has a default of 50 certificates per week (2) You can create a maximum of 300 New Orders per account per 3 hours.
+Each of these two limits needs to be bumped to a bigger value after capacity planning for certificate generation has been done.</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+There is an existing logic in the data plane that ensures that all sensitive parts in the ManagedKafka CR are not written in plain text.
+Instead a secret is created and only references to the secrets will be added before the ManagedKafka is created in the data plane.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="threat-model">Threat model</h3>
+<div class="paragraph">
+<p>Once the certificate are in the data plane in form of a Kubernetes secret, a privileged users can still see them.
+If this is on a enterprise data plane cluster without good security standards/policy, then anyone with the private key can impersonate the server or eavesdrop on a connection with the server.
+For non enterprise data plane clusters, this is mitigated by only allowing SREs to have the privilege / permissions to see these secrets.
+For enterprise data plane clusters, customers will be advised to do so as well.
+Morever, since there will be a different certificate per kafka instance, if one certificate is compromised, it won&#8217;t affect others and it can be safely revoked.
+The proposed solution also limits the possibility of an owner of a enterprise data plane cluster, eavesdropping on another data plane cluster that they do not own as the certificate keys will be different.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If the shared certificate for an existing Kafka is to be compromised, then it opens up a securiry risk on all existing Kafkas. However, the chances of this security breach occurring is mitigated by first and foremost ensuring only SREs have privileged access to data plane clusters. And second, if a the security issue is detected then certificates can be easily revoked and new ones autocreated
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="alternatives-considered-rejected">Alternatives Considered / Rejected</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Deploying <a href="https://www.redhat.com/sysadmin/cert-manager-operator-openshift">cert-manager operator</a> to the data plane. Rejected to avoid exposing domain registrar credentials and to avoid adding another component that consumes data plane resources and that needs to be monitored.</p>
+</li>
+<li>
+<p>Migrating existing their Kafkas. This change is disruptive to existing customers hence why it was rejected.
+The Kafka fleet manager will thus ensure that existing Kafkas continue to operate using a shared wildcard certificate on the <code>*.kafka.bf2.dev</code> domain i.e the proposed solution will only be applied to new Kafkas.</p>
+</li>
+<li>
+<p>Deploying <a href="https://www.redhat.com/sysadmin/cert-manager-operator-openshift">cert-manager operator</a> in the Control Plane.
+The Control plane then handles the pushing of the Certificate request CR, watching for the created secrets and storing them securely.
+Rejected because this is technically complex and has no clear benefit over the propsed solution of using a library.
+It also violates the design intentions of the fleet manager by turning into an Kubernetes operator.
+Finally, it&#8217;s another component deployed that has to be monitored and managed in the control plane which forces every one (especially dev environments) to have a running Kubernetes cluster running during development</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="challenges">Challenges</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The drawback is that the solution can&#8217;t or won&#8217;t handle the migration of already existing Kafkas.
+This is based on the fact that the proposal intends to make this change a transparent one to existing Kafka instances.
+For this, the Kafka fleet manager will ensure that existing Kafkas continue to operate using a shared wildcard certificate on the <code>*.kafka.bf2.dev</code> domain.
+All standard Kafkas will have a wildcard certificate on the <code>*.&lt;kafka-id&gt;.kafka.bf2.dev</code> subdomain where the <code>kafka-id</code> is unique for each Kafka.
+All new developer Kafkas (short living instances of 48 hours) will have a wildcard certificate on the <code>*.trial.kafka.bf2.dev</code> subdomain, and they will share the same wildcard certificate. This is done so as to keep our usage of the <a href="https://Letsencrypt.org/">Letsencrypt</a> sane and avoid frequently reaching their <a href="https://Letsencrypt.org/docs/rate-limits/">limits</a> due to spikes in creation of developer kafkas.</p>
+</li>
+<li>
+<p>Reaching the various advertised <a href="https://Letsencrypt.org/docs/rate-limits/">Letsencrypt limits</a> is also a challenge.
+However, the various limits once reached can be overridden via a request as described in <a href="https://Letsencrypt.org/docs/rate-limits/#a-id-overrides-a-overrides">Letsencrypt limits overrides</a>. The usage of the <a href="https://Letsencrypt.org/">Letsencrypt</a> is kept sane by sharing an auto managed wildcard certificate for all new developer Kafkas.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies">Dependencies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Depedency on Letsencyrpt and its limits</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences-if-not-completed">Consequences if not completed</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Living up with the toil related to the manual certificate handling.</p>
+</li>
+<li>
+<p>Certificate shared between Kafaks and potentially exposing it to customers the data planes.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/90/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Toward a more unified UX: BFF (Backends For Frontends) | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Toward a more unified UX: BFF (Backends For Frontends)" />
+<meta name="author" content="Andrea Peruffo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Context and Problem Statement" />
+<meta property="og:description" content="Context and Problem Statement" />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/92/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/92/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Toward a more unified UX: BFF (Backends For Frontends)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Andrea Peruffo"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"Context and Problem Statement","headline":"Toward a more unified UX: BFF (Backends For Frontends)","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/92/"},"url":"https://architecture.bf2.dev/adr/92/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Toward a more unified UX: BFF (Backends For Frontends)</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-91: Toward a more unified UX: BFF (Backends For Frontends)</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-approved">Approved</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Andrea Peruffo, 
+      
+      
+      
+      
+      Riccardo Forina, 
+      
+      
+      
+      
+      Eric Wittmann
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-UI">UI</span>
+      
+      <span class="tag tag-UX">UX</span>
+      
+      <span class="tag tag-Dev Exp">Dev Exp</span>
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#current-situation">Current situation</a></li>
+<li><a href="#proposal">Proposal</a>
+<ul class="sectlevel2">
+<li><a href="#threat-model">Threat model</a></li>
+</ul>
+</li>
+<li><a href="#alternatives-considered-rejected">Alternatives Considered / Rejected</a>
+<ul class="sectlevel2">
+<li><a href="#graphql">GraphQL</a></li>
+<li><a href="#expand-the-current-services-apis">Expand the current services APIs</a></li>
+</ul>
+</li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if not completed</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="context-and-problem-statement">Context and Problem Statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The integration of the Enterprise/Hybrid option of RHOSAK in UI, SDKs and CLI has shown that there is a margin for improvement in how we expose and consume our services APIs.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the services are exposing APIs for the offered specific functionality, but we lack an integration layer</p>
+</li>
+<li>
+<p>the data aggregation logic is duplicated, scattered, and eventually diverging in various codebases (especially UI and CLI)</p>
+</li>
+<li>
+<p>there is no "single source of truth" for data aggregated from various services</p>
+</li>
+<li>
+<p>the current REST API layer exposes the user to the entire complexity of the underlying architecture</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We want to deduplicate the development effort and provide a more cohesive UX to the users.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>a more cohesive UX experience across UI and CLI</p>
+</li>
+<li>
+<p>flow simplification for the REST API exposing opinionated endpoints directly mapping UI/CLI needs</p>
+</li>
+<li>
+<p>a single place with shared logic for aggregating and serving data</p>
+</li>
+<li>
+<p>reduce the interactions over the network for providing a given functionality</p>
+</li>
+<li>
+<p>easy testing/mocking setup for UI/CLI</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>provide a generic API layer for consuming the current services APIs</p>
+</li>
+<li>
+<p>provide a generic queryable layer for the current services APIs</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-situation">Current situation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the current architecture both UI and CLI are reaching out both Control Plane and Data Plane REST API endpoints.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="current_architecture.png" alt="Current Architecture">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposal">Proposal</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<strong>Assumption</strong> as a first iteration we are assuming that the CLI needs can be covered by a strict subset of the functionalities needed for the UI.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We propose to integrate <strong>one</strong> server side component commonly known as <a href="https://samnewman.io/patterns/architectural/bff/">BFF</a> (Backend For Frontend).</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="with_BFF.png" alt="Proposed Architecture">
+</div>
+</div>
+<div class="paragraph">
+<p>The service is implemented using Java and Quarkus to achieve maximum collaboration across the current teams and align with Red Hat tech strategy.
+The API layer is designed using API Designer(RHOAD) and conforming to the OpenAPI 3+ specification to achieve maximum collaboration across different teams and members with various technological background.
+The development is driven by a "Contract First" approach leveraging the [Apicurio Codegen Quarkus Extension](<a href="https://github.com/Apicurio/apicurio-codegen/tree/main/quarkus-extension" class="bare">https://github.com/Apicurio/apicurio-codegen/tree/main/quarkus-extension</a>) and re-using the Java SDKs(based on Kiota) provided by the DevExp Team.
+The BFF have to to be stateless so that it can easily be scaled up and down according to the needs.
+All of the exposed endpoints are going to perform 1+ REST APIs calls to the underlying services and provide back the result.
+Access to the underlying services will be done by propagating the original(user) access token to simplify development and to keep the security model similar to the current architecture.</p>
+</div>
+<div class="sect2">
+<h3 id="threat-model">Threat model</h3>
+<div class="paragraph">
+<p>Being it a publicly accessible service the generic service Threat model applies, we should ensure stability of the platform by having all the good practices in place:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Rate Limiting</p>
+</li>
+<li>
+<p>Circuit Breaking</p>
+</li>
+<li>
+<p>Caching</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Regarding multitenancy, it is achieved by re-using the Access Token for the initial API request to issue the following requests to the backend services.
+Access token propagation is the preferred model because:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>it keeps the security model unchanged: the alternative impose a carefully hardened BFF component to avoid escalation of privilege)</p>
+</li>
+<li>
+<p>it is similar to the usage without BFF (e.g. the UI would send the access token to each of the services)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Note that it could be come more difficult if we were to embrace <a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-dpop">sender-constrained tokens</a> or <a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures">signed HTTP requests</a>.
+This is a problem for later.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="alternatives-considered-rejected">Alternatives Considered / Rejected</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="graphql">GraphQL</h3>
+<div class="paragraph">
+<p>Is a well known technical platform for implementing BFFs, especially strong for composing data from multiple services but it doesn&#8217;t magically solves the problem by itself.
+When comparing a possible OpenAPI solution to a GraphQL one, for this specific problem, the real advantage in favor of the latter is the possibility for dynamic fields selections in the client.
+We do not consider this upside strong enough to outweighs some of the challenges:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Lack of expertise in the technology - one of the objective of this component is to enable multiple teams collaboration on the repo</p>
+</li>
+<li>
+<p>Challenges with Observability - Support for partial failures compromise the usage of "generic" REST APIs monitoring tools</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We leave the doors open to re-evaluate the choice of GraphQL in the future and/or in different contexts.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="expand-the-current-services-apis">Expand the current services APIs</h3>
+<div class="paragraph">
+<p>We want the current microservices to stay vertical and opinionated toward a minimal and curated API that directly maps the functionality of the service without having to deal with the integration challenges.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="challenges">Challenges</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Caching while guaranteeing multitenancy</p>
+</li>
+<li>
+<p>Shared ownership of the component across different teams</p>
+</li>
+<li>
+<p>Avoid API proliferation after the first BFF is in place</p>
+</li>
+<li>
+<p>Potential lack of control over APIs being aggregated</p>
+</li>
+<li>
+<p>The introduction of private data planes can introduce additional issues because of backend APIs reachability</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For private data plates, we know it is a known feature coming but its impact will not be done as part of this work.
+It could lead to change in the BFF pattern approached described here and to the control plane at large.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies">Dependencies</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>The new Java Kiota SDKs should be officially published</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences-if-not-completed">Consequences if not completed</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Duplicated effort from UI and DevExp teams in re-implementing aggregation logics</p>
+</li>
+<li>
+<p>A scattered UX experience</p>
+</li>
+<li>
+<p>Slow response times(due to the number of requests in background) using the CLI and the UI</p>
+</li>
+</ul>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/92/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

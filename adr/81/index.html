@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Kafka instance scaling | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Kafka instance scaling" />
+<meta name="author" content="Tom Bentley" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Note RFC-2119 keywords are used in this proposal." />
+<meta property="og:description" content="Note RFC-2119 keywords are used in this proposal." />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/81/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/81/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Kafka instance scaling" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Tom Bentley"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"Note RFC-2119 keywords are used in this proposal.","headline":"Kafka instance scaling","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/81/"},"url":"https://architecture.bf2.dev/adr/81/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Kafka instance scaling</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-81: Kafka instance scaling</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-accepted">Accepted</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      <img class="avatar avatar-small" alt="tombentley" width="40" height="40" data-proofer-ignore="true" src="https://avatars2.githubusercontent.com/tombentley?v=3&s=40" srcset="https://avatars2.githubusercontent.com/tombentley?v=3&s=40 1x, https://avatars2.githubusercontent.com/tombentley?v=3&s=80 2x, https://avatars2.githubusercontent.com/tombentley?v=3&s=120 3x, https://avatars2.githubusercontent.com/tombentley?v=3&s=160 4x" />
+      Tom Bentley
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-kafka">kafka</span>
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#current-situation">Current situation</a></li>
+<li><a href="#proposal">Proposal</a>
+<ul class="sectlevel2">
+<li><a href="#conceptual-model">Conceptual model</a></li>
+<li><a href="#general-principles">General principles</a></li>
+<li><a href="#uifleet-manager-interface">UI/Fleet manager interface</a></li>
+<li><a href="#fleet-manager-responsibilities">Fleet manager responsibilities</a></li>
+<li><a href="#fleet-managerfleet-shard-interface">Fleet manager/fleet shard interface</a></li>
+<li><a href="#threat-model">Threat model</a></li>
+</ul>
+</li>
+<li><a href="#alternatives-considered-rejected">Alternatives Considered / Rejected</a></li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if not completed</a></li>
+</ul>
+    </div>
+    
+    <div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<a href="https://datatracker.ietf.org/doc/html/rfc2119">RFC-2119</a> keywords are used in this proposal.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect1">
+<h2 id="context-and-problem-statement">Context and Problem Statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Excluding storage sizing, the Kafka service currently supports a single size of Kafka cluster composed of 3 broker pods with fixed CPU, memory and density.
+In order for the service to be more broadly applicable to production Kafka use cases we need to be able to provide it at a variety of scales.
+This means that when a user creates a Kafka instance they get to specify "how big" the instance they&#8217;re creating should be.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Define how instance scaling is modelled conceptually and in the interfaces between the UI, fleet manager and fleet shard.</p>
+</li>
+<li>
+<p>Avoid tying our hands to any particular unit of scaling.</p>
+</li>
+<li>
+<p>Enable other profiles of the service in the future, without having to change the contracts between components.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Consistency of scaling across different infrastructures (both on the same cloud, and between different clouds).</p>
+</li>
+<li>
+<p>Define how the fleet manager manages shard capacity.</p>
+</li>
+<li>
+<p>Storage scaling, which already supported in the fleet manager and shard, and is orthogonal to the scaling of clusters under consideration here.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-situation">Current situation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The service does not offer any scaling options, except for storage, which is orthogonal to this problem.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposal">Proposal</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="conceptual-model">Conceptual model</h3>
+<div class="paragraph">
+<p>Conceptually we define an <em>instance type</em> (also known as a <em>profile</em>), which is an ordered list of <em>sizes</em> of instance.</p>
+</div>
+<div class="paragraph">
+<p>In addition to being a composite of sizes, an <em>instance type</em> has an id and a set of parameters that is common across all the sizes in the instance type.</p>
+</div>
+<div class="paragraph">
+<p>A <em>size</em> has an id (which is unique among the other sizes in the same instance type), and a set of parameter values.
+Each parameter value associates a value with one of the parameters defined in the parent instance type.
+Each of the sizes in an instance type MUST have the same set of function parameters (e.g. ingress bandwidth), but the values MAY differ.</p>
+</div>
+<div class="paragraph">
+<p>Finally, we use the term <em>plan</em> to refer to an (instance type, size)-pair.
+Thus a plan is, unambiguously, a particular size of a particular instance type.</p>
+</div>
+<div class="paragraph">
+<p>The ordering of the list MUST be defined by the ordering of the functional attributes that define the service.</p>
+</div>
+<div class="paragraph">
+<p>For example, for the "Standard" instance type, we might have the sizes:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>small</code></dt>
+<dd>
+<p>Ingress 30MB/s, egress 30MB/s, 1000 partitions, 500 connections per instance, max 100 connections per second, 1MB max message size.</p>
+</dd>
+<dt class="hdlist1"><code>medium</code></dt>
+<dd>
+<p>Ingress 60MB/s, egress 60MB/s, 2000 partitions, 1000 connections per instance, max 100 connections per second, 1MB max message size.</p>
+</dd>
+<dt class="hdlist1"><code>large</code></dt>
+<dd>
+<p>Ingress 90MB/s, egress 90MB/s, 3000 partitions, 1500 connections per instance, max 100 connections per second, 1MB max message size.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>In this example, the functional attributes scale linearly, with the exception of connection rate and max message size.
+In general, linearity SHALL NOT be a requirement, even for those attributes which do scale up.
+For example, it would have been acceptable to define the <code>large</code> ingress as 100M/s, even though this is not 3× the <code>small</code> ingress, even when the other <code>large</code> functional parameters are 3× their <code>small</code> values.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="general-principles">General principles</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>An individual fleet shard is required to provide only a subset of all instance types supported by the service globally.
+Indeed, a fleet shard might possibly support only a single instance type.
+For example a shard on AWS might support a different set of instance types to a shard on Azure, or the same instance types might have different sizes on those clouds.
+One of the purposes of introducing the instance type and size concepts is to provide flexibility in the kinds of service offered in the future.</p>
+</li>
+<li>
+<p>The availability of an instance type might be limited to a particular cloud, region or combination of both.</p>
+</li>
+<li>
+<p>It is a private concern of the shard exactly how each size in an instance type is provisioned.
+In principle it could use vertical and/or horizontal scaling and/or density &gt; 1, in addition to applying quotas to limit capacity to the advertised limits.
+The fleet manager doesn&#8217;t know.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="uifleet-manager-interface">UI/Fleet manager interface</h3>
+<div class="paragraph">
+<p>This ADR does not mandate any particular presentation for how the scale options are presented in the UI.
+In particular while there is only one instance type defined, there is no requirement to display instance types in the UI at all.</p>
+</div>
+<div class="paragraph">
+<p>The fleet manager SHALL be the source of truth for the instance types and sizes available, and how those depend on cloud and region.
+The fleet manager SHALL provide an endpoint which the UI MUST use to determine the available instance types and sizes.
+The UI MUST NOT make assumptions about linearity of scaling, instead it uses only the instance types and sizes provided by the endpoint.</p>
+</div>
+<div class="sect3">
+<h4 id="instance-type-discovery">Instance type discovery</h4>
+<div class="paragraph">
+<p>Reusing the "Standard" instance type defined above, let&#8217;s illustrate how the Fleet Manager could communicate the available kinds of cluster to a UI.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="adr-81-ui-fleet_manager.png" alt="UI/Fleet manager interaction">
+</div>
+<div class="title">Figure 1. Sequence diagram of UI/Fleet manager interaction</div>
+</div>
+<div class="paragraph">
+<p>After the UI has discovered the available cloud providers and regions it would make another GET request <code>/api/kafkas_mgmt/v1/instance_types/{cloudId}/{cloudRegion}</code> to discover the instance types available in this cloud and region.
+An example response JSON is shown below.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example instance type available to a UI from the Fleet Manager&#8217;s <code>GET /api/kafkas_mgmt/v1/instance_types/{cloudId}/{cloudRegion}</code> endpoint</div>
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">"instance_types": [ <b class="conum">(1)</b>
+    { "id": "standard", <b class="conum">(2)</b>
+      "parameters": { <b class="conum">(3)</b>
+        "ingressThroughputPerSec" : { "name": "Ingress", "unit": "MiB/s" },
+        "egressThroughputPerSec": { "name": "Egress", "unit": "MiB/s" },
+        "maxPartitions": { "name": "Partitions" },
+        "totalMaxConnections": { "name": "Connections" },
+        "maxConnectionAttemptsPerSec": { "name": "Connection Rate", "unit": "/s" },
+        "maxMessageSize": { "name": "Maximum message size", "unit": "MiB" },
+        "quotaType": { "name": "The kind of quota an instance of this plan consumes" }, <b class="conum">(4)</b>
+        "quotaConsumed": { "name": "The amount of quota instance of this plan consumes" }, <b class="conum">(5)</b>
+        "capacityConsumed": { "name": "An amount of shard capacity consumed by an instance of this plan" } <b class="conum">(6)</b>
+      },
+      "sizes": [ <b class="conum">(7)</b>
+        { "id": "s", <b class="conum">(8)</b>
+          "parameterValues": { <b class="conum">(9)</b>
+            "ingressThroughputPerSec": "30", "egressThroughputPerSec": "30",
+            "maxPartitions": "1000", "totalMaxConnections": "500",
+            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
+            "quotaType": "foo",
+            "quotaConsumed": 1,
+            "capacityConsumed": 1
+          }
+        },
+        { "id": "m",
+          "parameterValues": {
+            "ingressThroughputPerSec": "60", "egressThroughputPerSec": "60",
+            "maxPartitions": "2000", "totalMaxConnections": "1000",
+            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
+            "quotaType": "foo",
+            "quotaConsumed": 2,
+            "capacityConsumed": 2
+          }
+        },
+        { "id": "l",
+          "parameterValues": {
+            "ingressTh &lt;10&gt;roughputPerSec": "90", "egressThroughputPerSec": "90",
+            "maxPartitions": "3000", "totalMaxConnections": "1500",
+            "maxConnectionAttemptsPerSec": "100", "maxMessageSize": "1",
+            "quotaType": "foo",
+            "quotaConsumed": 3,
+            "capacityConsumed": 3
+          }
+        }
+      ],
+    },
+    { "id": "eval",
+      // ...
+    }
+    // other profiles as necessary
+]</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>The order of this list MAY be reflect the way that instance types are shown in the UI.
+E.g. "Developer", "Standard" and "Enterprise" instance types might be shown in that order.</p>
+</li>
+<li>
+<p>Each instance type&#8217;s <code>id</code> uniquely identifies the instance type.
+It MUST NOT change.
+It should be treated as an internal id and MUST NOT be exposed directly to a user.</p>
+</li>
+<li>
+<p>Each instance type defines a set of parameters, together with their units and descriptions.
+Each size in the instance type must give values for all the parameters that the instance type defines.
+Different instance types MAY define different parameters.
+The units and descriptions MAY be localized.</p>
+</li>
+<li>
+<p>A reference to a kind of quota.
+This is an abstraction for how the service is billed.
+Note that all plans support this parameter.</p>
+</li>
+<li>
+<p>A reference to an amount of quota consumed.
+This is an abstraction for how the service is billed.
+Note that all plans support this parameter.</p>
+</li>
+<li>
+<p>This is currently needed so that the UI can report whether an instance can be created.
+This parameter will be removed once a shard is able to report its capacity to the fleet manager, and the fleet manager exposes a dedicated endpoint for plan validation.
+Note that all plans support this parameter.</p>
+</li>
+<li>
+<p>The size list MUST be ordered such that later items represent clusters with more capacity.</p>
+</li>
+<li>
+<p>The size <code>id</code> uniquely identifies the size within the instance type.
+It MUST NOT change.
+It should be treated as an internal id and MUST NOT be exposed directly to a user.
+The unit or meaning of cost is not defined in this ADR.</p>
+</li>
+<li>
+<p>The <code>parameterValues</code> of a size MUST define the same properties as the instance type&#8217;s <code>parameters</code> object.</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The above is not intended as a detailed API specification, merely an illustration of how the instance types and their sizes are communicated from the Fleet Manager to a UI.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Because the instance type and size ids never change a UI MAY use them as keys for localized user-facing names and descriptions.</p>
+</div>
+<div class="paragraph">
+<p>Where it is necessary to refer to a plan using a single string, the syntax <code>&lt;InstanceTypeId&gt;.&lt;SizeId&gt;</code> SHOULD be used.
+To avoid ambiguity instance type and size ids MUST be a value RFC 1123 Label Name.</p>
+</div>
+<div class="paragraph">
+<p>It may be necessary, eventually, to distinguish the supported actions that are supported for a given instance type and size.
+For example, we might want to prevent the creation of new instances of the "eval" instance type while supporting existing instances.
+So we might eventually want additional properties in the instance size schema.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="instance-creation">Instance creation</h4>
+<div class="paragraph">
+<p>The <code>POST /api/kafkas_mgmt/v1/kafkas</code> endpoint would change to take the instance type id and size id in addition to the existing parameters.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example <code>POST /api/kafkas_mgmt/v1/kafkas</code> made by a UI to the Fleet Manager to create an instance</div>
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+    "region": "us-east-1",
+    "cloud_provider": "aws",
+    "plan": "standard.s", <b class="conum">(1)</b>
+    "name": "serviceapitest"
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>New property.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>To allow the API to evolve compatibly, the manager MAY use a default instance type and size in the case that the <code>POST</code> request omits these properties.</p>
+</div>
+<div class="paragraph">
+<p>If the requested instance type and/or size is not available in that cloud provider and region a HTTP 400 error response is returned.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="getting-instance-state">Getting instance state</h4>
+<div class="paragraph">
+<p>Similarly, the <code>GET /api/kafkas_mgmt/v1/kafkas/{id}</code> endpoint would change to include the instance type and size.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fleet-manager-responsibilities">Fleet manager responsibilities</h3>
+<div class="paragraph">
+<p>The supported instance types are passed to the fleet manager via app interface.</p>
+</div>
+<div class="paragraph">
+<p>When terraforming a shard, the manager needs to keep track of which instance types are/will be supported on that shard.</p>
+</div>
+<div class="paragraph">
+<p>Currently it is acceptable for the manager to embed knowledge of the machine types needed by the shard.
+The manager does not know how the nodes running on those machines will be used.
+It is expected that a future ADR will describe a mechanism for the shard and manager to dynamically adjust the number of nodes.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fleet-managerfleet-shard-interface">Fleet manager/fleet shard interface</h3>
+<div class="imageblock">
+<div class="content">
+<img src="adr-81-fso-manager.png" alt="Fleet shard operator/Fleet manager interaction">
+</div>
+<div class="title">Figure 2. Sequence diagram of Fleet shard operator/Fleet manager interaction</div>
+</div>
+<div class="paragraph">
+<p>When the manager includes an instance in the response to its <code>GET /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas</code> it does not include the instance type or size.
+It instead passes the functional parameters corresponding to the size selected by the user via the Managed Custom Resource.
+This is basically the same as the existing contract.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example fragment of JSON for an instance included in the <code>GET /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas</code> response from the Fleet Manager</div>
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">"capacity": { <b class="conum">(1)</b>
+  "ingressThroughputPerSec": "4Mi", <b class="conum">(2)</b>
+  "egressThroughputPerSec": "4Mi",
+  "totalMaxConnections": "500",
+  "maxDataRetentionSize": "100Gi",
+  "maxPartitions": "100",
+  "maxDataRetentionPeriod": "P14D",
+  "maxConnectionAttemptsPerSec": "100"
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>While these parameters are related to the size parameters exposed by the fleet manager to the UI there is no requirement for them to be the same set, or for the same ids to be used.</p>
+</li>
+<li>
+<p>Currently the API uses a combined <code>ingressEgressThroughputPerSec</code> property</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The shard then uses its internal model to determine the deployment configuration (in terms of <code>Kafka</code> CRs, ingress replicas and so on).
+Initially this could be as simple as dividing the <code>ingressThroughputPerSec</code> by some constant in order to determine a number of brokers to be deployed, and using the remaining parameters to configure quotas.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="threat-model">Threat model</h3>
+<div class="paragraph">
+<p>No changes to existing threat models identified.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="alternatives-considered-rejected">Alternatives Considered / Rejected</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">A single instance type</dt>
+<dd>
+<p>This would work fine initially, but:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>We couldn&#8217;t easily offer a size smaller than "small".</p>
+</li>
+<li>
+<p>It would be problematic if later on wanted to be able to provision the service on different hardware, or otherwise offer a service that doesn&#8217;t fit the initial sizes.</p>
+</li>
+<li>
+<p>It requires that we can provide the same sizes on other clouds, which could be problematic if performance parity between clouds could not be achieved.</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1">An integer unit (1 unit, 2 unit etc)</dt>
+<dd>
+<p>Similar problems to those of having single instance type.
+Note that although this ADR is using size names which follow T-shirt nomenclature, the names are really just labels and could be changed to "1 unit", "2 units" without loss of generality.</p>
+</dd>
+<dt class="hdlist1">Provisioning only in multiples of integer units</dt>
+<dd>
+<p>E.g. a instance type with sizes 100, 200, etc.
+This solves being able to insert new sizes between existing sizes in the future, but because it&#8217;s a single scale it doesn&#8217;t provide the flexibility of supporting multiple instance types.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="challenges">Challenges</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Defining the <em>instance type</em> concept up-front (before we actually need it) imposes a small extra cost in terms of the initial implementation complexity of providing a scalable service.
+However, adopting this conceptual model early means</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>we can recognize and develop a collective understand of the fact that however we initially define how we scale the service is arbitrary and may be subject to change over time, between clouds, or as a result of our future desire to provide the service in a different way.</p>
+</li>
+<li>
+<p>the inter-component contracts consider this need up-front.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies">Dependencies</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences-if-not-completed">Consequences if not completed</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some decisions about the scaling model, and it&#8217;s representation between the interfaces is required in order to provide a scalable service.</p>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/81/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Naming policy for customer facing metrics | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Naming policy for customer facing metrics" />
+<meta name="author" content="JameelB" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<meta property="og:description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<link rel="canonical" href="https://architecture.bf2.dev/ap/16/" />
+<meta property="og:url" content="https://architecture.bf2.dev/ap/16/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Naming policy for customer facing metrics" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"JameelB"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"This site contains resources about the architecture and processes for Red Hat Application Services.","headline":"Naming policy for customer facing metrics","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/ap/16/"},"url":"https://architecture.bf2.dev/ap/16/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Naming policy for customer facing metrics</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">AP-16: Naming policy for customer facing metrics</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-draft">Draft</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      JameelB
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-kafka">kafka</span>
+      
+    </div>
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#intent">Intent</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#applicability">Applicability</a></li>
+<li><a href="#structure">Structure</a>
+<ul class="sectlevel2">
+<li><a href="#metric-name">Metric Name</a></li>
+<li><a href="#label-name">Label Name</a></li>
+<li><a href="#things-to-avoid">Things to avoid</a></li>
+<li><a href="#deprecating-metrics">Deprecating Metrics</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</li>
+<li><a href="#participants">Participants</a></li>
+<li><a href="#consequences">Consequences</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="intent">Intent</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Define a policy for naming metrics exposed to users in a consistent way.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="motivation">Motivation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Managed services may provide a metrics API to allow users to collect metrics of their own instances.
+Metrics exposed by the API can be used to build dashboards in the service&#8217;s UI or allow users to integrate them with their own monitoring systems.</p>
+</div>
+<div class="paragraph">
+<p>The metrics API may have multiple endpoints to return metrics in different format.
+For example, the service may provide a <code>/query</code> or <code>/query_range</code> endpoints for users to query metrics, returning them in a JSON format.
+The service may also provide an endpoint that returns metrics in a Prometheus Text format, the defacto standard format used for scraping metrics in many monitoring systems.</p>
+</div>
+<div class="paragraph">
+<p>The associated conventions for these formats are not sufficient in themselves to ensure that the metrics are exposed in a consistent way.
+There is insufficient guidance on metric naming schemes which may lead to lack of consistency, clarity and unintentional exposure of implementation details in the exposed metrics.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="applicability">Applicability</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This applies to any metrics that are exposed via an API to the end user of any managed service.</p>
+</div>
+<div class="paragraph">
+<p>This does not apply to any managed services which provides access to metrics in other means (e.g. metric visualization via a system such as Grafana)</p>
+</div>
+<div class="paragraph">
+<p>This does not have to apply to metrics that are used for internal monitoring systems like dashboards and alerts.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="structure">Structure</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="metric-name">Metric Name</h3>
+<div class="paragraph">
+<p>The metric name should adhere to the format below:</p>
+</div>
+<div class="paragraph">
+<p><strong>&lt;service-prefix&gt;_&lt;optional:category&gt;_&lt;descriptor&gt;_&lt;optional:base-unit&gt;_&lt;optional:type|aggregate&gt;</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>service-prefix</strong>: The metric name should be prefixed with the service prefix agreed on by the team (e.g. <code>kas</code> for Kafka, <code>srs</code> for Service Registry)</p>
+</li>
+<li>
+<p><strong>category</strong> (optional): The category that the metric belongs to.
+This should be used for logically grouping the metrics which will help with documentation and allow users to discover related metrics.
+The customer facing metric categories for the service must be agreed on by the team (e.g. <code>instance</code>, <code>broker</code>, <code>topic</code>).</p>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Caution</div>
+</td>
+<td class="content">
+Avoid using categories that exposes implementation details of the service.
+Metric names are part of the API contract and will be documented.
+For example, categories like <code>topic</code> and <code>broker</code> in Kafka are ok to use as they are foundational concepts in Kafka and are intrinsic to the service.
+However, components where these metrics originated from, e.g. canary or kafka-exporter, are implementation details.
+These should not be used as a metric category.
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p><strong>descriptor</strong>: Describes what is being measured.</p>
+</li>
+<li>
+<p><strong>base-unit</strong> (optional): Describes the unit used for measuring the metric (e.g. <code>seconds</code>, <code>bytes</code>).
+This should be in plural form.
+See <a href="https://prometheus.io/docs/practices/naming/#base-units">Prometheus base units</a> for a list of units that can be used here.</p>
+</li>
+<li>
+<p><strong>type|aggregate</strong> (optional): Describes the type of or aggregate used for measuring the metric. (e.g. <code>total</code>, <code>rate&lt;time&gt;</code>, <code>info</code>, <code>bucket</code>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Metric names must also adhere to the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Must match the regex <code>[a-z_][a-z0-9_]*</code>.</p>
+</li>
+<li>
+<p>Each word should be separated by <code>_</code> (e.g. the descriptor <code>availablevolume</code> should be seperated into <code>available_volume</code>).</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="label-name">Label Name</h3>
+<div class="paragraph">
+<p>Label names must adhere to the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Must match the regex <code>[a-z_][a-z0-9_]*</code>.</p>
+</li>
+<li>
+<p>Each word should be separated by <code>_</code> (e.g. the label name <code>brokername</code> should be seperated into <code>broker_name</code>).</p>
+</li>
+<li>
+<p>Must have consistent names across all metrics.
+Avoid using different label names in different metrics that describes the same feature.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="things-to-avoid">Things to avoid</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Avoid having label names included in the metric name if possible.
+This introduces redundancy and will cause confusion if the respective labels are aggregated away.</p>
+</li>
+<li>
+<p>Use <strong>:</strong> in the metric or label name. This is reserved for recording rules only.
+Even if the underlying metric is a recording rule, this should be avoided as this is an implementation detail and should not be exposed to the end user.</p>
+</li>
+<li>
+<p>Use any other cases apart from snake_case.</p>
+</li>
+<li>
+<p>Expose underlying components in the metric or label name.
+For example, avoid including project names like 'strimzi' or 'kafka-exporter' or OpenShift/Kubernetes resources like 'namespaces' or 'projects'.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deprecating-metrics">Deprecating Metrics</h3>
+<div class="paragraph">
+<p>The team&#8217;s API deprecation policy must be followed when deprecating metrics.</p>
+</div>
+<div class="paragraph">
+<p>The length of the deprecation period should be agreed upon by the team and applied for all metrics exposed in their API.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples">Examples</h3>
+<div class="paragraph">
+<p>Here are some examples of Kafka metrics converted to this naming policy:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>kubelet_volume_stats_available_bytes{persistentvolumeclaim="data-0-test-kafka-0"}</p>
+<div class="paragraph">
+<p>&#8594; <code>kas_broker_volume_available_bytes{volume="data-0-test-kafka-0"}</code></p>
+</div>
+</li>
+<li>
+<p>kafka_namespace:kafka_server_socket_server_metrics_connection_count:sum</p>
+<div class="paragraph">
+<p>&#8594; <code>kas_instance_connection_total</code></p>
+</div>
+</li>
+<li>
+<p>kafka_namespace:haproxy_server_bytes_in_total:rate5m</p>
+<div class="paragraph">
+<p>&#8594; <code>kas_instance_incoming_bytes_rate5m</code></p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>More examples can be seen in <a href="../../_adr/87/index.adoc#converted-metrics">ADR-87: Converted Metrics</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="references">References</h3>
+<div class="paragraph">
+<p>The proposed metric and label naming policy above is based on the following existing guidelines from Prometheus:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://prometheus.io/docs/practices/naming/">Prometheus naming best practices</a></p>
+</li>
+<li>
+<p><a href="https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels">Prometheus metric names and labels</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="participants">Participants</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Customers/Business Unit&#8201;&#8212;&#8201;source of requests for new customer facing metrics.</p>
+</li>
+<li>
+<p>Control Plane&#8201;&#8212;&#8201;development team for the KAS Fleet Manager API.</p>
+</li>
+<li>
+<p>Kafka Integrations&#8201;&#8212;&#8201;team with knowledge on the available Kafka metrics.</p>
+</li>
+<li>
+<p>Running the Services&#8201;&#8212;&#8201;gates all metrics that is included in the Prometheus remote-write configuration to Observatorium.</p>
+</li>
+<li>
+<p>UI/UX&#8201;&#8212;&#8201;consumes customer facing metrics for Kafka dashboards in the UI.</p>
+</li>
+<li>
+<p>Documentation/Customer Content Services&#8201;&#8212;&#8201;documents the metrics in the product documentation.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences">Consequences</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Consistent and coherent naming of customer facing metrics within the service.</p>
+</li>
+<li>
+<p>Avoid unintentional exposure of implementation details.</p>
+</li>
+<li>
+<p>Consistency with other services which also applies this architecture pattern.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_ap/16/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>ADRs | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="ADRs" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<meta property="og:description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="ADRs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"This site contains resources about the architecture and processes for Red Hat Application Services.","headline":"ADRs","url":"https://architecture.bf2.dev/adr/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">ADRs</h1>
+  </header> -->
+
+  <div class="post-content">
+    <div class="sect1">
+<h2 id="architecture-decision-records">Architecture Decision Records</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t know what an ADR is, look <a href="/about/#architecture-decision-records-adr">here</a>.
+To learn about the process for creating or replacing ADRs, look <a href="/about/adr-process">here</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="accepted-adrs">Accepted ADRs</h2>
+<div class="sectionbody">
+<table>
+
+
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="0/">ADR-0: ADR template</a>
+
+      <span class="tag tag-"></span>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="1/">ADR-1: Document architecture decision using the Architecture Decision Records approach and define their template</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="3/">ADR-3: Aggregating UI components and tenancy model</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="4/">ADR-4: Developer CLI Initial Architecture</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="5/">ADR-5: Kafka Cluster Certificate Generation</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="6/">ADR-6: Service Registry Deployment</a>
+
+      <span class="tag tag-service-registry">service-registry</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="7/">ADR-7: Service Registry Storage</a>
+
+      <span class="tag tag-service-registry">service-registry</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="8/">ADR-8: Agent Operator for managing the Kafka Cluster Lifecycle</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="10/">ADR-10: Installation & Configuration of Observability Components from Within an OSD Cluster</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="13/">ADR-13: Connector runtime options</a>
+
+      <span class="tag tag-connectors">connectors</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="14/">ADR-14: Service Registry Security</a>
+
+      <span class="tag tag-service-registry">service-registry</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="17/">ADR-17: Binding OSD-based Applications to Managed Kafkas</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="18/">ADR-18: Managed Kafka Upgrades</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="22/">ADR-22: Using the OpenShift Developer Console to bind OSD-based Applications to RHOSAK</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="23/">ADR-23: Connectors Control and Data Planes Architecture</a>
+
+      <span class="tag tag-connectors">connectors</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="24/">ADR-24: Should Managed Services artifact builds use upstream or Red Hat built dependencies</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="29/">ADR-29: Add-on Flow for Managed Connectors</a>
+
+      <span class="tag tag-connectors">connectors</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="33/">ADR-33: Installation methods for components on agent OSD clusters</a>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="35/">ADR-35: Management of Connector sensitive data</a>
+
+      <span class="tag tag-connectors">connectors</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="36/">ADR-36: Token requests for agent operators to authenticate with control plane</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="37/">ADR-37: MK Fleet Shard Operator</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="38/">ADR-38: MK Fleet Shard Synchronizer</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="40/">ADR-40: Control Plane and Data Plane High Level API Contract</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="41/">ADR-41: Strimzi Operator Installation and Upgrade</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="42/">ADR-42: Architecture for data plane components upgrade management</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="43/">ADR-43: Kas-fleet-manager integration with AMS</a>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="44/">ADR-44: Kafka ACLs for Public Eval</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="46/">ADR-46: URL path for our management APIs</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="49/">ADR-49: Persisting performance tests results</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="50/">ADR-50: Integrate Control Plane with Notification Service</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="51/">ADR-51: Approach for building and automating RHOAS Services SDKs</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="54/">ADR-54: Connector Service: Meta Service</a>
+
+      <span class="tag tag-connectors">connectors</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="55/">ADR-55: Connector Service: Connector Deploy & Upgrade</a>
+
+      <span class="tag tag-connectors">connectors</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="56/">ADR-56: IngressController per cloud Availability Zone</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="57/">ADR-57: Fleetshard tells fleet manager what DNS records to create for an instance</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="58/">ADR-58: Use of Kubeconfig to interact with standalone clusters in the dataplane</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="66/">ADR-66: Fleet Manager - Terms and Quota management with AMS</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="68/">ADR-68: Colocating managed services on the same data plane OSD fleet</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="76/">ADR-76: Handling usage of dynamically-async-created DNS records from dependent services</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="77/">ADR-77: Heterogeneous Kafka data plane</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="79/">ADR-79: Authorization for Control Planes</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="80/">ADR-80: CEE diagnostic gathering mechanism</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="81/">ADR-81: Kafka instance scaling</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="82/">ADR-82: Streaming Unit Hour Metrics</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="83/">ADR-83: Can-I API</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-rejected">
+      <a href="84/">ADR-84: Upstream SOPs</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Rejected
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="85/">ADR-85: Upstream SOPs</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="86/">ADR-86: Canary Authentication in RHOSAK</a>
+
+      <span class="tag tag-kafka">kafka</span>
+
+      <span class="tag tag-Canary">Canary</span>
+
+      <span class="tag tag-Authentication">Authentication</span>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="87/">ADR-87: Exposing metrics via the KAS Fleet Manager API</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="88/">ADR-88: Authorization for fleet-manager admin APIs</a>
+
+      <span class="tag tag-sso">sso</span>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-superseded">
+      <a href="89/">ADR-89: A bf2 subdomain & wildcard certificate per data plane cluster</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Superseded
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="90/">ADR-90: Automatic certificate management per Kafka instance</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="91/">ADR-91: Generating clients code from OpenAPI contracts for our service APIs</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+
+
+  <tr>
+    <td><span class="status-approved">
+      <a href="91/">ADR-91: Toward a more unified UX: BFF (Backends For Frontends)</a>
+
+      <span class="tag tag-UI">UI</span>
+
+      <span class="tag tag-UX">UX</span>
+
+      <span class="tag tag-Dev Exp">Dev Exp</span>
+      </span>
+    </td>
+    <td>
+      Approved
+    </td>
+  </tr>
+
+
+</table>
+</div>
+</div>  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/pages/adr.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

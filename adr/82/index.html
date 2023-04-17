@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Streaming Unit Hour Metrics | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Streaming Unit Hour Metrics" />
+<meta name="author" content="Peter Braun" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Context and problem statement" />
+<meta property="og:description" content="Context and problem statement" />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/82/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/82/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Streaming Unit Hour Metrics" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Peter Braun"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"Context and problem statement","headline":"Streaming Unit Hour Metrics","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/82/"},"url":"https://architecture.bf2.dev/adr/82/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Streaming Unit Hour Metrics</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-82: Streaming Unit Hour Metrics</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-accepted">Accepted</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Peter Braun
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-kafka">kafka</span>
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and problem statement</a></li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#current-architecture">Current architecture</a></li>
+<li><a href="#proposed-architecture">Proposed architecture</a></li>
+<li><a href="#threat-model">Threat model</a></li>
+<li><a href="#requires-architecutral-overview-update">Requires architecutral overview update</a></li>
+<li><a href="#alternatives-considered-rejected">Alternatives considered / rejected</a></li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if not completed</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="context-and-problem-statement">Context and problem statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Streaming Unit pricing will be accomplished by introducing a new concept called ‘Streaming Unit Hours’. This is defined as Cluster Hours multiplied by the Streaming Unit Size. Here Streaming Unit Size should not be confused with Quota usage which is required for prepaid pricing.</p>
+</div>
+<div class="paragraph">
+<p>Cluster Hours are currently recorded on the data plane clusters using a recording rule (kafka_id:strimzi_resource_state:max_over_time1h). We need a way to multiply the value of this with the Streaming Unit Size for a given instance.</p>
+</div>
+<div class="paragraph">
+<p>Other metrics don’t need to be multiplied: storage and traffic are billed independently of the Streaming Unit.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Modify the recording rule kafka_id:strimzi_resource_state:max_over_time1h to multiply its value by the Streaming Unit Size.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Changes concerning third party systems. This ADR is only concerned with the Managed Kafka changes.</p>
+</li>
+<li>
+<p>Define additional fields to hold the cost per Streaming Unit hour. The amount is simply multiplied by the instance size.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Stakeholders</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Eng</p>
+</li>
+<li>
+<p>BU</p>
+</li>
+<li>
+<p>QE</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-architecture">Current architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Cluster Hours are defined in our <a href="https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk">Observability Resources</a> repository among other consumption related metrics. It is collected on the data plane and remote written to the central metrics storage. From there it is made available to Subscription Watch who use it to create invoices.</p>
+</div>
+<div class="paragraph">
+<p>Cluster Hours is based on the maximum-per-one-hour value of the underlying strimzi_resource_state metric which is 1 when a Kafka CR is present in the namespace. Thus, our billing is accurate to the beginning of every hour (rounded up).</p>
+</div>
+<div class="paragraph">
+<p>The Kafka instance size in Streaming Units is not taken into account at any point here.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposed-architecture">Proposed architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Proposed Architecture</p>
+</div>
+<div class="paragraph">
+<p><strong>Firstly</strong>, the size in Streaming Units needs to be available to the data plane. That is currently not the case. The options to achieve this are:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Include it in the Managed Kafka CR as an annotation. The CR is retrieved by the Fleetshard sync component via the /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas endpoint.</p>
+</li>
+<li>
+<p>Include it in the Managed Kafka CR Capacity spec. Also retrieved by the Fleetshard sync component via the /api/kafkas_mgmt/v1/agent-clusters/{id}/kafkas endpoint.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>Secondly</strong>, the Streaming Unit size needs to be exposed as a metric on the data plane. Components that could expose this are either the Fleetshard Operator, the Fleetshard Sync component or the Canary.</p>
+</div>
+<div class="paragraph">
+<p>Why a metric and not a label? Prometheus does not allow to multiply a metric with a value retrieved from a label. Instead, the multiplication needs to happen as a join of two metrics, the existing Cluster Hours and the new Streaming Unit Size.</p>
+</div>
+<div class="paragraph">
+<p><strong>Thirdly</strong>, the new Streaming Unit Hours metric needs to be scraped and made available to the cluster monitoring stack per individual OSD cluster. It does not need to be sent to Observatorium as it will only be used in the link:https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk/blob/main/resources/prometheus/billing-recording-rules.yaml#L11(recording rule) to calculate the Cluster Hours (now Streaming Unit Hours). The query in the recording rule needs to be updated to multiply the value by the Streaming Unit size,e.g.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>max_over_time(strimzi_resource_state[1h]) * on (resource_namespace) group_left sum by (resource_namespace) (kafka_instance_streaming_unit_size)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Note</strong>: the new metric is required to have the resource_namespace label for the join to work.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="threat-model">Threat model</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>No threat model changes are expected here.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="requires-architecutral-overview-update">Requires architecutral overview update</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>No architectural overview update anticipated.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="alternatives-considered-rejected">Alternatives considered / rejected</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Alternatives to the described approach are multiple products and Streaming Unit metadata. They have been elaborated in <a href="https://docs.google.com/document/d/1fkeEqZ6JIclsgtynssBH43uphP2dVgvuPmsb-eaDKro/edit#heading=h.gn81l1rechyx">this document</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="challenges">Challenges</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>A component that can expose the Streaming Unit size as a metric needs to be identified.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies">Dependencies</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Testing and validation should be considered a dependency as this is a critical change that influences how customers are billed.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences-if-not-completed">Consequences if not completed</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>We will not be able to bill customers correctly.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>[1] <a href="https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk/blob/main/resources/prometheus/billing-recording-rules.yaml#L11" class="bare">https://github.com/bf2fc6cc711aee1a0c2a/observability-resources-mk/blob/main/resources/prometheus/billing-recording-rules.yaml#L11</a></p>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/82/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

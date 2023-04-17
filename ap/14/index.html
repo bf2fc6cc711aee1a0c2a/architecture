@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Allowing specialization of public SOPs to a specific execution context | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Allowing specialization of public SOPs to a specific execution context" />
+<meta name="author" content="Rachel Lawton" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="When implementing a public upstream opensource SOPS repo, the proposed solution is to follow a two repository model. One private repository that will contain SOPs that will have internal information specific to a company. This could be infrastructure informaton, links to secrets and internal communciation for example. The second side of the model is to have a public repository that will have SOPs consumable by anyone. This model will allow other service operating group teams to use the private SOP repository without any information loss and allow upstream users to use and contribute to the SOP without riskinng altering the context of the content a company may have." />
+<meta property="og:description" content="When implementing a public upstream opensource SOPS repo, the proposed solution is to follow a two repository model. One private repository that will contain SOPs that will have internal information specific to a company. This could be infrastructure informaton, links to secrets and internal communciation for example. The second side of the model is to have a public repository that will have SOPs consumable by anyone. This model will allow other service operating group teams to use the private SOP repository without any information loss and allow upstream users to use and contribute to the SOP without riskinng altering the context of the content a company may have." />
+<link rel="canonical" href="https://architecture.bf2.dev/ap/14/" />
+<meta property="og:url" content="https://architecture.bf2.dev/ap/14/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Allowing specialization of public SOPs to a specific execution context" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Rachel Lawton"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"When implementing a public upstream opensource SOPS repo, the proposed solution is to follow a two repository model. One private repository that will contain SOPs that will have internal information specific to a company. This could be infrastructure informaton, links to secrets and internal communciation for example. The second side of the model is to have a public repository that will have SOPs consumable by anyone. This model will allow other service operating group teams to use the private SOP repository without any information loss and allow upstream users to use and contribute to the SOP without riskinng altering the context of the content a company may have.","headline":"Allowing specialization of public SOPs to a specific execution context","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/ap/14/"},"url":"https://architecture.bf2.dev/ap/14/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Allowing specialization of public SOPs to a specific execution context</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">AP-14: Allowing specialization of public SOPs to a specific execution context</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-accepted">Accepted</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Rachel Lawton
+      
+    </div>
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      
+    </div>
+    
+    <div class="paragraph">
+<p>When implementing a public upstream opensource SOPS repo, the proposed solution is to follow a two repository model.
+One private repository that will contain SOPs that will have internal information specific to a company.
+This could be infrastructure informaton, links to secrets and internal communciation for example.
+The second side of the model is to have a public repository that will have SOPs consumable by anyone.
+This model will allow other service operating group teams to use the private SOP repository without any information loss and allow upstream users to use and contribute to the SOP without riskinng altering the context of the content a company may have.</p>
+</div>
+<div class="paragraph">
+<p>The recommended flow of using information contributed upstream repo in the internal downstream repo is through the use of automation.
+The automation will pull from a branch in the upstream repo into a branch in the downstream repo.
+The content of the upstream repo should be merged into a single directory in the downstream repo allowing engineers to eliminate the possibility of merge conflicts as much as possible.
+From there to aid with seamless use and integration with the downstream repo the automation will create a file using a template with the new snippet of information from the upstream repo, this can then be decorated with additional information relevant to the downstream team only.</p>
+</div>
+<div class="paragraph">
+<p>Some pitfalls that contributors have to be mindful of are,</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When contributing to an upstream repository is what exactly should and shouldn&#8217;t be said.
+To help solve this issue a document with terms and personas should be created to make contributing in an open source way as easy as possible.
+The upstream repository should also consider having multiple different locations reminding the user that it&#8217;s a public repository.</p>
+</li>
+<li>
+<p>In the scenario when an existing downstream internal repo already exists with previous work contributed to it, if the team would like to migrate some or all there previous existing SOPS upstream, care and consideration needs to be implmented when weighing up the path forward.
+This scenerio is not the expected day to day pattern, as it would introduce an ongoing risk if content is written in the ‘private’ context.
+In this scenario there are a few options to choose from to address this.
+For example:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Leave all existing SOPs as-is downstream and start to write new content upstream.
+Then when the content is approved upstream, follow the model to consume it downstream.
+This approach eliminates any risk associated with making existing content public.</p>
+</li>
+<li>
+<p>Extract content from existing downstream SOPs that is potentially relevant to the upstream project, taking care not to expose any potential sensitive information.
+Then pull it back into the downstream, decorating it as required for downstream consumption.
+This would be a once off ‘bulk’ extraction that exposes some risk of exposing sensitive content.
+Though, as it is limited to a single event, it could be given extra scrutiny than would be required if it was a regular occurrence e.g. all content written downstream first.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_ap/14/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Can-I API | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Can-I API" />
+<meta name="author" content="Massimiliano Ziccardi" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Context and Problem Statement Deciding whether a certain operation is allowed can be a complex matter and may require interactions with different components." />
+<meta property="og:description" content="Context and Problem Statement Deciding whether a certain operation is allowed can be a complex matter and may require interactions with different components." />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/83/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/83/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Can-I API" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Massimiliano Ziccardi"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"Context and Problem Statement Deciding whether a certain operation is allowed can be a complex matter and may require interactions with different components.","headline":"Can-I API","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/83/"},"url":"https://architecture.bf2.dev/adr/83/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Can-I API</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-83: Can-I API</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-accepted">Accepted</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Massimiliano Ziccardi
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-kafka">kafka</span>
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#current-architecture">Current architecture</a></li>
+<li><a href="#proposed-architecture">Proposed architecture</a>
+<ul class="sectlevel2">
+<li><a href="#threat-model">Threat model</a></li>
+</ul>
+</li>
+<li><a href="#alternatives-considered-rejected">Alternatives Considered / Rejected</a></li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if not completed</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="context-and-problem-statement">Context and Problem Statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Deciding whether a certain operation is allowed can be a complex matter and may require interactions with different components.</p>
+</div>
+<div class="paragraph">
+<p>The clients need to be able to check whether a certain operation is allowed without having all or any of the details about the instance the user wants to create (because the user hasn&#8217;t completed the form yet).
+So the only available inputs are the top-level verb (create, delete, list, etc.) and the resource (e.g. kafka instance)</p>
+</div>
+<div class="paragraph">
+<p>Currently, consumers of the Kas Fleet Manager APIs have no way of verifying in advance whether a particular request will be successful.
+The only way to do that, is to perform the same checks that Kas Fleet Manager will do while executing the action.</p>
+</div>
+<div class="paragraph">
+<p>This brings complexities and duplications. For example, just to check whether the creation of a new kafka is possible or not,
+currently UI and CLI have to perform at least the following checks:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Verify that the required terms and conditions have been accepted (this requires interaction with another service)</p>
+</li>
+<li>
+<p>Make sure you have enough quota allocated. This requires:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Having knowledge of the AMS endpoints and how to deal with them</p>
+</li>
+<li>
+<p>Having knowledge of the AMS terms used for designing the instance types (RHOSAKTrial for eval/developer and RHOSAK for standard)</p>
+</li>
+<li>
+<p>Enquire the quota assigned using the AMS endpoints, loop through the resources and check that enough quota is still available for product RHOSAK and resource RHOSAK</p>
+</li>
+<li>
+<p>If you have no quota assigned for STANDARD instances (RHOSAK), fallback to EVAL</p>
+</li>
+<li>
+<p>If you have quota for STANDARD (RHOSAK), but it is 0, fallback to EVAL (RHOSAKTrial)</p>
+</li>
+<li>
+<p>If you have quota for STANDARD (RHOSAK) and it is greater than 0 but all the granted quota is consumed, the creation should fail</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Verify that at least one OCD Cluster has capacity for the instance you are going to create</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Another point of attention is that currently, any change in the flow requires an update to all the actors/consumers who are carrying out those checks.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>API consumers can query a new KAS Fleet Manager Can-I API to check if they can perform a certain action and receive a response with the outcome (allowed/denied) containing all the granted resources or, eventually, the missing requirements.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-architecture">Current architecture</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Kas Fleet Manager currently only allows the ‘try and see if it works’ approach: if what you are trying to do fails, Kas Fleet Manager gives you some details on what went wrong, but you have no way of checking in advance if what you want to do is possible</p>
+</li>
+<li>
+<p>API Consumers (like UI) are doing the required checks into their codebase and every time a change occurs, both Kas Fleet Manager and UI have to be updated to reflect the change</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposed-architecture">Proposed architecture</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>We need to create a new API.
+The API will be authenticated and will allow the callers to check in advance whether they can perform a certain operation.
+A different endpoint will be provided for each verb-resource pair, which, in turn, will provide a schema defining exactly what the answer will look like.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>GET /api/v1/can/{verb}/{resource}?deep=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The API will stop at the first error unless <code>deep=true</code> is specified.
+Output of the API will be a JSON with at least the following content:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  allowed: boolean,
+  reasons: [{
+    code: string,
+    description: string,
+    metadata: {             // additional details
+      {key string}: {value string}
+    }
+  }]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The rest of the content will depend on the action-resource pair.</p>
+</div>
+<div class="paragraph">
+<p>Some real world example for an invocation of the <code>/can/create/kafka</code> could be:</p>
+</div>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Just one quota available: <code>standard.x2</code> won&#8217;t be returned</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  allowed: true,
+  plans: ['standard.x1'],
+  quota: {
+    granted: 6,
+    used: 5
+  }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>More than one quota available:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  allowed: true,
+  plans: ['standard.x1', 'standard.x2'],
+  quota: {
+    granted: 6,
+    used: 5
+  }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Terms not accepted</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  allowed: false,
+  reasons: [{
+    code: "ERR-TERMS-01",
+    description: "Required terms have not been accepted",
+    metadata: {
+      acceptance_url: "https://url.to.accept.terms"
+    }
+  }]
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Terms not accepted and insufficient quota (with deep=true)</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  allowed: false,
+  reasons: [{
+    code: "ERR-TERMS-01",
+    description: "Required terms have not been accepted",
+    metadata: {
+      acceptance_url: "https://url.to.accept.terms"
+    }}, {
+    code: "ERR-QUOTA-01",
+    description: "No enough quota available",
+    metadata: {
+      quota_assigned: 10,
+      quota_available: 1,
+      quota_needed: 2
+    }}
+  }]
+}</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="threat-model">Threat model</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>No threat model changes are expected here.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="alternatives-considered-rejected">Alternatives Considered / Rejected</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Using Authorino. This approach has been discarded because Authorino is more suited for a 'granted/denied' answer than for querying for permissions and producing complex responses</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="challenges">Challenges</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Client application will have to be updated to take advantage of the new API</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependencies">Dependencies</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Current check logic implemented in the Kas Fleet Manager needs to be moved to a common, reusable framework that will be used by both the Kas Fleet Manager middlewares and the new Can-I API</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences-if-not-completed">Consequences if not completed</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>We will keep on having internal logic duplicated in client applications to perform the exact same checks Kas Fleet Manager does</p>
+</li>
+<li>
+<p>We will keep on having to propagate any changes to the checks to all the client applications</p>
+</li>
+<li>
+<p>We won&#8217;t eliminate the risk of bugs in the implementation of the checks within the client applications</p>
+</li>
+</ul>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/83/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

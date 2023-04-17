@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Automatic management of certificates per managed instance using Letsencrypt | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Automatic management of certificates per managed instance using Letsencrypt" />
+<meta name="author" content="Manyanda Chitimbo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Intent" />
+<meta property="og:description" content="Intent" />
+<link rel="canonical" href="https://architecture.bf2.dev/ap/17/" />
+<meta property="og:url" content="https://architecture.bf2.dev/ap/17/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Automatic management of certificates per managed instance using Letsencrypt" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Manyanda Chitimbo"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"Intent","headline":"Automatic management of certificates per managed instance using Letsencrypt","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/ap/17/"},"url":"https://architecture.bf2.dev/ap/17/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Automatic management of certificates per managed instance using Letsencrypt</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">AP-17: Automatic management of certificates per managed instance using Letsencrypt</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-accepted">Accepted</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Manyanda Chitimbo
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-tls">tls</span>
+      
+      <span class="tag tag-certificates">certificates</span>
+      
+      <span class="tag tag-dns">dns</span>
+      
+      <span class="tag tag-Letsencrypt">Letsencrypt</span>
+      
+    </div>
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#intent">Intent</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#applicability">Applicability</a></li>
+<li><a href="#description">Description</a></li>
+<li><a href="#participants">Participants</a></li>
+<li><a href="#consequences">Consequences</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="intent">Intent</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Define a pattern for the automatic management of certificates per managed instance using Letsencrypt</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="motivation">Motivation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When a managed service is deployed on the data plane cluster its routes have be reachable via TLS.
+It means that a managed service deployed in the data plane has to provide a way to the clients (end users) to verify and validate the TLS connection.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="applicability">Applicability</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This pattern applies to any service deployed on a dataplane that wants a managed service routes to be reachable via TLS</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="description">Description</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A managed service will use <a href="https://Letsencrypt.org">Letsencrypt</a> to managed certificates on the fly i.e automatic and thus removing the need for manual intervention and the toil related to this.</p>
+</div>
+<div class="paragraph">
+<p>To avoid sharing of certificates between deployed instances, managed service implementors are recommended to generate a dedicated certificate per managed instance.
+Furthermore, all routes for the managed services deployed on the the data plane will be of the form <code>&lt;managed-instance-id&gt;.myservice.bf2.dev</code> where the <code>&lt;managed-instance-id&gt;</code> is the unique id of the managed instance.
+Managed service implementations should note that, the subdomain used for a managed instance must be independent of the dataplane in which it (currently) resides.</p>
+</div>
+<div class="paragraph">
+<p>If we take the Managed Kafka Service as an example, it generates a dedicated wildcard certificate per managed Kafka instance - see <a href="../../adr/90">ADR-90</a>.
+All the Kafka routes are of the form <code>&lt;unique-route-slug&gt;.&lt;kafka-instance-id&gt;.kafka.bf2.dev</code> e.g for a Kafka with an id <code>cnn0gug972g57r0a9qg0</code>, then bootstrap server host will be <code>example-cfn-fug---g&#8212;&#8203;r-a-qga.cnn0gug972g57r0a9qg0.kafka.bf2.dev</code> and the Kafka admin server URL will be <code><a href="https://admin-server-example-cfn-fug---g&#8212;&#8203;r-a-qga.cnn0gug972g57r0a9qg0.kafka.bf2.dev" class="bare">https://admin-server-example-cfn-fug---g&#8212;&#8203;r-a-qga.cnn0gug972g57r0a9qg0.kafka.bf2.dev</a></code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="participants">Participants</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Certificate Requester&#8201;&#8212;&#8201;knows all the request the certificate for each managed instance from Certificate Authority. This could be either the Control Plane if the one responsible for requesting the certificate. It could also be an cert manager Operator deployed in the data plane.</p>
+</li>
+<li>
+<p>Data Plane&#8201;&#8212;&#8201;where the managed instances are deployed. This is where the certificates reside in form of a Kubernetes secret.</p>
+</li>
+<li>
+<p>Letsencrypt&#8201;&#8212;&#8201;Certificate authority where the certificate is issued.</p>
+</li>
+<li>
+<p>Vault - a secure storage for the generated certificates if the certificate requester is the Control Plane.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences">Consequences</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>What this pattern brings:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Automated management of certificates per managed instance.</p>
+</li>
+<li>
+<p>Avoid sharing of certificate, if one certificate is compromised, the rest of the certiicates are not affected</p>
+</li>
+<li>
+<p>Consistency with other services which also apply this AP</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>However there are challenges that service implementors have to be aware of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Once the certificates are generated, the managed service have to secure storing of the auto generated certificate in Vault and ensuring that only privileged users e.g only SRE, have access to Vault.</p>
+</li>
+<li>
+<p>Once the certificates in the Data Plane, they should be in a Kubernetes secret that only priveldged users can see.</p>
+</li>
+<li>
+<p>Reaching the various advertised <a href="https://Letsencrypt.org/docs/rate-limits/">Letsencrypt limits</a> is also a challenge.
+However, the various limits once reached can be overridden via a request as described in <a href="https://Letsencrypt.org/docs/rate-limits/#a-id-overrides-a-overrides">Letsencrypt limits overrides</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_ap/17/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

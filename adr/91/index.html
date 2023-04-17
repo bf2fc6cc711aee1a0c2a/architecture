@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Generating clients code from OpenAPI contracts for our service APIs | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Generating clients code from OpenAPI contracts for our service APIs" />
+<meta name="author" content="Andrea Peruffo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Context and Problem Statement" />
+<meta property="og:description" content="Context and Problem Statement" />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/91/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/91/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Generating clients code from OpenAPI contracts for our service APIs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Andrea Peruffo"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"Context and Problem Statement","headline":"Generating clients code from OpenAPI contracts for our service APIs","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/91/"},"url":"https://architecture.bf2.dev/adr/91/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Generating clients code from OpenAPI contracts for our service APIs</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-91: Generating clients code from OpenAPI contracts for our service APIs</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-accepted">Accepted</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Andrea Peruffo
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and Problem Statement</a>
+<ul class="sectlevel2">
+<li><a href="#security">Security</a></li>
+<li><a href="#technical-debt">Technical debt</a></li>
+<li><a href="#community">Community</a></li>
+</ul>
+</li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#current-architecture">Current Architecture</a></li>
+<li><a href="#proposed-architecture">Proposed Architecture</a>
+<ul class="sectlevel2">
+<li><a href="#advantages">Advantages:</a></li>
+<li><a href="#disadvantages">Disadvantages:</a></li>
+<li><a href="#additional-reading">Additional Reading</a></li>
+<li><a href="#threat-model">Threat Model</a></li>
+<li><a href="#alternatives-considered-rejected">Alternatives Considered / Rejected</a></li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if Not Completed</a></li>
+</ul>
+</li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="context-and-problem-statement">Context and Problem Statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are internally committed to using OpenAPI specification and encourage our customers to do the same with products like API Designer and Service Registry.</p>
+</div>
+<div class="paragraph">
+<p>The current approach to automatically generating client SDKs for Red Hat&#8217;s application services has a number of problems/issues that need to be holistically addressed.
+This AP will document the challenges with our current approach and propose a solution using new technologies.</p>
+</div>
+<div class="paragraph">
+<p>In client-server architectures, servers are written using either a contract-first or code-first approach.
+However, we always have the need to interact with those APIs from clients.
+Generation of the API clients can (and should) be completely automated.
+This represents a contract-first approach to creating API clients.</p>
+</div>
+<div class="paragraph">
+<p>We do generate/write clients for several purposes, the most relevant are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Service SDKs</p>
+</li>
+<li>
+<p>CLI tools</p>
+</li>
+<li>
+<p>UI (e.g. console.dot)</p>
+</li>
+<li>
+<p>Provisioning Tools (Ansible, Terraform)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Most of our toolchains are (in some ways) using <code>openapi-generator</code>, developed and maintained by the "OpenAPI Tools" organization (which is NOT affiliated with the OpenAPI initiative).</p>
+</div>
+<div class="paragraph">
+<p>Unfortunately, OpenAPI Generator is not a well maintained OSS project:
+image::openapi-generator-gh.png[]</p>
+</div>
+<div class="paragraph">
+<p>Even our own attempts to fix known bugs have been ineffective:
+<a href="https://github.com/OpenAPITools/openapi-generator/pull/13616" class="bare">https://github.com/OpenAPITools/openapi-generator/pull/13616</a></p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s also pretty common to have breaking changes in the generator tooling, which results in breaking changes in the generated code.
+When this happens it can be hard to detect and often happens without a clear migration path.</p>
+</div>
+<div class="paragraph">
+<p>For these reasons we are often <a href="https://github.com/redhat-developer/app-services-sdk-go/blob/13d1cad9a937c456a9623ad188c44790e3370d83/openapitools.json#L5">stuck on old versions</a>, preventing (in some cases) the opportunity to fix CVEs and issues by keeping transitive dependencies and used frameworks updated.</p>
+</div>
+<div class="paragraph">
+<p>Following are a variety of critical/important issues we currently have due to our OpenAPI Generator based approach to API Client generation.</p>
+</div>
+<div class="sect2">
+<h3 id="security">Security</h3>
+<div class="paragraph">
+<p>We should be able to keep our dependency trees under control and update/refresh whenever a vulnerability in the stack is detected.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="technical-debt">Technical debt</h3>
+<div class="paragraph">
+<p>We want to be able to improve the quality of the generated clients and SDKs and improve them over time, introducing even structural bug fixes and improvements.  Overall we strive for our code to be well structured and maintainable, even when that code is being generated (to the best extent possible).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="community">Community</h3>
+<div class="paragraph">
+<p>We want our community of customers to be able to use best-in-class tools to perform their day-to-day work. OpenAPI generation is an important piece of tooling and we should be able to provide a much better OSS experience than the one we are right now.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Identify alternative tooling that can be used in place of the current OpenAPI generator</p>
+</li>
+<li>
+<p>Validate and improve the integration patterns and the user experience</p>
+</li>
+<li>
+<p>Use up-to-date tooling and libraries for our customer-facing API clients</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Dictate a technical decision for internal usage or for projects that are successfully rolling their own SDKs and clients (e.g. by manually curating them)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-architecture">Current Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Inside Red Hat we are mostly relying (in various ways) on OpenAPI Generator to generate clients, we also maintain a <a href="https://github.com/quarkiverse/quarkus-openapi-generator">Quarkus Extension</a> based on the same generator.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposed-architecture">Proposed Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We propose to switch to an alternative OSS tooling provided by Microsoft called <a href="https://github.com/microsoft/kiota">Kiota</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="advantages">Advantages:</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Community</p>
+</li>
+<li>
+<p>Better design/architecture</p>
+</li>
+<li>
+<p>Better developer experience</p>
+</li>
+<li>
+<p>Maintenance</p>
+</li>
+<li>
+<p>Swappable implementation libraries</p>
+</li>
+<li>
+<p>Compatibility matrix</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disadvantages">Disadvantages:</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Not GA (yet)</p>
+</li>
+<li>
+<p>External Owners (Microsoft)</p>
+</li>
+<li>
+<p>Core Generator codebase is .NET</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="community-2">Community</h4>
+<div class="paragraph">
+<p>The responses in the community are quick and provide context <a href="https://github.com/microsoft/kiota-java/issues/121#issuecomment-1372248993">above expectations</a>.</p>
+</div>
+<div class="paragraph">
+<p>Collaboration is actively fostered and contributing to both the core generator and the auxiliary libraries is facilitated and encouraged with active and timely feedback.</p>
+</div>
+<div class="paragraph">
+<p>Cross-project integrations are facilitated and <a href="https://github.com/microsoft/kiota/discussions/2154">healthy conversations</a> are initiated on both (RH and Microsoft) sides.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="better-designarchitecture">Better design/architecture</h4>
+<div class="paragraph">
+<p>Kiota design is extremely principled and follows <a href="https://microsoft.github.io/kiota/extending/">good and detailed guidelines</a> throughout the project.
+The project leadership shows broad and deep experience in building successful code generators, which are pragmatic and extensible.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="better-developer-experience">Better developer experience</h4>
+<div class="paragraph">
+<p>The project&#8217;s architectural design decisions are supported and embraced throughout all of the different implementations so that the user is going to have a consistent and uniform experience while using the generated code across different languages.
+Additionally, the fluent code style of the generated clients provides a better experience for consumers, resulting in higher levels of developer joy.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="maintenance">Maintenance</h4>
+<div class="paragraph">
+<p>Experience shows that issues are answered within hours, PRs are continuously accepted and merged, and guidance is provided when needed.</p>
+</div>
+<div class="paragraph">
+<p>Transitive dependencies are kept up to date in a timely manner.</p>
+</div>
+<div class="paragraph">
+<p>Improvements and bugs are continuously integrated into both the generator and the auxiliary libraries' repositories.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="swappable-implementation-libraries">Swappable implementation libraries</h4>
+<div class="paragraph">
+<p>The design of Kiota allows consumers of the code generator to provide their own <a href="https://microsoft.github.io/kiota/extending/corelibrary.html">“opinionated” implementations</a> of core generated client functionality.
+This is done via a set of interfaces to core functionality that all generated clients leverage (e.g. a Java HTTP client interface).  Default implementations of these interfaces are provided, but alternatives can easily be created and used.</p>
+</div>
+<div class="paragraph">
+<p>Specifically for the Red Hat use case, we are free to roll out our own implementations of the core libraries to better support Red Hat products and strategy (e.g. Quarkus specific implementations of certain functionality).</p>
+</div>
+<div class="paragraph">
+<p>Creating alternatives for the provided default libraries is doable in a very reasonable amount of time.
+<a href="https://github.com/andreaTP/kiota-utils/blob/1a7dcecd92ce8794fe479e9c37c71d5733a39ff6/http/jdk-http/src/main/java/io/apicurio/kiota/http/JdkHttpRequestAdapter.java#L1">Here</a> you can find an alternative implementation of the Java HttpClient interface that is based on the client embedded in JDK 11+ (vs. the out-of-the-box implementation that is based on OkHttp).
+We expect to provide:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>one <code>RHTokenProvider</code> that will work automatically with <a href="https://access.redhat.com/articles/3626371">offline tokens</a> and SSO like <a href="https://github.com/andreaTP/kiota-utils/blob/93083650e0374f511abefd099033f05276927deb/rh-auth/src/main/java/com/github/andreatp/kiota/auth/RHAccessTokenProvider.java#L24">we did for Java</a> for each supported language.</p>
+</li>
+<li>
+<p>a Java Vert-X HTTP client implementation (as opposed to the default OkHttp)</p>
+</li>
+<li>
+<p>a Java JSON serialization based on Jackson (as opposed to the default Gson)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In the long term, we expect that most of the bug fixes are going to happen in those shared libraries, and being able to maintain and release them at our own pace is a key element for success.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="compatibility-matrix">Compatibility matrix</h4>
+<div class="paragraph">
+<p>Kiota <a href="https://github.com/microsoft/kiota/issues/2020">compatibility matrix</a> covers the current Red Hat use-cases, specifically:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Java</p>
+</li>
+<li>
+<p>Go</p>
+</li>
+<li>
+<p>Python</p>
+</li>
+<li>
+<p>TypeScript</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The generator doesn&#8217;t need to stitch or even know about specific frameworks and/or libraries as they rely only on interfaces (called “abstractions”), and implementation libraries are swappable.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="external-owners-microsoft">External Owners (Microsoft)</h4>
+<div class="paragraph">
+<p>The project is maintained and owned by Microsoft, specifically by the team working on Microsoft Graph.
+We will be having some direct discussions with them soon around their plans for the project and a possible collaboration.
+Initial impressions indicate that they are very receptive to improvements and collaborations.
+But, of course, they will always own the project in the same way that Red Hat owns our first-party OSS projects.</p>
+</div>
+<div class="paragraph">
+<p>On the flip side, this is a possible occasion for a strong collaboration between two of the major players in the Software industry that can drive more and more community adoption of the technology/stack.</p>
+</div>
+<div class="paragraph">
+<p>Using OpenAPI Tools we are in a very similar situation except from the fact that it&#8217;s more a "pure" Open Source project.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="legal-requirements-terms-acceptance-and-export-control">Legal Requirements (Terms Acceptance and Export Control)</h4>
+<div class="paragraph">
+<p>Kiota and the relevant component are released under the MIT license.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="additional-reading">Additional Reading</h3>
+<div class="paragraph">
+<p>Kiota design: <a href="https://microsoft.github.io/kiota/extending/" class="bare">https://microsoft.github.io/kiota/extending/</a>
+Some libraries are already used [in Red Hat projects](<a href="https://github.com/microsoft/kiota-abstractions-go/network/dependents" class="bare">https://github.com/microsoft/kiota-abstractions-go/network/dependents</a>).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="threat-model">Threat Model</h3>
+<div class="imageblock">
+<div class="content">
+<img src="threat-model.png" alt="threat model">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Given that Kiota is going to produce source code and runs on the client side there are no specific threats for RH SaaS</p>
+</li>
+<li>
+<p>A Code Generator could produce malicious or corrupted generated code.</p>
+</li>
+<li>
+<p>Clients with large numbers of dependencies could be vulnerable if not refreshed</p>
+</li>
+<li>
+<p>A swapped implementation may not be well supported</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="alternatives-considered-rejected">Alternatives Considered / Rejected</h3>
+<div class="sect3">
+<h4 id="keep-going-with-the-current-generator">Keep going with the current generator</h4>
+<div class="paragraph">
+<p>The DevExp team has identified as a major piece of maintenance the upgrade of the currently outdated <a href="https://github.com/OpenAPITools/openapi-generator">openapi-generator</a>.
+The current SDKs are full of quirks and edge cases in most cases hacked around to end up with a working implementation.
+Having to maintain hacks and workarounds to keep the SDKs working is a major blocker to updating toward newer versions of the generator.</p>
+</div>
+<div class="paragraph">
+<p>The monolithic approach to a generation used by openapi-generator also offers challenges in a modular approach to bug fixes and improvements.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="ibm">IBM</h4>
+<div class="paragraph">
+<p>We have had extensive discussions with IBM regarding their approach to <a href="https://github.com/IBM/ibm-cloud-sdk-common">client SDK</a> generation and we very much like their governance model over APIs produced in the company.
+The IBM openapi-codegen(closed source) is a fork of the “official” generator.
+IBM does maintain an <a href="https://cloud.ibm.com/docs/api-handbook">API Handbook</a> and they verify the compatibility running the tooling on all of their OpenApi specifications (similar to what is explained <a href="https://github.com/microsoft/kiota/issues/2020">in this open ticket for Kiota</a>).</p>
+</div>
+<div class="paragraph">
+<p>Full text of this section is available as a [private Addendum](<a href="https://docs.google.com/document/d/1x97PVV0rF00SlbMeC8mVy4e7sl5zYcUtME6KC-TEJOU/edit" class="bare">https://docs.google.com/document/d/1x97PVV0rF00SlbMeC8mVy4e7sl5zYcUtME6KC-TEJOU/edit</a>).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="per-language-tooling">Per language tooling</h4>
+<div class="paragraph">
+<p>There are a number of independent projects to generate code specifically for one language (often written in the same).
+On average those tools are much better than the “official” openapi-generator counterpart, but it is extremely challenging to provide a cohesive result out of disparate tools for the users and engage with various communities at different levels of maturity/openness.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="challenges">Challenges</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>There are improvements to be done and we would require to publish alternative core libraries to fully integrate the experience and the support.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="consequences-if-not-completed">Consequences if Not Completed</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>It will be extremely hard to fix timely security issues in the current SDKs, Clients, UIs</p>
+</li>
+<li>
+<p>It&#8217;s almost impossible to contribute to the design and implement new features for the client-generated code</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/91/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

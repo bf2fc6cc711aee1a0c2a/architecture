@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Upstream SOPs | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Upstream SOPs" />
+<meta name="author" content="Rachel Lawton" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<meta property="og:description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<link rel="canonical" href="https://architecture.bf2.dev/adr/84/" />
+<meta property="og:url" content="https://architecture.bf2.dev/adr/84/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-17T14:56:12+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Upstream SOPs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Rachel Lawton"},"dateModified":"2023-04-17T14:56:12+00:00","datePublished":"2023-04-17T14:56:12+00:00","description":"This site contains resources about the architecture and processes for Red Hat Application Services.","headline":"Upstream SOPs","mainEntityOfPage":{"@type":"WebPage","@id":"https://architecture.bf2.dev/adr/84/"},"url":"https://architecture.bf2.dev/adr/84/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Upstream SOPs</h1>
+  </header> -->
+
+  <div class="post-content">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title">ADR-84: Upstream SOPs</h1>
+  </header>
+
+  <div>
+    <div>Status: <span class="status-rejected">Rejected</span>
+    
+    </div>
+    <div>Authors:
+      
+      
+      
+      
+      Rachel Lawton, 
+      
+      
+      
+      
+      David Martin
+      
+    </div>
+    
+    <div>Tags: 
+      
+      <span class="tag tag-kafka">kafka</span>
+      
+    </div>
+    
+    
+  </div>
+
+  <div class="post-content">
+    <div class="post-toc">
+      <h2>Contents</h2>
+      <ul class="sectlevel1">
+<li><a href="#context-and-problem-statement">Context and Problem Statement</a></li>
+<li><a href="#goals">Goals</a></li>
+<li><a href="#non-goals">Non-goals</a></li>
+<li><a href="#stakeholders">Stakeholders</a></li>
+<li><a href="#current-architecture">Current Architecture</a></li>
+<li><a href="#proposal">Proposal</a>
+<ul class="sectlevel2">
+<li><a href="#example-implementation">Example implementation</a></li>
+</ul>
+</li>
+<li><a href="#threat-model">Threat model</a></li>
+<li><a href="#alternatives-considered-rejected">Alternatives Considered / Rejected</a></li>
+<li><a href="#challenges">Challenges</a></li>
+<li><a href="#consequences-if-not-completed">Consequences if not completed</a></li>
+</ul>
+    </div>
+    
+    <div class="sect1">
+<h2 id="context-and-problem-statement">Context and Problem Statement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We want to build an upstream community around managed services. This means all aspects of the managed service including the ability to run and manage the service, which extends to operational knowledge &amp; procedures. One such element is Standard Operating Procedures (SOPs). These SOPs include information like how to scale up the service as load increases as well as how to diagnose and fix specific issues based on alerting. However, currently these SOPs have been written from an internal perspective and are not immediately usable or consumable upstream.
+This document proposes a solution for maintaining an upstream version of the SOPs and having  a mechanism for consuming them downstream, as well as vice versa.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Propose a model for maintaining 2 versions of SOPs, for upstream and downstream consumption.</p>
+</li>
+<li>
+<p>Provide a worked example of this model as a reference.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-goals">Non-goals</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Implement a complete solution for a product or service</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="stakeholders">Stakeholders</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Eng</p>
+</li>
+<li>
+<p>SRE</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="current-architecture">Current Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An example of what a current SOP architecture looks like is the Red Hat OpenShift Streams for Apache Kafka (RHOSAK) managed service. The RHOSAK SOPs are located in a private repository, as the SOPs contain references to Red Hat specific internal information that is not suitable for consumption by external users. Such information includes links to secrets, information about how RHOSAK specifically set up their stage and production environments, further communication information e.g contact customer and information on the infrastructure itself. The flow of how information is contributed to the RHOSAK SOPs is for an engineer or SRE to submit PRs to the repo.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="upstream_downstream_docs_pattern.png" alt="Upstream/downstream">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proposal">Proposal</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The proposed solution is to follow a two repository model. One private repository that will contain SOPs that have the Red Hat internal information mentioned above, the other being a public repository that will have SOPs with the Red Hat internal information removed. This model will allow the SRE teams to use the private SOP repository without any information loss and allow upstream users to use and contribute to the SOP without breaching any Red Hat data policies.</p>
+</div>
+<div class="paragraph">
+<p>The content of the SOPs will be mirrored/synced between both repositories apart from the Red Hat internal information. The flow of contributing information to the repositories can be done both ways i.e from downstream to upstream and from upstream to downstream. This information can be contributed manually through the creation of pull requests or it can be done autonomously using the mirroring features in the repository. The team in charge of the SOPs will be responsible for maintaining the information between both repositories. This includes merging contributions from external users in the upstream repository and ensuring, if applicable, it gets added to the downstream repository and vice versa.</p>
+</div>
+<div class="paragraph">
+<p>SOPs from a private downstream repository that contain sensitive information, will have to be cleaned of all sensitive information before being pushed to the upstream public repository. Such information might be links to secrets or information about the managed service infrastructure etc. The pre-existing Structure of the SOPs should also be looked at, to see if any information can be removed that is no longer necessary or can be moved to a different internal location, this will help reduce overhead when syncing.</p>
+</div>
+<div class="sect2">
+<h3 id="example-implementation">Example implementation</h3>
+<div class="paragraph">
+<p>An example implementation of this model can be seen by the RHOSAK team through a ‘steel thread’ they are currently working on. They have implemented an internal downstream version of the SOPs repo in Gitlab, as it comes with asciidoc functionality that github does not provide. Such functionality is asciidoc includes, RHOSAK are using the includes functionality to extrapolate sensitive or repetitive information from the SOPs themselves and have the information in a separate config file that can be used across the SOPs. They will then be able to make the actual SOP asciidoc file available upstream but the sensitive information will not be included as the include config file will not be available upstream. Please see below for example code. The upstream SOPs repo will be located in Github and be public to external users. It will not contain any include config file so no sensitive information will be rendered. The include path will be present so external users can add their own include config file with their own information if they choose to do so.</p>
+</div>
+<div class="sect3">
+<h4 id="example-of-the-private-sop-asciidoc">Example of the private SOP asciidoc</h4>
+<div class="listingblock">
+<div class="content">
+<pre>= What to do if the 'PodCrashingAlert' is firing
+. Step 1: Check for events and logs
+. Step 2: Delete the pod
+. Step 3: Reset the configuration
+
+If you're still having trouble, check out the generic link:troubleshooting.html[Troubleshooting] doc</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="example-asciidoc-includes-config-file">Example asciidoc includes config file</h4>
+<div class="listingblock">
+<div class="content">
+<pre>//tag::contact-eng[]
+If all documented procedures have been followed and all avenues of troubleshooting have been exhausteed, contact engineering as per the https://docs.example.com/internal_contant_info[Internal Contact Info Document].
+//end::contact-eng[]</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="example-of-rendered-private-sop">Example of rendered private SOP:</h4>
+<div class="imageblock">
+<div class="content">
+<img src="private_downstream.png" alt="Upstream/downstream">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="example-of-rendered-public-sop">Example of rendered public SOP:</h4>
+<div class="imageblock">
+<div class="content">
+<img src="public%20upstream.png" alt="Upstream/downstream">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="threat-model">Threat model</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Does open-sourcing our SOPs give an attacker information that could be helpful to them in compromising our service?</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="alternatives-considered-rejected">Alternatives Considered / Rejected</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Not having a open sourced SOPs repo:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Keeping the current most common architecture i.e Having a single private SOPs repo only. Rejected as managed services can not open source the SOPs</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Github actions:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Using github actions and a renderer plugin to remove Red Hat internal information. This allows the ability to have SOPs without sensitive information. Rejected as there was a lot of extra work and overhead needed to get this option working.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="challenges">Challenges</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Most existing managed services that have pre existing SOPs in a private repo that want to adopt this model, will have to migrate their current SOPs to the upstream public repository. These SOPs may have content already that would need to be stripped back or cleaned for the upstream repo.</p>
+</div>
+<div class="paragraph">
+<p>The overhead of having to maintain two separate repos, ensuring that neither become out of sync or become unusable and out of date.
+Dependencies
+n/a</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="consequences-if-not-completed">Consequences if not completed</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>No open source solution for SOPs in various service communities</p>
+</div>
+</div>
+</div>  
+  </div>
+
+</article>
+  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/_adr/84/index.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

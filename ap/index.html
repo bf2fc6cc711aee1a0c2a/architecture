@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Architectural Patterns | Application Services Architecture</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Architectural Patterns" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<meta property="og:description" content="This site contains resources about the architecture and processes for Red Hat Application Services." />
+<link rel="canonical" href="https://architecture.bf2.dev/ap/" />
+<meta property="og:url" content="https://architecture.bf2.dev/ap/" />
+<meta property="og:site_name" content="Application Services Architecture" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Architectural Patterns" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"This site contains resources about the architecture and processes for Red Hat Application Services.","headline":"Architectural Patterns","url":"https://architecture.bf2.dev/ap/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://architecture.bf2.dev/feed.xml" title="Application Services Architecture" /></head>
+<body><link rel="icon" type="image/png" href="/favicon.png">
+<header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Application Services Architecture</a>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <div class="trigger">
+        <a class="page-link" href="/about/">About</a>
+        <a class="page-link" href="/overview/">Overview</a>
+        <a class="page-link" href="/context/">Context</a>
+        <a class="page-link" href="/padr/">PADRs</a>
+        <a class="page-link" href="/adr/">ADRs</a>
+        <a class="page-link" href="/ap/">APs</a>
+        <a class="page-link" href="/glossary/">Glossary</a>
+        <!-- <a class="page-link" href="/component/">Components</a> -->
+      </div>
+    </nav></div>
+</header>
+<div class="wrapper">
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <link rel="stylesheet" href="/css/adr.css">
+<article class="post">
+
+  <!-- <header class="post-header">
+    <h1 class="post-title">Architectural Patterns</h1>
+  </header> -->
+
+  <div class="post-content">
+    <div class="sect1">
+<h2 id="architectural-patterns">Architectural Patterns</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don’t know what an Architectural Pattern, or AP, is, look <a href="/about/#architectural-pattern-ap">here</a>.</p>
+</div>
+<h4></h4>
+<table>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="0/">AP-0: Template</a>
+
+      <span class="tag tag-"></span>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="16/">AP-16: Naming policy for customer facing metrics</a>
+
+      <span class="tag tag-kafka">kafka</span>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="17/">AP-17: Automatic management of certificates per managed instance using Letsencrypt</a>
+
+      <span class="tag tag-tls">tls</span>
+
+      <span class="tag tag-certificates">certificates</span>
+
+      <span class="tag tag-dns">dns</span>
+
+      <span class="tag tag-Letsencrypt">Letsencrypt</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="18/">AP-18: OpenAPI clients code generation - Kiota</a>
+
+      <span class="tag tag-ADR91">ADR91</span>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="19/">AP-19: Use a BFF component in front of our APIs to unify UX and client support</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="20/">AP-20: AP Proposal - Addons Monitoring</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+</table>
+
+<h4>DNS, network, bandwidth</h4>
+<table>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="3/">AP-3: DNS names for endpoints</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="8/">AP-8: Bandwidth sensitive workload and Availability Zones</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="13/">AP-13: Waiting for DNS record creation</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+</table>
+
+<h4>Dynamic Scaling</h4>
+<table>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="15/">AP-15: Dynamic Scaling of Data Plane clusters</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+</table>
+
+<h4>Fleet manager, fleet shard and instance operators</h4>
+<table>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="1/">AP-1: ManagedCR</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="4/">AP-4: Fleet manager - fleet shard local autonomy</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="5/">AP-5: Instance operator responsibility hand over</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="6/">AP-6: Fleet shard operator - instance operator versioning</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="7/">AP-7: Update / upgrade responsibility principle</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+</table>
+
+<h4>Multi services usages</h4>
+<table>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="9/">AP-9: Orchestration of services and resources dependencies</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="10/">AP-10: Service interactions and dependencies during development</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+</table>
+
+<h4>Other</h4>
+<table>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="2/">AP-2: Blast radius reduction principle</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+  <tr>
+    <td><span class="status-draft">
+      <a href="12/">AP-12: How to push rules from git to production</a>
+      </span>
+    </td>
+    <td>
+      Draft
+    </td>
+  </tr>
+
+</table>
+
+<h4>SOPs</h4>
+<table>
+
+  <tr>
+    <td><span class="status-accepted">
+      <a href="14/">AP-14: Allowing specialization of public SOPs to a specific execution context</a>
+      </span>
+    </td>
+    <td>
+      Accepted
+    </td>
+  </tr>
+
+</table>
+</div>
+</div>  
+  </div>
+
+</article>
+
+      </div>
+    </main><div class="edit">
+  <a href="https://github.com/bf2fc6cc711aee1a0c2a/architecture/edit/main/pages/ap.adoc">✎ Edit this page</a>
+</div>
+</div>
+<footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Application Services Architecture</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Application Services Architecture</li><li><a class="u-email" href="mailto:mk-support@redhat.com">mk-support@redhat.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div> 
+
+      <div class="footer-col footer-col-3">
+        <p>This site contains resources about the architecture and processes for Red Hat Application Services.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
