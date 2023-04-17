@@ -1,0 +1,118 @@
+---
+num: 91
+title: "Toward a more unified UX: BFF (Backends For Frontends)"
+status: "Approved"
+authors:
+  - "Andrea Peruffo"
+  - "Riccardo Forina"
+  - "Eric Wittmann"
+tags:
+  - UI
+  - UX
+  - Dev Exp
+applies_padrs: # What PADRs does this ADR apply?
+applies_patterns:
+  - 19
+---
+
+## Context and Problem Statement
+
+The integration of the Enterprise/Hybrid option of RHOSAK in UI, SDKs and CLI has shown that there is a margin for improvement in how we expose and consume our services APIs.
+
+* the services are exposing APIs for the offered specific functionality, but we lack an integration layer
+* the data aggregation logic is duplicated, scattered, and eventually diverging in various codebases (especially UI and CLI)
+* there is no "single source of truth" for data aggregated from various services
+* the current REST API layer exposes the user to the entire complexity of the underlying architecture
+
+We want to deduplicate the development effort and provide a more cohesive UX to the users.
+
+## Goals
+
+* a more cohesive UX experience across UI and CLI
+* flow simplification for the REST API exposing opinionated endpoints directly mapping UI/CLI needs
+* a single place with shared logic for aggregating and serving data
+* reduce the interactions over the network for providing a given functionality
+* easy testing/mocking setup for UI/CLI
+
+## Non-goals
+
+* provide a generic API layer for consuming the current services APIs
+* provide a generic queryable layer for the current services APIs
+
+## Current situation
+
+In the current architecture both UI and CLI are reaching out both Control Plane and Data Plane REST API endpoints.
+
+image::current_architecture.png[Current Architecture]
+
+
+## Proposal
+
+[NOTE]
+*Assumption* as a first iteration we are assuming that the CLI needs can be covered by a strict subset of the functionalities needed for the UI.
+
+We propose to integrate *one* server side component commonly known as https://samnewman.io/patterns/architectural/bff/[BFF] (Backend For Frontend).
+
+image::with_BFF.png[Proposed Architecture]
+
+The service is implemented using Java and Quarkus to achieve maximum collaboration across the current teams and align with Red Hat tech strategy.
+The API layer is designed using API Designer(RHOAD) and conforming to the OpenAPI 3+ specification to achieve maximum collaboration across different teams and members with various technological background.
+The development is driven by a "Contract First" approach leveraging the [Apicurio Codegen Quarkus Extension](https://github.com/Apicurio/apicurio-codegen/tree/main/quarkus-extension) and re-using the Java SDKs(based on Kiota) provided by the DevExp Team.
+The BFF have to to be stateless so that it can easily be scaled up and down according to the needs.
+All of the exposed endpoints are going to perform 1+ REST APIs calls to the underlying services and provide back the result.
+Access to the underlying services will be done by propagating the original(user) access token to simplify development and to keep the security model similar to the current architecture.
+
+### Threat model
+
+Being it a publicly accessible service the generic service Threat model applies, we should ensure stability of the platform by having all the good practices in place:
+
+* Rate Limiting
+* Circuit Breaking
+* Caching
+
+Regarding multitenancy, it is achieved by re-using the Access Token for the initial API request to issue the following requests to the backend services.
+Access token propagation is the preferred model because:
+
+* it keeps the security model unchanged: the alternative impose a carefully hardened BFF component to avoid escalation of privilege)
+* it is similar to the usage without BFF (e.g. the UI would send the access token to each of the services)
+
+Note that it could be come more difficult if we were to embrace https://datatracker.ietf.org/doc/html/draft-ietf-oauth-dpop[sender-constrained tokens] or https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures[signed HTTP requests].
+This is a problem for later.
+
+## Alternatives Considered / Rejected
+
+### GraphQL
+
+Is a well known technical platform for implementing BFFs, especially strong for composing data from multiple services but it doesn't magically solves the problem by itself.
+When comparing a possible OpenAPI solution to a GraphQL one, for this specific problem, the real advantage in favor of the latter is the possibility for dynamic fields selections in the client.
+We do not consider this upside strong enough to outweighs some of the challenges:
+
+* Lack of expertise in the technology - one of the objective of this component is to enable multiple teams collaboration on the repo
+* Challenges with Observability - Support for partial failures compromise the usage of "generic" REST APIs monitoring tools
+
+We leave the doors open to re-evaluate the choice of GraphQL in the future and/or in different contexts.
+
+### Expand the current services APIs
+
+We want the current microservices to stay vertical and opinionated toward a minimal and curated API that directly maps the functionality of the service without having to deal with the integration challenges.
+
+## Challenges
+
+* Caching while guaranteeing multitenancy
+* Shared ownership of the component across different teams
+* Avoid API proliferation after the first BFF is in place
+* Potential lack of control over APIs being aggregated
+* The introduction of private data planes can introduce additional issues because of backend APIs reachability
+
+For private data plates, we know it is a known feature coming but its impact will not be done as part of this work.
+It could lead to change in the BFF pattern approached described here and to the control plane at large.
+
+## Dependencies
+
+* The new Java Kiota SDKs should be officially published
+
+## Consequences if not completed
+
+* Duplicated effort from UI and DevExp teams in re-implementing aggregation logics
+* A scattered UX experience
+* Slow response times(due to the number of requests in background) using the CLI and the UI
