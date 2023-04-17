@@ -1,0 +1,58 @@
+---
+num: 17
+tags:
+  - "tls"
+  - "certificates"
+  - "dns"
+  - "Letsencrypt"
+title: "Automatic management of certificates per managed instance using Letsencrypt"
+status: "Accepted"
+authors:
+  - "Manyanda Chitimbo"
+---
+
+## Intent
+
+Define a pattern for the automatic management of certificates per managed instance using Letsencrypt
+
+## Motivation
+
+When a managed service is deployed on the data plane cluster its routes have be reachable via TLS.
+It means that a managed service deployed in the data plane has to provide a way to the clients (end users) to verify and validate the TLS connection.
+
+## Applicability
+
+This pattern applies to any service deployed on a dataplane that wants a managed service routes to be reachable via TLS
+
+## Description
+
+A managed service will use https://Letsencrypt.org[Letsencrypt] to managed certificates on the fly i.e automatic and thus removing the need for manual intervention and the toil related to this.
+
+To avoid sharing of certificates between deployed instances, managed service implementors are recommended to generate a dedicated certificate per managed instance.
+Furthermore, all routes for the managed services deployed on the the data plane will be of the form `<managed-instance-id>.myservice.bf2.dev` where the `<managed-instance-id>` is the unique id of the managed instance.
+Managed service implementations should note that, the subdomain used for a managed instance must be independent of the dataplane in which it (currently) resides.
+
+If we take the Managed Kafka Service as an example, it generates a dedicated wildcard certificate per managed Kafka instance - see link:../../adr/90[ADR-90].
+All the Kafka routes are of the form `<unique-route-slug>.<kafka-instance-id>.kafka.bf2.dev` e.g for a Kafka with an id `cnn0gug972g57r0a9qg0`, then bootstrap server host will be `example-cfn-fug---g--r-a-qga.cnn0gug972g57r0a9qg0.kafka.bf2.dev` and the Kafka admin server URL will be `https://admin-server-example-cfn-fug---g--r-a-qga.cnn0gug972g57r0a9qg0.kafka.bf2.dev`.
+
+## Participants
+
+* Certificate Requester -- knows all the request the certificate for each managed instance from Certificate Authority. This could be either the Control Plane if the one responsible for requesting the certificate. It could also be an cert manager Operator deployed in the data plane. 
+* Data Plane -- where the managed instances are deployed. This is where the certificates reside in form of a Kubernetes secret.
+* Letsencrypt -- Certificate authority where the certificate is issued.
+* Vault - a secure storage for the generated certificates if the certificate requester is the Control Plane.
+
+## Consequences
+
+What this pattern brings:
+
+* Automated management of certificates per managed instance.
+* Avoid sharing of certificate, if one certificate is compromised, the rest of the certiicates are not affected
+* Consistency with other services which also apply this AP
+
+However there are challenges that service implementors have to be aware of:
+
+* Once the certificates are generated, the managed service have to secure storing of the auto generated certificate in Vault and ensuring that only privileged users e.g only SRE, have access to Vault.
+* Once the certificates in the Data Plane, they should be in a Kubernetes secret that only priveldged users can see. 
+* Reaching the various advertised https://Letsencrypt.org/docs/rate-limits/[Letsencrypt limits] is also a challenge.
+However, the various limits once reached can be overridden via a request as described in https://Letsencrypt.org/docs/rate-limits/#a-id-overrides-a-overrides[Letsencrypt limits overrides]
